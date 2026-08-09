@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai'
 import { supabaseServer } from '@/lib/supabase-server'
 import { validatePlanInput } from '@/lib/validate'
-import { buildFreeDraftPrompt } from '@/lib/prompt'
+import { buildFreeDraftPrompt, freeItinerarySchema } from '@/lib/prompt'
 import type { FreeItinerary } from '@/lib/types'
 
 // AI 키는 이 파일(서버) 안에서만 쓰인다. 브라우저로는 절대 나가지 않는다.
@@ -42,7 +42,11 @@ export async function POST(req: Request) {
     const res = await ai.models.generateContent({
       model: MODEL,
       contents: buildFreeDraftPrompt(input),
-      config: { responseMimeType: 'application/json', temperature: 0.7 },
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: freeItinerarySchema,
+        temperature: 0.7,
+      },
     })
     if (!res.text) throw new Error('empty response')
     itinerary = JSON.parse(res.text) as FreeItinerary

@@ -1,4 +1,62 @@
+import { Type } from '@google/genai'
 import type { PlanInput } from './types'
+
+/**
+ * 결과의 모양을 API에게 강제한다. 글로 "이 형식으로 줘"라고 부탁만 하면
+ * 가끔 JSON 뒤에 설명을 덧붙여서 읽다가 깨진다 (실제로 겪었다).
+ *
+ * 부수 효과가 더 중요하다 — **여기 없는 항목은 AI가 만들어낼 수 없다.**
+ * 무료 범위(1/3)가 부탁이 아니라 규칙이 된다.
+ */
+export const freeItinerarySchema = {
+  type: Type.OBJECT,
+  properties: {
+    tripTitle: { type: Type.STRING },
+    summary: { type: Type.STRING },
+    days: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          dayNumber: { type: Type.INTEGER },
+          theme: { type: Type.STRING },
+          activities: {
+            type: Type.ARRAY,
+            minItems: 3,
+            maxItems: 3, // 아침·오후·저녁. 늘리려면 무료로 얼마나 줄지부터 다시 정한다
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                time: { type: Type.STRING },
+                name: { type: Type.STRING },
+                note: { type: Type.STRING },
+              },
+              required: ['time', 'name', 'note'],
+            },
+          },
+        },
+        required: ['dayNumber', 'theme', 'activities'],
+      },
+    },
+    sampleTip: {
+      type: Type.OBJECT,
+      properties: {
+        activityName: { type: Type.STRING },
+        highlight: { type: Type.STRING },
+        pitfall: { type: Type.STRING },
+        insiderSecret: { type: Type.STRING },
+      },
+      required: ['activityName', 'highlight', 'pitfall', 'insiderSecret'],
+    },
+    picks: {
+      type: Type.OBJECT,
+      properties: { stay: { type: Type.STRING }, dining: { type: Type.STRING } },
+      required: ['stay', 'dining'],
+    },
+    totalEstimate: { type: Type.STRING },
+  },
+  required: ['tripTitle', 'summary', 'days', 'sampleTip', 'picks', 'totalEstimate'],
+}
 
 /**
  * AI에게 주는 지시문.
@@ -35,26 +93,14 @@ THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
 Write everything in ${languageName(input.language)}.
 Tone: warm, specific, confident. Never salesy.
 
-Return ONLY valid JSON in exactly this shape:
-{
-  "tripTitle": string,
-  "summary": string (2-3 sentences on the feel of this trip),
-  "days": [
-    {
-      "dayNumber": number,
-      "theme": string (max 6 words),
-      "activities": [ { "time": string, "name": string, "note": string (one line) } ]
-    }
-  ],
-  "sampleTip": {
-    "activityName": string (which activity this tip is about),
-    "highlight": string (the must-do, max 12 words),
-    "pitfall": string (a specific mistake to avoid),
-    "insiderSecret": string (something only a local would know)
-  },
-  "picks": { "stay": string, "dining": string },
-  "totalEstimate": string
-}`
+Field notes:
+- summary: 2-3 sentences on how this trip will feel
+- theme: max 6 words
+- note: one line per activity
+- sampleTip.highlight: the must-do, max 12 words
+- sampleTip.pitfall: a specific mistake first-timers make here
+- sampleTip.insiderSecret: something only a local would know
+- totalEstimate: one line, whole trip`
 }
 
 function languageName(code: string): string {
