@@ -3,13 +3,19 @@
 
 /** 손님이 폼(A3)에 넣는 값 */
 export type PlanInput = {
+  /** 한국 어디를 가는지. 여러 도시를 도는 여행이 많다. 없으면 AI가 일정을 못 만든다 */
+  destinations: string[]
   startDate: string // 'YYYY-MM-DD'
   durationDays: number
   travelers: number
   budgetPerPerson?: number
+  /** 손님은 해외 여행객이라 달러·유로로 생각한다 */
+  budgetCurrency: string
   styles: string[]
   audience?: string
   interests?: string
+  /** 할랄·비건·알레르기·휠체어. 이걸 챙기는 게 우리가 돈 받는 이유에 가깝다 */
+  dietaryNotes?: string
   language: string
 }
 
@@ -44,18 +50,21 @@ export type FreeItinerary = {
 export type Plan = {
   id: string
   created_at: string
+  destinations: string[]
   start_date: string
   duration_days: number
   travelers: number
   budget_per_person: number | null
+  budget_currency: string
   styles: string[]
   audience: string | null
   interests: string | null
+  dietary_notes: string | null
   language: string
   itinerary: FreeItinerary | null
 }
 
-export type ConsultationStatus = 'received' | 'in_progress' | 'done'
+export type ConsultationStatus = 'received' | 'in_progress' | 'done' | 'cancelled'
 
 /** consultations 테이블 한 줄 */
 export type Consultation = {
