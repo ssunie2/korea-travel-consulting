@@ -5,7 +5,9 @@ import { buildFreeDraftPrompt } from '@/lib/prompt'
 import type { FreeItinerary } from '@/lib/types'
 
 // AI 키는 이 파일(서버) 안에서만 쓰인다. 브라우저로는 절대 나가지 않는다.
-const MODEL = process.env.GEMINI_MODEL ?? 'gemini-2.5-flash'
+// 실제로 재보고 고른 값이다. gemini-3.6-flash 는 같은 품질에 58초가 걸렸다.
+// 모델 이름은 종종 사라지므로(gemini-2.5-flash 가 그랬다) 코드를 안 고쳐도 되게 환경변수로 바꿀 수 있게 뒀다.
+const MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash'
 
 // ponytail: 요금 폭탄 방어용 최소 장치. 서버 한 대 안에서만 세므로 서버가 여러 대로 늘면 그만큼 헐거워진다.
 // 제대로 하려면 DB나 별도 저장소로 옮긴다 (이슈 C3)
