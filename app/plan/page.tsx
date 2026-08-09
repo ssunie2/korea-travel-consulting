@@ -35,8 +35,10 @@ export default function PlanForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function toggle(list: string[], value: string, set: (v: string[]) => void) {
-    set(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
+  // 반드시 이전 값을 받아서 계산한다.
+  // `list` 를 그대로 쓰면 빠르게 두 번 연속 누를 때 두 번째가 첫 번째를 지운다 (실제로 겪었다).
+  function toggle(value: string, set: React.Dispatch<React.SetStateAction<string[]>>) {
+    set((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -115,7 +117,7 @@ export default function PlanForm() {
                     key={d}
                     type="button"
                     aria-pressed={on}
-                    onClick={() => toggle(destinations, d, setDestinations)}
+                    onClick={() => toggle(d, setDestinations)}
                     className={`rounded-full border px-4 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3E6FB0] ${
                       on
                         ? "border-[#12211C] bg-[#12211C] text-[#F2EDE3]"
@@ -171,7 +173,7 @@ export default function PlanForm() {
                     key={s}
                     type="button"
                     aria-pressed={on}
-                    onClick={() => toggle(styles, s, setStyles)}
+                    onClick={() => toggle(s, setStyles)}
                     className={`rounded-full border px-4 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3E6FB0] ${
                       on
                         ? "border-[#12211C] bg-[#12211C] text-[#F2EDE3]"
