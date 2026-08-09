@@ -67,18 +67,21 @@ export const freeItinerarySchema = {
  */
 export function buildFreeDraftPrompt(input: PlanInput): string {
   const budget = input.budgetPerPerson
-    ? `about ${input.budgetPerPerson.toLocaleString()} KRW per person`
+    ? `about ${input.budgetPerPerson.toLocaleString()} ${input.budgetCurrency} per person`
     : 'not specified'
 
   return `You are a Korean travel consultant writing a FREE TEASER itinerary for a foreign visitor.
 
 Trip:
+- Going to: ${input.destinations.join(', ')}
 - Start date: ${input.startDate}
 - Length: ${input.durationDays} days
 - Travelers: ${input.travelers} (${input.audience ?? 'unspecified group'})
 - Budget: ${budget}
 - Styles: ${input.styles.length ? input.styles.join(', ') : 'no preference'}
 - Interests: ${input.interests ?? 'none given'}
+${input.dietaryNotes ? `- MUST WORK AROUND: ${input.dietaryNotes}\n  Every food recommendation has to respect this. Do not suggest anything they cannot eat or reach.` : ''}
+- Stay inside the places listed above. Do not add cities they did not ask for.
 
 THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
 - Each day: a short theme + EXACTLY 3 activities (morning, afternoon, evening). One line each.

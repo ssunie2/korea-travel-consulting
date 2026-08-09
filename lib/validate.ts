@@ -9,6 +9,12 @@ export function validatePlanInput(raw: unknown): { ok: true; value: PlanInput } 
   if (typeof raw !== 'object' || raw === null) return { ok: false, error: 'invalid body' }
   const d = raw as Record<string, unknown>
 
+  // 목적지가 없으면 AI가 일정을 만들 수 없다
+  const destinations = Array.isArray(d.destinations)
+    ? d.destinations.filter((s): s is string => typeof s === 'string' && s.trim() !== '').slice(0, 10)
+    : []
+  if (destinations.length === 0) return { ok: false, error: 'pick at least one destination' }
+
   if (typeof d.startDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(d.startDate)) {
     return { ok: false, error: 'startDate must be YYYY-MM-DD' }
   }
@@ -41,16 +47,23 @@ export function validatePlanInput(raw: unknown): { ok: true; value: PlanInput } 
 
   const text = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : undefined)
 
+  const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY']
+  const budgetCurrency =
+    typeof d.budgetCurrency === 'string' && CURRENCIES.includes(d.budgetCurrency) ? d.budgetCurrency : 'KRW'
+
   return {
     ok: true,
     value: {
+      destinations,
       startDate: d.startDate,
       durationDays,
       travelers,
       budgetPerPerson,
+      budgetCurrency,
       styles,
       audience: text(d.audience, 40),
       interests: text(d.interests, 500),
+      dietaryNotes: text(d.dietaryNotes, 300),
       language: typeof d.language === 'string' && /^[a-z]{2}$/.test(d.language) ? d.language : 'en',
     },
   }

@@ -58,13 +58,16 @@ export async function POST(req: Request) {
   const { data, error } = await supabaseServer()
     .from('plans')
     .insert({
+      destinations: input.destinations,
       start_date: input.startDate,
       duration_days: input.durationDays,
       travelers: input.travelers,
       budget_per_person: input.budgetPerPerson ?? null,
+      budget_currency: input.budgetCurrency,
       styles: input.styles,
       audience: input.audience ?? null,
       interests: input.interests ?? null,
+      dietary_notes: input.dietaryNotes ?? null,
       language: input.language,
       itinerary,
     })

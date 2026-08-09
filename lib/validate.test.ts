@@ -3,7 +3,15 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { validatePlanInput } from './validate.ts'
 
-const good = { startDate: '2026-10-01', durationDays: 5, travelers: 2, language: 'en', styles: ['food'] }
+const good = {
+  destinations: ['Seoul'],
+  startDate: '2026-10-01',
+  durationDays: 5,
+  travelers: 2,
+  budgetCurrency: 'USD',
+  language: 'en',
+  styles: ['food'],
+}
 
 test('정상 입력은 통과한다', () => {
   const r = validatePlanInput(good)
@@ -22,6 +30,15 @@ test('기간이 숫자가 아니면 막는다', () => {
 test('인원 범위를 벗어나면 막는다', () => {
   assert.equal(validatePlanInput({ ...good, travelers: 0 }).ok, false)
   assert.equal(validatePlanInput({ ...good, travelers: 999 }).ok, false)
+})
+
+test('목적지가 없으면 막는다 (AI가 일정을 못 만든다)', () => {
+  assert.equal(validatePlanInput({ ...good, destinations: [] }).ok, false)
+})
+
+test('통화가 이상하면 KRW 로 되돌린다', () => {
+  const r = validatePlanInput({ ...good, budgetCurrency: 'BTC' })
+  assert.equal(r.ok && r.value.budgetCurrency, 'KRW')
 })
 
 test('날짜 형식이 틀리면 막는다', () => {
