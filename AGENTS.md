@@ -1,7 +1,7 @@
-# 여행 컨설팅 사이트 — 팀 공통 규칙 v1.0
+# 여행 컨설팅 사이트 — 팀 공통 규칙 v1.1
 
 > 이 문서는 **이 저장소에서 일하는 모든 사람과 AI(Claude·Codex)** 에게 주는 규칙이다.
-> 작성: 뮤조 / 최초 작성일: 2026-08-09 / 버전: 1.0
+> 작성: 뮤조 / 최초 작성일: 2026-08-09 / 버전: 1.1
 >
 > 이 파일이 규칙의 유일한 원본이다. 따로 파일을 주고받지 않는다 — `git pull` 하면 항상 최신본이 따라온다.
 > 규칙을 바꾸고 싶으면 이 파일을 고쳐서 PR로 올린다. (`CLAUDE.md`는 이 파일을 불러오기만 한다)
@@ -121,13 +121,49 @@ git push -u origin feat/내가-할-일    # ④ GitHub에 올리기
 
 ---
 
-## 8. 지금 상태와 다음 할 일
+## 8. 폴더 구조 — 어떤 파일이 어디 사는지
 
-- 저장소에는 `README.md`와 이 규칙 문서뿐이다 (2026-08-09 기준). 코드는 아직 없다
+```
+app/                  화면. 폴더 이름이 그대로 주소가 된다
+  page.tsx              → 첫 화면 (/)
+  plan/page.tsx         → 여행 정보 입력 폼 (/plan)
+  plan/[id]/page.tsx    → 결과 화면 (/plan/아이디)
+  api/                → 서버에서만 도는 코드. AI 키처럼 숨겨야 할 건 전부 여기
+  admin/              → 우리만 보는 관리자 화면
+lib/                  여러 화면이 같이 쓰는 코드
+  supabase-server.ts    → 데이터베이스 연결 (서버 전용)
+components/           여러 화면이 같이 쓰는 화면 조각 (버튼, 카드 등)
+supabase/migrations/  DB 구조 변경 기록 (SQL 파일)
+```
+
+`app/` 안에서 **폴더 이름 = 인터넷 주소**다. `app/plan/page.tsx`를 만들면 `우리사이트.com/plan`이 된다.
+
+## 9. 충돌 안 나게 나눠 맡는 법
+
+같은 파일을 둘이 동시에 고치면 충돌(conflict)이 난다. 그래서:
+
+- **이슈마다 "내가 건드릴 파일"을 미리 적어둔다.** 겹치면 순서를 정하거나 한 명이 맡는다
+- **자기 화면 폴더 안에서만 논다.** `app/plan/`을 맡았으면 그 안만 고친다
+- **아래 파일들은 모두가 같이 쓰므로 조심한다.** 고쳐야 하면 이슈나 PR에 먼저 말한다
+
+| 공용 파일 | 언제 건드리게 되나 |
+|---|---|
+| `package.json` | 새 라이브러리를 깔 때 |
+| `app/layout.tsx` | 모든 화면에 공통으로 들어가는 것(머리말, 꼬리말)을 바꿀 때 |
+| `app/globals.css` | 전체 색·글꼴을 바꿀 때 |
+| `lib/` 안의 파일 | 공용 코드를 바꿀 때 |
+| `AGENTS.md` | 규칙을 바꿀 때 |
+
+- 작업 시작 전에 항상 `git checkout main && git pull` 로 최신을 받고 브랜치를 딴다. **오래된 상태에서 시작하는 게 충돌의 가장 큰 원인이다**
+
+## 10. 지금 상태와 다음 할 일
+
+- 2026-08-09 기준: 규칙 문서 + Next.js 뼈대까지 올라감. 기능 코드는 아직 없다
+- 1차(MVP) 범위 10개는 이슈 #2 참고
 - 다음 순서
-  1. 사이트 기획 — 어떤 화면이 필요한지, DB에 무엇을 저장할지
-  2. 프로젝트 뼈대 올리기 (뮤조 담당)
-  3. 배포 방식 결정
+  1. 기능별 이슈 10개 만들기
+  2. 둘이 나눠 맡기
+  3. DB 테이블 설계(C1)와 AI 서버(C2)를 먼저 — 나머지가 이 위에 얹힌다
 
 ---
 
@@ -136,3 +172,14 @@ git push -u origin feat/내가-할-일    # ④ GitHub에 올리기
 | 버전 | 날짜 | 내용 |
 |---|---|---|
 | 1.0 | 2026-08-09 | 최초 작성 |
+| 1.1 | 2026-08-09 | 뼈대 추가에 맞춰 폴더 구조(8장)와 충돌 방지 규칙(9장) 추가 |
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
