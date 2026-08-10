@@ -9,6 +9,7 @@ const STATUS_LABEL: Record<ConsultationStatus, string> = {
   received: '접수',
   in_progress: '진행중',
   done: '완료',
+  cancelled: '취소',
 }
 
 async function updateStatus(formData: FormData) {
