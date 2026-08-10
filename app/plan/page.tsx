@@ -28,8 +28,19 @@ const label = "font-[family-name:var(--font-geist-mono)] text-xs uppercase track
 const field =
   "mt-2 w-full rounded-lg border border-[#CFC6B4] bg-white px-4 py-3 text-base text-[#1B211E] focus:border-[#3E6FB0] focus:outline-2 focus:outline-offset-0 focus:outline-[#3E6FB0]";
 
+// 서버가 돌려주는 문장은 개발자용이라 손님에게 그대로 보이면 안 된다.
+const MESSAGES: Record<number, string> = {
+  400: "Something in the form doesn't look right. Please check the dates and numbers.",
+  429: "You've made a few drafts already. Please try again in an hour.",
+  502: "Our writer is having a moment. Please try again.",
+};
+const FALLBACK = "We couldn't create your draft. Please try again.";
+const TIMEOUT_MS = 60_000;
+
 export default function PlanForm() {
   const router = useRouter();
+  // 오늘보다 이전 날짜를 못 고르게 막는 값
+  const today = new Date().toISOString().slice(0, 10);
   const [destinations, setDestinations] = useState<string[]>([]);
   const [styles, setStyles] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -52,9 +63,15 @@ export default function PlanForm() {
     setSubmitting(true);
 
     const f = new FormData(e.currentTarget);
+
+    // 시간 제한이 없으면 서버가 응답을 안 줄 때 버튼이 잠긴 채로 영원히 멈춘다.
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), TIMEOUT_MS);
+
     try {
       const res = await fetch("/api/plan", {
         method: "POST",
+        signal: abort.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           destinations,
@@ -71,12 +88,25 @@ export default function PlanForm() {
         }),
       });
 
+      if (!res.ok) {
+        // 서버가 왜 거절했는지는 로그에만 남기고, 손님에게는 우리 문장을 보여준다
+        console.error("plan request failed:", res.status, await res.text());
+        setError(MESSAGES[res.status] ?? FALLBACK);
+        setSubmitting(false);
+        return;
+      }
+
       const body = await res.json();
-      if (!res.ok) throw new Error(body.error ?? "Something went wrong.");
       router.push(`/plan/${body.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(
+        err instanceof DOMException && err.name === "AbortError"
+          ? "This is taking longer than usual. Please try again."
+          : FALLBACK
+      );
       setSubmitting(false); // 성공하면 화면이 넘어가므로 실패했을 때만 다시 열어준다
+    } finally {
+      clearTimeout(timer);
     }
   }
 
@@ -134,7 +164,8 @@ export default function PlanForm() {
           <div className="grid gap-6 sm:grid-cols-3">
             <label className="block">
               <span className={label}>Start date *</span>
-              <input type="date" name="startDate" required className={field} />
+              {/* 지나간 날짜를 고르면 AI가 이미 끝난 여행의 일정을 만든다. 서버에서도 한 번 더 막는다 */}
+              <input type="date" name="startDate" required min={today} className={field} />
             </label>
             <label className="block">
               <span className={label}>Days *</span>
