@@ -46,6 +46,72 @@ export type FreeItinerary = {
   totalEstimate: string
 }
 
+/**
+ * 유료로 파는 전체 일정.
+ *
+ * 우리가 파는 것은 "정보량"이 아니라 **분석 결과**다.
+ * ① 최적 동선 — 같은 곳을 두 번 오가지 않게 지역별로 묶고 이동 시간을 줄인다
+ * ② 예산 대비 최선 — 같은 돈으로 더 나은 선택을 짚어준다
+ * 항목을 늘릴 때 이 둘에 기여하지 않으면 넣지 않는다.
+ */
+export type FullItinerary = {
+  tripTitle: string
+  summary: string
+  days: {
+    dayNumber: number
+    theme: string
+    /** 지역으로 묶은 결과. "왜 이 순서인지"가 우리가 파는 것이다 */
+    area: string
+    routeNote: string
+    /** 무료는 하루 3개로 묶었지만 여기는 실제 하루만큼 넣는다 */
+    activities: {
+      time: string
+      name: string
+      description: string
+      duration?: string
+      location?: string
+      estimatedCost?: string
+      /** 앞 장소에서 여기까지 어떻게·몇 분 */
+      gettingThere?: string
+      /** 무료에서는 전체에 1개만 줬다. 여기는 활동마다 붙는다 */
+      tips: {
+        highlight: string
+        pitfall: string
+        insiderSecret: string
+        reservationRequired: boolean
+      }
+    }[]
+    photoSpot?: { name: string; bestTime: string; advice: string }
+  }[]
+  /** 각 5곳. 무료는 이름만 1곳씩이었다 */
+  picks: {
+    stay: PlaceRecommendation[]
+    dining: PlaceRecommendation[]
+    cafes: PlaceRecommendation[]
+  }
+  /** 무료는 총액만 줬다 */
+  costBreakdown: {
+    totalEstimate: string
+    accommodation: string
+    dining: string
+    transport: string
+    activities: string
+    /** 손님이 적은 예산과 견줘서 남는지 모자라는지 */
+    budgetFit: string
+    /** 같은 돈으로 더 나은 선택 — 이게 "가성비 분석"의 결과물이다 */
+    valueMoves: string[]
+  }
+  clothing: { weatherSummary: string; outfits: string[]; advice: string }
+  packingTips: string[]
+}
+
+export type PlaceRecommendation = {
+  name: string
+  area: string
+  priceLevel: string
+  reason: string
+}
+
 /** plans 테이블 한 줄 */
 export type Plan = {
   id: string
