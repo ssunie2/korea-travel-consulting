@@ -5,7 +5,7 @@ import { validatePlanInput } from './validate.ts'
 
 const good = {
   destinations: ['Seoul'],
-  startDate: '2026-10-01',
+  startDate: new Date(Date.now() + 90 * 864e5).toISOString().slice(0, 10),
   durationDays: 5,
   travelers: 2,
   budgetCurrency: 'USD',
@@ -39,6 +39,14 @@ test('목적지가 없으면 막는다 (AI가 일정을 못 만든다)', () => {
 test('통화가 이상하면 KRW 로 되돌린다', () => {
   const r = validatePlanInput({ ...good, budgetCurrency: 'BTC' })
   assert.equal(r.ok && r.value.budgetCurrency, 'KRW')
+})
+
+test('지나간 날짜는 막는다 (끝난 여행 일정을 만들게 된다)', () => {
+  assert.equal(validatePlanInput({ ...good, startDate: '2020-01-01' }).ok, false)
+})
+
+test('오늘은 통과한다', () => {
+  assert.equal(validatePlanInput({ ...good, startDate: new Date().toISOString().slice(0, 10) }).ok, true)
 })
 
 test('날짜 형식이 틀리면 막는다', () => {

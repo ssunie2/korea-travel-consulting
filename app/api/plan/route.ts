@@ -9,6 +9,9 @@ import type { FreeItinerary } from '@/lib/types'
 // 모델 이름은 종종 사라지므로(gemini-2.5-flash 가 그랬다) 코드를 안 고쳐도 되게 환경변수로 바꿀 수 있게 뒀다.
 const MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash'
 
+// AI 생성에 실측 12.7초가 걸린다. 기본 상한에 걸려 잘리면 손님은 원인 모를 실패를 본다.
+export const maxDuration = 60
+
 // ponytail: 요금 폭탄 방어용 최소 장치. 서버 한 대 안에서만 세므로 서버가 여러 대로 늘면 그만큼 헐거워진다.
 // 제대로 하려면 DB나 별도 저장소로 옮긴다 (이슈 C3)
 const RECENT = new Map<string, number[]>()
@@ -29,7 +32,12 @@ export async function POST(req: Request) {
     return Response.json({ error: parsed.error }, { status: 400 })
   }
 
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  // 손님이 직접 보낼 수 있는 값은 믿지 않는다.
+  // `x-forwarded-for` 앞쪽은 조작할 수 있어서 그것만 보면 5회 제한이 무한이 된다.
+  // Vercel이 직접 채우는 `x-real-ip` 를 먼저 보고, 없으면 `x-forwarded-for` 의 **마지막** 값을 쓴다
+  // (프록시가 뒤에 붙이므로 마지막이 실제 접속자에 가장 가깝다).
+  const forwarded = req.headers.get('x-forwarded-for')?.split(',').map((s) => s.trim()).filter(Boolean) ?? []
+  const ip = req.headers.get('x-real-ip')?.trim() || forwarded.at(-1) || 'unknown'
   if (tooManyRequests(ip)) {
     return Response.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
   }

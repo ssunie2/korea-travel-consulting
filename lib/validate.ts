@@ -20,6 +20,11 @@ export function validatePlanInput(raw: unknown): { ok: true; value: PlanInput } 
   }
   const start = new Date(`${d.startDate}T00:00:00Z`)
   if (Number.isNaN(start.getTime())) return { ok: false, error: 'startDate is not a real date' }
+
+  // 지나간 날짜로 신청하면 AI가 이미 끝난 여행의 일정을 만들어낸다. 요금은 나가고 결과는 쓸모없다.
+  // 손님 쪽이 어제여도 한국은 오늘일 수 있으므로 하루 여유를 둔다.
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+  if (d.startDate < oneDayAgo) return { ok: false, error: 'startDate must not be in the past' }
   const twoYears = new Date()
   twoYears.setFullYear(twoYears.getFullYear() + 2)
   if (start > twoYears) return { ok: false, error: 'startDate is too far in the future' }
