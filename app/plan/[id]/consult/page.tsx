@@ -119,11 +119,17 @@ export default async function ConsultPage({
       <p className="mt-5 leading-relaxed text-[#3D4A44]">
         We take what you told us and work out the route that wastes the least time, and where your
         money goes furthest. A tip at every stop, five places to stay and five to eat, costs broken
-        down, and the bookings that need Korean handled for you.
+        down, and exactly what to book and when — including the places that only take Korean phone
+        reservations.
       </p>
       <p className="mt-3 leading-relaxed text-[#3D4A44]">
         Leave your details and we&apos;ll reply within one business day with the price for this
         trip. <strong>Nothing is charged until you agree.</strong>
+      </p>
+      {/* 우리는 여행업자가 아니다. 예약은 손님이 직접 한다 — 이 선을 손님에게도 분명히 해둔다 */}
+      <p className="mt-3 leading-relaxed text-[#4A5D54]">
+        We plan; you book. We don&apos;t make reservations for you or take payment for hotels,
+        restaurants or tickets — we tell you exactly what to book and how.
       </p>
 
       {error && (
