@@ -114,6 +114,17 @@ export default async function ContactPage({
               >
                 Send
               </button>
+
+              <p className="mt-4 text-sm leading-relaxed text-[#4A5D54]">
+                By sending this you agree to our{" "}
+                <Link
+                  href="/privacy"
+                  className="underline underline-offset-4 hover:text-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+                >
+                  privacy policy
+                </Link>
+                . We only use your email to reply.
+              </p>
             </form>
           </>
         )}
