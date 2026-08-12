@@ -162,16 +162,17 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
             That&apos;s one tip. Every stop has one.
           </h2>
           <p className="mt-4 max-w-xl leading-relaxed text-[#3D4A44]">
-            The draft above is the shape of your trip. A consultation fills it in — a tip at
-            every stop, five stays and five restaurants chosen for your budget, costs broken
-            down, and the bookings that need Korean handled for you.
+            The draft above is the shape of your trip. The full plan fills it in — a tip at every
+            stop, five stays and five restaurants chosen for your budget, costs broken down, and
+            exactly what to book and when, including the places that only take Korean phone
+            reservations.
           </p>
           {/* TODO(#11): A6 상담 신청 화면이 생기면 이 주소로 연결된다. 아직 없다. */}
           <Link
             href={`/plan/${plan.id}/consult`}
             className="mt-8 inline-flex items-center rounded-full bg-[#12211C] px-8 py-3.5 text-base text-[#F2EDE3] transition-colors hover:bg-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#3E6FB0]"
           >
-            Book a consultation
+            Get the full plan
           </Link>
           <p className="mt-5 font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[#4A5D54]">
             Keep this link — your draft stays here
