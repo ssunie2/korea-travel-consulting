@@ -96,9 +96,11 @@ export default async function ConsultPage({
         <h1 className="font-[family-name:var(--font-display)] text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight">
           We&apos;ve got it.
         </h1>
+        {/* 규칙 6번: 사람이 상담하지 않는다. 사람이 답장한다는 약속을 두면 안 된다 */}
         <p className="mt-5 text-lg leading-relaxed text-[#3D4A44]">
-          We&apos;ll email you within one business day with what we can do for this trip and what
-          it costs. Nothing is charged until you say yes.
+          Your full plan is <strong>₩150,000</strong>. We&apos;ll email you the link to pay and the
+          plan itself — it&apos;s put together for you start to finish, so there&apos;s no call to
+          book and nobody to wait on.
         </p>
         <p className="mt-8 leading-relaxed text-[#3D4A44]">
           Your free draft stays where it is —{" "}
@@ -122,9 +124,10 @@ export default async function ConsultPage({
         down, and exactly what to book and when — including the places that only take Korean phone
         reservations.
       </p>
+      {/* 규칙 6번: 사람이 상담하지 않는다. 사람이 답장한다는 약속을 두면 안 된다 */}
       <p className="mt-3 leading-relaxed text-[#3D4A44]">
-        Leave your details and we&apos;ll reply within one business day with the price for this
-        trip. <strong>Nothing is charged until you agree.</strong>
+        <strong>₩150,000</strong> — one price, however long your trip is. Leave your email and
+        we&apos;ll send you the link.
       </p>
       {/* 우리는 여행업자가 아니다. 예약은 손님이 직접 한다 — 이 선을 손님에게도 분명히 해둔다 */}
       <p className="mt-3 leading-relaxed text-[#4A5D54]">
