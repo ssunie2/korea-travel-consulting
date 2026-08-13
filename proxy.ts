@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server'
 // 누가 언제 상태를 바꿨는지 기록이 필요해지면 그때 Supabase 로그인으로 옮긴다.
 export const config = { matcher: '/admin/:path*' }
 
-export function middleware(req: Request) {
+export function proxy(req: Request) {
   const password = process.env.ADMIN_PASSWORD
 
   // 비밀번호를 안 정했으면 아예 잠근다. 설정을 빠뜨렸을 때 열려 있는 것보다 닫혀 있는 게 낫다.

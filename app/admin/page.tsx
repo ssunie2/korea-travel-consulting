@@ -19,7 +19,14 @@ async function updateStatus(formData: FormData) {
 
   if (!(status in STATUS_LABEL)) return
 
-  await supabaseServer().from('consultations').update({ status }).eq('id', id)
+  // 결과를 반드시 받는다. 안 받으면 실패했을 때 화면이 성공과 똑같이 보여서
+  // 원인을 찾는 데만 한참 걸린다 (실제로 겪었다).
+  const { error } = await supabaseServer().from('consultations').update({ status }).eq('id', id)
+  if (error) {
+    console.error('상태 변경 실패:', id, status, error.message)
+    return
+  }
+
   revalidatePath('/admin')
 }
 
@@ -74,9 +81,18 @@ export default async function AdminPage() {
 
                 <form action={updateStatus} className="ml-auto flex items-center gap-2">
                   <input type="hidden" name="id" value={c.id} />
+                  {/*
+                    key: 상태가 바뀌면 이 칸을 새로 그린다.
+                      값을 리액트가 쥐고 있지 않아서(uncontrolled), 다시 그려도 브라우저가
+                      잡고 있던 옛 값이 그대로 남는다. key 가 바뀌면 새 칸이 되어 새 값이 보인다.
+                    autoComplete="off": 새로고침할 때 브라우저가 이전에 고른 값을 되살리는 걸 막는다.
+                      이것 때문에 강력 새로고침(⌘⇧R)을 해야만 제대로 보였다.
+                  */}
                   <select
+                    key={c.status}
                     name="status"
                     defaultValue={c.status}
+                    autoComplete="off"
                     className="rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-700 dark:bg-transparent"
                   >
                     {Object.entries(STATUS_LABEL).map(([value, label]) => (
