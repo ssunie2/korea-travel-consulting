@@ -68,14 +68,14 @@ const STARS = [
 // 움직임은 CSS로만 준다. 자바스크립트가 없어도 그림은 그대로 나온다.
 const MOTION = `
 @keyframes ktc-drift { from { transform: translateX(-40px) } to { transform: translateX(60px) } }
-@keyframes ktc-ride  { from { transform: translateX(-140px) } to { transform: translateX(1060px) } }
+@keyframes ktc-ride  { from { transform: translateX(-300px) } to { transform: translateX(1060px) } }
 @keyframes ktc-tw    { 0%,100% { opacity:.2 } 50% { opacity:1 } }
 .ktc-clouds { animation: ktc-drift 24s ease-in-out infinite alternate }
 .ktc-train  { animation: ktc-ride 13s linear infinite }
 .ktc-star   { animation: ktc-tw 3.4s ease-in-out infinite }
 @media (prefers-reduced-motion: reduce) {
   .ktc-clouds, .ktc-star { animation: none }
-  .ktc-train { animation: none; transform: translateX(430px) }
+  .ktc-train { animation: none; transform: translateX(340px) }
 }
 `;
 
@@ -283,14 +283,99 @@ export default function Home() {
             {/* 환승역 표시 — 팁이 붙는 자리 */}
             <circle cx="420" cy="206" r="20" fill="none" stroke="#EF7C1C" strokeWidth="4" />
 
-            {/* 지하철. 일부러 DAY 글자보다 위로 다니게 해서 정거장을 안 가린다 */}
+            {/*
+              지하철. 서울 전동차를 옆에서 본 모습이다 — 앞칸(오른쪽)에 운전실이 있고
+              출입문과 창이 번갈아 오는 것, 지붕의 팬터그래프, 아래 대차가
+              "진짜 전철"로 보이게 하는 부분이다.
+              일부러 DAY 글자보다 위로 다니게 해서 정거장을 안 가린다.
+            */}
             <g className="ktc-train">
-              <rect x="0" y="134" width="104" height="26" rx="7" fill="#F5F7F8" stroke="#12211C" strokeWidth="2.5" />
-              <rect x="8" y="140" width="18" height="12" rx="2.5" fill="#00A5DE" />
-              <rect x="32" y="140" width="18" height="12" rx="2.5" fill="#00A5DE" />
-              <rect x="56" y="140" width="18" height="12" rx="2.5" fill="#00A5DE" />
-              <rect x="82" y="140" width="14" height="12" rx="2.5" fill="#FFD52E" />
-              <rect x="0" y="127" width="104" height="6" rx="3" fill="#00A84D" />
+              {/* 그린 뒤에 키운다 — 좌표를 다 고치는 것보다 낫고, 세로 위치는 translate 로 맞춘다 */}
+              <g transform="translate(0,-32) scale(1.25)">
+              {/* ── 팬터그래프 (지붕 위 집전장치) ── */}
+              <g stroke="#3D4A44" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M44 117 L57 105 L70 117" />
+                <line x1="47" y1="117" x2="67" y2="117" />
+                <line x1="45" y1="104" x2="69" y2="104" strokeWidth="2.2" />
+              </g>
+              {/* 지붕 냉방장치 */}
+              <rect x="20" y="114" width="22" height="4" rx="1.5" fill="#B7C2C9" />
+              <rect x="126" y="114" width="24" height="4" rx="1.5" fill="#B7C2C9" />
+              <rect x="170" y="114" width="20" height="4" rx="1.5" fill="#B7C2C9" />
+
+              {/* ── 대차와 바퀴 ── */}
+              <g fill="#2A3D35">
+                <rect x="14" y="147" width="22" height="6" rx="2" />
+                <rect x="66" y="147" width="22" height="6" rx="2" />
+                <rect x="120" y="147" width="22" height="6" rx="2" />
+                <rect x="180" y="147" width="22" height="6" rx="2" />
+              </g>
+              <g fill="#12211C">
+                {[19, 31, 71, 83, 125, 137, 185, 197].map((cx) => (
+                  <circle key={cx} cx={cx} cy="152" r="3.2" />
+                ))}
+              </g>
+
+              {/* ── 연결기 ── */}
+              <rect x="99" y="132" width="10" height="5" rx="2" fill="#69707A" />
+
+              {/* ── 뒷칸 ── */}
+              <g>
+                <rect x="4" y="118" width="96" height="30" rx="4" fill="#EDF1F3" stroke="#12211C" strokeWidth="1.8" />
+                <rect x="7" y="118" width="90" height="3.5" rx="1.75" fill="#C8D2D8" />
+                {/* 노선 색 띠 */}
+                <rect x="5" y="138" width="94" height="5" fill="#00A84D" />
+                {/* 창 — 출입문 사이사이 */}
+                <g fill="#5E9FC9">
+                  <rect x="25" y="124" width="15" height="11" rx="1.5" />
+                  <rect x="44" y="124" width="15" height="11" rx="1.5" />
+                  <rect x="82" y="124" width="14" height="11" rx="1.5" />
+                </g>
+                {/* 출입문 — 가운데가 갈라지는 두 짝 */}
+                <g fill="#DCE4E8" stroke="#8B9299" strokeWidth="0.9">
+                  <rect x="10" y="121" width="11" height="21" rx="1" />
+                  <rect x="63" y="121" width="11" height="21" rx="1" />
+                </g>
+                <g stroke="#8B9299" strokeWidth="0.9">
+                  <line x1="15.5" y1="121" x2="15.5" y2="142" />
+                  <line x1="68.5" y1="121" x2="68.5" y2="142" />
+                </g>
+              </g>
+
+              {/* ── 앞칸 (운전실) ── */}
+              <g>
+                <path
+                  d="M108 122 Q108 118 112 118 H201 Q210 118 212 126 L213 140 Q213 148 205 148 H112 Q108 148 108 144 Z"
+                  fill="#EDF1F3"
+                  stroke="#12211C"
+                  strokeWidth="1.8"
+                />
+                <rect x="111" y="118" width="88" height="3.5" rx="1.75" fill="#C8D2D8" />
+                <rect x="109" y="138" width="101" height="5" fill="#00A84D" />
+                {/* 행선 표시 */}
+                <rect x="186" y="121" width="20" height="4" rx="1" fill="#12211C" />
+                <rect x="188" y="122" width="16" height="2" rx="1" fill="#FFD52E" />
+                {/* 창 */}
+                <g fill="#5E9FC9">
+                  <rect x="129" y="124" width="15" height="11" rx="1.5" />
+                  <rect x="148" y="124" width="15" height="11" rx="1.5" />
+                </g>
+                {/* 운전실 창 — 더 크고 앞쪽으로 기울어 있다 */}
+                <path d="M184 127 H204 L207 135 H184 Z" fill="#5E9FC9" />
+                {/* 출입문 */}
+                <g fill="#DCE4E8" stroke="#8B9299" strokeWidth="0.9">
+                  <rect x="114" y="121" width="11" height="21" rx="1" />
+                  <rect x="167" y="121" width="11" height="21" rx="1" />
+                </g>
+                <g stroke="#8B9299" strokeWidth="0.9">
+                  <line x1="119.5" y1="121" x2="119.5" y2="142" />
+                  <line x1="172.5" y1="121" x2="172.5" y2="142" />
+                </g>
+                {/* 전조등 */}
+                <circle cx="204" cy="145" r="2.4" fill="#FFF6D0" stroke="#12211C" strokeWidth="0.8" />
+                <circle cx="196" cy="145" r="2.4" fill="#FFF6D0" stroke="#12211C" strokeWidth="0.8" />
+              </g>
+              </g>
             </g>
           </g>
         </svg>
