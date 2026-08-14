@@ -173,7 +173,7 @@ type Scene = {
   /** 전동차 높이. DAY 글자 바로 위를 달리게 맞춘 값 (장면마다 다르다) */
   trainY: number;
   rideClass: string;
-  clouds: { x: number; y: number; w: number; h: number; o?: number }[];
+  clouds: { x: number; y: number; s: number; o?: number }[];
   stars: { cx: number; cy: number; r: number; delay: string }[];
 };
 
@@ -190,21 +190,20 @@ const WIDE: Scene = {
   trainY: 85,
   rideClass: "ktc-train",
   clouds: [
-    { x: 70, y: 74, w: 150, h: 26 },
-    { x: 104, y: 44, w: 86, h: 26 },
-    { x: 600, y: 56, w: 184, h: 28 },
-    { x: 648, y: 24, w: 98, h: 26 },
-    { x: 380, y: 118, w: 104, h: 20, o: 0.85 },
+    { x: 60, y: 112, s: 1.05 },
+    { x: 470, y: 92, s: 1.3 },
+    { x: 285, y: 182, s: 0.68, o: 0.8 },
+    { x: 855, y: 196, s: 0.58, o: 0.7 },
   ],
   stars: [
-    { cx: 120, cy: 70, r: 2.2, delay: "0s" },
-    { cx: 260, cy: 42, r: 1.8, delay: ".7s" },
-    { cx: 430, cy: 84, r: 2, delay: "1.4s" },
-    { cx: 610, cy: 48, r: 1.7, delay: ".4s" },
-    { cx: 770, cy: 94, r: 2.3, delay: "2s" },
-    { cx: 900, cy: 54, r: 1.9, delay: "1.1s" },
-    { cx: 330, cy: 146, r: 1.6, delay: "2.6s" },
-    { cx: 690, cy: 156, r: 1.6, delay: ".2s" },
+    { cx: 120, cy: 150, r: 2.2, delay: "0s" },
+    { cx: 260, cy: 176, r: 1.8, delay: ".7s" },
+    { cx: 430, cy: 206, r: 2, delay: "1.4s" },
+    { cx: 610, cy: 162, r: 1.7, delay: ".4s" },
+    { cx: 770, cy: 226, r: 2.3, delay: "2s" },
+    { cx: 900, cy: 186, r: 1.9, delay: "1.1s" },
+    { cx: 330, cy: 254, r: 1.6, delay: "2.6s" },
+    { cx: 690, cy: 244, r: 1.6, delay: ".2s" },
   ],
 };
 
@@ -227,18 +226,16 @@ const NARROW: Scene = {
   trainY: 69,
   rideClass: "ktc-train-n",
   clouds: [
-    { x: 30, y: 70, w: 100, h: 22 },
-    { x: 55, y: 40, w: 62, h: 22 },
-    { x: 268, y: 58, w: 118, h: 24 },
-    { x: 300, y: 26, w: 70, h: 22 },
-    { x: 178, y: 118, w: 70, h: 18, o: 0.85 },
+    { x: 12, y: 118, s: 0.85 },
+    { x: 210, y: 92, s: 1.0 },
+    { x: 118, y: 190, s: 0.58, o: 0.8 },
   ],
   stars: [
-    { cx: 60, cy: 70, r: 2.2, delay: "0s" },
-    { cx: 150, cy: 42, r: 1.8, delay: ".7s" },
-    { cx: 244, cy: 88, r: 2, delay: "1.4s" },
-    { cx: 340, cy: 48, r: 1.7, delay: ".4s" },
-    { cx: 424, cy: 96, r: 2.3, delay: "2s" },
+    { cx: 60, cy: 152, r: 2.2, delay: "0s" },
+    { cx: 150, cy: 182, r: 1.8, delay: ".7s" },
+    { cx: 244, cy: 216, r: 2, delay: "1.4s" },
+    { cx: 340, cy: 166, r: 1.7, delay: ".4s" },
+    { cx: 424, cy: 232, r: 2.3, delay: "2s" },
   ],
 };
 
@@ -360,24 +357,21 @@ function MetroScene({
       aria-label={`A subway line. DAY 1 through ${last} are the stations, and a train runs along it. The sky matches the current time in Seoul.`}
     >
       <defs>
-        <linearGradient id={`ktc-head-${scene.id}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={PAPER} stopOpacity="1" />
-          <stop offset=".5" stopColor={PAPER} stopOpacity=".55" />
-          <stop offset="1" stopColor={PAPER} stopOpacity="0" />
-        </linearGradient>
         <linearGradient id={`ktc-foot-${scene.id}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor={PAPER} stopOpacity="0" />
           <stop offset=".55" stopColor={PAPER} stopOpacity=".8" />
           <stop offset="1" stopColor={PAPER} stopOpacity="1" />
         </linearGradient>
         {/*
-          하늘은 **한 장의 그러데이션**이다. 전에는 진한 파랑 사각형 위에 옅은 파랑을
-          겹쳐 놨는데, 두 색이 만나는 자리에 가로선이 그대로 보였다.
-          위에서 아래로 한 번에 옅어지게 하면 선이 아예 생기지 않는다.
+          하늘 한 장. **바탕색(크림)에서 시작해서** 파랑으로 넘어간다.
+          전에는 파란 하늘 위에 크림색을 반투명으로 덮어 위쪽을 지웠는데,
+          두 색이 알파로 섞이는 구간이 탁해지면서 오히려 경계가 도드라졌다.
+          색을 직접 이어붙이면 섞이는 자리가 없고, 위쪽 글 영역과 한 면이 된다.
         */}
         <linearGradient id={`ktc-sky-${scene.id}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={sky.top} />
-          <stop offset="0.55" stopColor={sky.bottom} />
+          <stop offset="0" stopColor={PAPER} />
+          <stop offset="0.30" stopColor={sky.top} />
+          <stop offset="0.66" stopColor={sky.bottom} />
           <stop offset="1" stopColor={sky.bottom} />
         </linearGradient>
         <clipPath id={`ktc-cut-${scene.id}`}>
@@ -387,8 +381,6 @@ function MetroScene({
 
       <g clipPath={`url(#ktc-cut-${scene.id})`}>
         <rect width={scene.w} height="450" fill={`url(#ktc-sky-${scene.id})`} />
-        {/* 위쪽을 바탕색으로 녹인다. 글과 그림이 맞닿는 선이 안 생긴다 */}
-        <rect width={scene.w} height="129" fill={`url(#ktc-head-${scene.id})`} />
 
         {sky.stars > 0 && (
           <g opacity={sky.stars} fill="#FFFFFF">
@@ -406,19 +398,20 @@ function MetroScene({
         )}
 
         {/* 해 또는 달 */}
-        <circle cx={scene.orbX} cy="108" r="30" fill={sky.orb} opacity={sky.orbOpacity} />
+        <circle cx={scene.orbX} cy="150" r="30" fill={sky.orb} opacity={sky.orbOpacity} />
 
-        <g className="ktc-clouds" fill="#FFFFFF" opacity={0.55 + sky.haze * 0.45}>
+        {/*
+          구름. 둥근 사각형을 쌓으면 뭉툭해 보여서, **덩어리 세 개와 아랫면**으로 그린다.
+          겹쳐도 얼룩이 안 지는 이유는 투명도를 낱개가 아니라 g 에 한 번만 주기 때문이다.
+        */}
+        <g className="ktc-clouds" fill="#FFFFFF" opacity={0.62 + sky.haze * 0.38}>
           {scene.clouds.map((c) => (
-            <rect
-              key={`${c.x}-${c.y}`}
-              x={c.x}
-              y={c.y}
-              width={c.w}
-              height={c.h}
-              rx={c.h / 2}
-              opacity={c.o}
-            />
+            <g key={`${c.x}-${c.y}`} transform={`translate(${c.x},${c.y}) scale(${c.s})`} opacity={c.o}>
+              <circle cx="28" cy="24" r="17" />
+              <circle cx="58" cy="17" r="23" />
+              <circle cx="88" cy="27" r="15" />
+              <rect x="10" y="26" width="92" height="18" rx="9" />
+            </g>
           ))}
         </g>
 
