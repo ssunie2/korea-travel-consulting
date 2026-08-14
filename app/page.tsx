@@ -500,7 +500,8 @@ export default function Home() {
 
           {/* 한옥의 결은 사진으로, 노선의 그래픽은 아래 SVG로 이어 붙인다. */}
           <figure className="relative mx-auto w-full max-w-[31rem] overflow-hidden rounded-[1.75rem] border-[3px] border-[#12211C] bg-[#12211C] shadow-[0_28px_70px_-28px_rgba(18,33,28,0.65)] md:justify-self-end">
-            <div className="relative aspect-[4/5]">
+            {/* 2:3 — 원본 사진 비율 그대로다. 잘리는 데 없이 세로가 길어진다 */}
+            <div className="relative aspect-[2/3]">
               <Image
                 src="/seoul-blue-hour.jpg"
                 alt="A hanok-lined street in Seoul at blue hour, with Namsan Tower in the distance"
