@@ -500,7 +500,17 @@ export default function Home() {
 
           {/* 한옥의 결은 사진으로, 노선의 그래픽은 아래 SVG로 이어 붙인다. */}
           <figure className="relative mx-auto w-full max-w-[31rem] overflow-hidden rounded-[1.75rem] border-[3px] border-[#12211C] bg-[#12211C] shadow-[0_28px_70px_-28px_rgba(18,33,28,0.65)] md:justify-self-end">
-            {/* 2:3 — 원본 사진 비율 그대로다. 잘리는 데 없이 세로가 길어진다 */}
+            {/*
+              TODO(출시 전): 이 이미지는 **AI 가 만든 그림이지 실제 사진이 아니다.**
+              1024×1536(AI 표준 출력 크기), 카메라 정보 전무, 확대하면 사람 형체와
+              기와가 뭉개져 있다. 북촌로11길에서 남산을 본 구도를 흉내낸 것이다.
+
+              우리가 파는 게 "실제로 가보면 이렇다"는 정보라서, 첫 화면에 존재하지 않는
+              골목을 걸어두면 들키는 순간 무너지는 게 사진 한 장이 아니다.
+              **손님을 받기 전에 직접 찍은 사진이나 라이선스가 분명한 실사진으로 바꾼다.**
+              선경이 알고 있고, 지금은 자리를 채워두는 용도로만 둔다.
+            */}
+            {/* 2:3 — 원본 비율 그대로다. 잘리는 데 없이 세로가 길어진다 */}
             <div className="relative aspect-[2/3]">
               <Image
                 src="/seoul-blue-hour.jpg"
