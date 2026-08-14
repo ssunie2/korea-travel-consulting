@@ -159,14 +159,19 @@ const TIPS = [
  *
  * 같은 그림을 폭만 줄이면 세로도 같이 눌려서, 폰에서는 높이가 112px 밖에 안 남는다.
  * 애써 그린 전철이 손톱만해지고 DAY 글자를 못 읽는다.
- * 그래서 폰은 **좌표계 폭을 460 으로 좁힌** 장면을 따로 쓴다. 높이는 그대로 300 이라
- * 세로가 245px 로 두 배 넘게 살아나고, 그 안의 모든 것이 같이 커진다.
+ * 그래서 폰은 **좌표계 폭을 460 으로 좁힌** 장면을 따로 쓴다. 높이는 둘 다 450 이라
+ * 폰에서 세로가 367px 로 살아나고, 그 안의 모든 것이 같이 커진다.
+ *
+ * 세로 450 은 하늘을 넉넉히 보이게 하려고 잡은 값이다(원래 300). 노선은 y=309,
+ * 전동차는 그 위 `trainY` 에 놓여 DAY 글자를 살짝 띄우고 달린다.
  */
 type Scene = {
   id: string;
   w: number;
   stations: { x: number; label: string }[];
   orbX: number;
+  /** 전동차 높이. DAY 글자 바로 위를 달리게 맞춘 값 (장면마다 다르다) */
+  trainY: number;
   rideClass: string;
   clouds: { x: number; y: number; w: number; h: number; o?: number }[];
   stars: { cx: number; cy: number; r: number; delay: string }[];
@@ -182,23 +187,24 @@ const WIDE: Scene = {
     { x: 900, label: "DAY 4" },
   ],
   orbX: 820,
+  trainY: 85,
   rideClass: "ktc-train",
   clouds: [
-    { x: 70, y: 46, w: 150, h: 26 },
-    { x: 104, y: 28, w: 86, h: 26 },
-    { x: 600, y: 34, w: 184, h: 28 },
-    { x: 648, y: 16, w: 98, h: 26 },
-    { x: 380, y: 70, w: 104, h: 20, o: 0.85 },
+    { x: 70, y: 74, w: 150, h: 26 },
+    { x: 104, y: 44, w: 86, h: 26 },
+    { x: 600, y: 56, w: 184, h: 28 },
+    { x: 648, y: 24, w: 98, h: 26 },
+    { x: 380, y: 118, w: 104, h: 20, o: 0.85 },
   ],
   stars: [
-    { cx: 120, cy: 44, r: 2.2, delay: "0s" },
-    { cx: 260, cy: 26, r: 1.8, delay: ".7s" },
-    { cx: 430, cy: 52, r: 2, delay: "1.4s" },
-    { cx: 610, cy: 30, r: 1.7, delay: ".4s" },
-    { cx: 770, cy: 58, r: 2.3, delay: "2s" },
-    { cx: 900, cy: 34, r: 1.9, delay: "1.1s" },
-    { cx: 330, cy: 88, r: 1.6, delay: "2.6s" },
-    { cx: 690, cy: 94, r: 1.6, delay: ".2s" },
+    { cx: 120, cy: 70, r: 2.2, delay: "0s" },
+    { cx: 260, cy: 42, r: 1.8, delay: ".7s" },
+    { cx: 430, cy: 84, r: 2, delay: "1.4s" },
+    { cx: 610, cy: 48, r: 1.7, delay: ".4s" },
+    { cx: 770, cy: 94, r: 2.3, delay: "2s" },
+    { cx: 900, cy: 54, r: 1.9, delay: "1.1s" },
+    { cx: 330, cy: 146, r: 1.6, delay: "2.6s" },
+    { cx: 690, cy: 156, r: 1.6, delay: ".2s" },
   ],
 };
 
@@ -218,29 +224,36 @@ const NARROW: Scene = {
     { x: 414, label: "DAY 4" },
   ],
   orbX: 385,
+  trainY: 69,
   rideClass: "ktc-train-n",
   clouds: [
-    { x: 30, y: 44, w: 100, h: 22 },
-    { x: 55, y: 26, w: 62, h: 22 },
-    { x: 268, y: 36, w: 118, h: 24 },
-    { x: 300, y: 18, w: 70, h: 22 },
-    { x: 178, y: 72, w: 70, h: 18, o: 0.85 },
+    { x: 30, y: 70, w: 100, h: 22 },
+    { x: 55, y: 40, w: 62, h: 22 },
+    { x: 268, y: 58, w: 118, h: 24 },
+    { x: 300, y: 26, w: 70, h: 22 },
+    { x: 178, y: 118, w: 70, h: 18, o: 0.85 },
   ],
   stars: [
-    { cx: 60, cy: 44, r: 2.2, delay: "0s" },
-    { cx: 150, cy: 26, r: 1.8, delay: ".7s" },
-    { cx: 244, cy: 54, r: 2, delay: "1.4s" },
-    { cx: 340, cy: 30, r: 1.7, delay: ".4s" },
-    { cx: 424, cy: 60, r: 2.3, delay: "2s" },
+    { cx: 60, cy: 70, r: 2.2, delay: "0s" },
+    { cx: 150, cy: 42, r: 1.8, delay: ".7s" },
+    { cx: 244, cy: 88, r: 2, delay: "1.4s" },
+    { cx: 340, cy: 48, r: 1.7, delay: ".4s" },
+    { cx: 424, cy: 96, r: 2.3, delay: "2s" },
   ],
 };
 
-/** 서울 전동차. 두 장면이 똑같은 그림을 쓴다. */
-function Train() {
+/**
+ * 서울 전동차. 두 장면이 똑같은 그림을 쓴다.
+ *
+ * `y` 로 높이를 받는 이유: **DAY 글자 바로 위를 달려야 하는데**, 글자는 HTML 이 그리고
+ * 그 간격이 px 로 고정돼 있다. 좌표계 폭이 다른 두 장면에서는 같은 px 이 서로 다른
+ * 좌표값이 되므로, 장면마다 높이를 따로 준다.
+ */
+function Train({ y }: { y: number }) {
   return (
     <>
               {/* 그린 뒤에 키운다 — 좌표를 다 고치는 것보다 낫고, 세로 위치는 translate 로 맞춘다 */}
-              <g transform="translate(0,-84) scale(1.25)">
+              <g transform={`translate(0,${y}) scale(1.25)`}>
               {/* ── 팬터그래프 (지붕 위 집전장치) ── */}
               <g stroke="#3D4A44" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M44 117 L57 105 L70 117" />
@@ -341,7 +354,7 @@ function MetroScene({
   const last = scene.stations.at(-1)!.label;
   return (
     <svg
-      viewBox={`0 0 ${scene.w} 300`}
+      viewBox={`0 0 ${scene.w} 450`}
       className={className}
       role="img"
       aria-label={`A subway line. DAY 1 through ${last} are the stations, and a train runs along it. The sky matches the current time in Seoul.`}
@@ -358,15 +371,15 @@ function MetroScene({
           <stop offset="1" stopColor={PAPER} stopOpacity="1" />
         </linearGradient>
         <clipPath id={`ktc-cut-${scene.id}`}>
-          <rect width={scene.w} height="300" />
+          <rect width={scene.w} height="450" />
         </clipPath>
       </defs>
 
       <g clipPath={`url(#ktc-cut-${scene.id})`}>
-        <rect width={scene.w} height="300" fill={sky.bottom} />
-        <rect width={scene.w} height="152" fill={sky.top} />
+        <rect width={scene.w} height="450" fill={sky.bottom} />
+        <rect width={scene.w} height="228" fill={sky.top} />
         {/* 위쪽을 바탕색으로 녹인다. 글과 그림이 맞닿는 선이 안 생긴다 */}
-        <rect width={scene.w} height="86" fill={`url(#ktc-head-${scene.id})`} />
+        <rect width={scene.w} height="129" fill={`url(#ktc-head-${scene.id})`} />
 
         {sky.stars > 0 && (
           <g opacity={sky.stars} fill="#FFFFFF">
@@ -384,7 +397,7 @@ function MetroScene({
         )}
 
         {/* 해 또는 달 */}
-        <circle cx={scene.orbX} cy="72" r="30" fill={sky.orb} opacity={sky.orbOpacity} />
+        <circle cx={scene.orbX} cy="108" r="30" fill={sky.orb} opacity={sky.orbOpacity} />
 
         <g className="ktc-clouds" fill="#FFFFFF" opacity={0.55 + sky.haze * 0.45}>
           {scene.clouds.map((c) => (
@@ -401,17 +414,17 @@ function MetroScene({
         </g>
 
         {/* 아래쪽도 바탕색으로 녹여 아래 글과 한 면이 되게 한다 */}
-        <rect y="236" width={scene.w} height="64" fill={`url(#ktc-foot-${scene.id})`} />
+        <rect y="354" width={scene.w} height="96" fill={`url(#ktc-foot-${scene.id})`} />
 
         {/*
           노선만 그린다. **정거장 동그라미와 DAY 글자는 SVG 가 아니라 위에 겹친 HTML 이 그린다.**
           누를 수 있어야 하고(라디오 버튼), 고른 역에 표시가 남아야 해서다.
           여기서 같이 그리면 글자가 두 겹으로 겹쳐 보인다 — 실제로 그렇게 났었다.
         */}
-        <path d={`M0 206 L${scene.w} 206`} stroke="#00A84D" strokeWidth="10" strokeLinecap="round" />
+        <path d={`M0 309 L${scene.w} 309`} stroke="#00A84D" strokeWidth="10" strokeLinecap="round" />
 
         <g className={scene.rideClass}>
-          <Train />
+          <Train y={scene.trainY} />
         </g>
       </g>
     </svg>
