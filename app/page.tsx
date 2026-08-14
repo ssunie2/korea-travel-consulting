@@ -370,14 +370,23 @@ function MetroScene({
           <stop offset=".55" stopColor={PAPER} stopOpacity=".8" />
           <stop offset="1" stopColor={PAPER} stopOpacity="1" />
         </linearGradient>
+        {/*
+          하늘은 **한 장의 그러데이션**이다. 전에는 진한 파랑 사각형 위에 옅은 파랑을
+          겹쳐 놨는데, 두 색이 만나는 자리에 가로선이 그대로 보였다.
+          위에서 아래로 한 번에 옅어지게 하면 선이 아예 생기지 않는다.
+        */}
+        <linearGradient id={`ktc-sky-${scene.id}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={sky.top} />
+          <stop offset="0.55" stopColor={sky.bottom} />
+          <stop offset="1" stopColor={sky.bottom} />
+        </linearGradient>
         <clipPath id={`ktc-cut-${scene.id}`}>
           <rect width={scene.w} height="450" />
         </clipPath>
       </defs>
 
       <g clipPath={`url(#ktc-cut-${scene.id})`}>
-        <rect width={scene.w} height="450" fill={sky.bottom} />
-        <rect width={scene.w} height="228" fill={sky.top} />
+        <rect width={scene.w} height="450" fill={`url(#ktc-sky-${scene.id})`} />
         {/* 위쪽을 바탕색으로 녹인다. 글과 그림이 맞닿는 선이 안 생긴다 */}
         <rect width={scene.w} height="129" fill={`url(#ktc-head-${scene.id})`} />
 
