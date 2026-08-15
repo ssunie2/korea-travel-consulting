@@ -193,15 +193,6 @@ export default async function Home() {
     >
       <style dangerouslySetInnerHTML={{ __html: MOTION }} />
 
-      {/* ── 노선 띠. 역명판의 맨 윗줄이다 ──────────────── */}
-      <div
-        aria-hidden
-        className="h-[3px] w-full"
-        style={{
-          background:
-            "linear-gradient(90deg,#00A84D 0 40%,#EF7C1C 40% 72%,#0052A4 72% 100%)",
-        }}
-      />
 
       {/* ── 역명판 + 하늘 ─────────────────────────────── */}
       <section>
@@ -287,7 +278,7 @@ export default async function Home() {
                 </span>
               </figcaption>
               <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-[#12171A]/90 px-3 py-2 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-[0.15em] text-[#E8EAEB] backdrop-blur-sm sm:left-7 sm:top-7">
-                <span aria-hidden className="h-2 w-2 rounded-full bg-[#EF7C1C]" />
+                <span aria-hidden className="h-2 w-2 rounded-full bg-[#E86B54]" />
                 Local view
               </div>
             </div>
