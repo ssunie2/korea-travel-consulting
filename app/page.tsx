@@ -198,14 +198,15 @@ export default async function Home() {
       <section>
         <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-center md:gap-14 md:pt-12">
           <div>
-            <div className="flex items-center gap-3">
-              <span className="grid h-12 w-12 flex-none place-items-center rounded-full border border-[#E8EAEB] text-center font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-tight tracking-tight text-[#E8EAEB]">
-                DAY
-                <br />01
-              </span>
-              <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.18em] text-[#8B9691]">
-                Before you fly
-              </span>
+            {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
+            <div>
+              <p className="font-[family-name:var(--font-geist-mono)] text-[1.35rem] lowercase leading-none tracking-[-0.02em] text-[#E8EAEB]">
+                mohallae
+              </p>
+              <p className="mt-2 font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.18em] text-[#8B9691]">
+                모할래 <span aria-hidden className="mx-1 text-[#4A5450]">·</span>
+                <span className="uppercase">Before you fly</span>
+              </p>
             </div>
 
             <h1 className="mt-5 max-w-[15ch] font-[family-name:var(--font-display)] text-[clamp(2.75rem,7vw,5rem)] leading-[0.95] tracking-tight">
@@ -502,7 +503,7 @@ export default async function Home() {
 
       <footer className="border-t border-[#2A3330]">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-[family-name:var(--font-geist-mono)] text-xs text-[#8B9691] sm:flex-row sm:items-center sm:justify-between">
-          <span>Korea Travel Consulting</span>
+          <span>mohallae</span>
           <div className="flex gap-5">
             <Link href="/privacy" className="underline-offset-4 hover:underline">
               Privacy
