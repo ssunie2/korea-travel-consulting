@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Instrument_Serif } from "next/font/google";
+import { seoulWeather, type Sky } from "@/lib/weather";
 
 // 표제용 서체. layout.tsx 를 건드리지 않으려고 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -58,6 +59,9 @@ const MOTION = `
 .ktc-train   { animation: ktc-ride 13s linear infinite }
 .ktc-train-n { animation: ktc-ride-n 9s linear infinite }
 .ktc-star   { animation: ktc-tw 3.4s ease-in-out infinite }
+@keyframes ktc-fall { from { transform: translateY(-40px) } to { transform: translateY(340px) } }
+.ktc-drop  { animation: ktc-fall 1s linear infinite }
+.ktc-flake { animation: ktc-fall 5s linear infinite }
 .ktc-tip { display: none }
 .ktc-route:has(#ktc-day-1:checked) .ktc-tip-1,
 .ktc-route:has(#ktc-day-2:checked) .ktc-tip-2,
@@ -70,7 +74,7 @@ const MOTION = `
   .ktc-route:has(#ktc-day-4:checked) .ktc-tip-4 { display: grid }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ktc-clouds, .ktc-star { animation: none }
+  .ktc-clouds, .ktc-star, .ktc-drop, .ktc-flake { animation: none }
   .ktc-train   { animation: none; transform: translateX(340px) }
   .ktc-train-n { animation: none; transform: translateX(60px) }
 }
@@ -337,13 +341,21 @@ function Train({ y }: { y: number }) {
   );
 }
 
+/**
+ * 비·눈 자리. **Math.random 을 쓰면 안 된다** — 서버와 브라우저가 다른 값을 뽑으면
+ * 화면이 한 번 깜빡이며 다시 그려진다. 그래서 번호에서 값을 만들어 늘 같은 자리에 떨어뜨린다.
+ */
+const drift = (i: number, k: number) => ((i * 9301 + k * 49297) % 233280) / 233280;
+
 function MetroScene({
   scene,
   sky,
+  weather,
   className,
 }: {
   scene: Scene;
   sky: (typeof SKY)[keyof typeof SKY];
+  weather: Sky;
   className: string;
 }) {
   const last = scene.stations.at(-1)!.label;
@@ -396,13 +408,24 @@ function MetroScene({
         )}
 
         {/* 해 또는 달 */}
-        <circle cx={scene.orbX} cy="150" r="30" fill={sky.orb} opacity={sky.orbOpacity} />
+        {/* 흐리거나 비·눈이면 해와 달이 구름 뒤로 들어간다 */}
+        <circle
+          cx={scene.orbX}
+          cy="150"
+          r="30"
+          fill={sky.orb}
+          opacity={weather === "clear" ? sky.orbOpacity : sky.orbOpacity * 0.3}
+        />
 
         {/*
           구름. 둥근 사각형을 쌓으면 뭉툭해 보여서, **덩어리 세 개와 아랫면**으로 그린다.
           겹쳐도 얼룩이 안 지는 이유는 투명도를 낱개가 아니라 g 에 한 번만 주기 때문이다.
         */}
-        <g className="ktc-clouds" fill="#FFFFFF" opacity={0.62 + sky.haze * 0.38}>
+        <g
+          className="ktc-clouds"
+          fill="#FFFFFF"
+          opacity={Math.min(1, 0.62 + sky.haze * 0.38 + (weather === "clear" ? 0 : 0.28))}
+        >
           {scene.clouds.map((c) => (
             <g key={`${c.x}-${c.y}`} transform={`translate(${c.x},${c.y}) scale(${c.s})`} opacity={c.o}>
               <circle cx="28" cy="24" r="17" />
@@ -412,6 +435,40 @@ function MetroScene({
             </g>
           ))}
         </g>
+
+        {/* 비 또는 눈 */}
+        {weather !== "clear" && weather !== "cloud" && (
+          <g>
+            {Array.from({ length: Math.round(scene.w / 26) }, (_, i) => {
+              const x = drift(i, 1) * scene.w;
+              const delay = `${(drift(i, 2) * 2).toFixed(2)}s`;
+              return weather === "rain" ? (
+                <line
+                  key={i}
+                  className="ktc-drop"
+                  x1={x}
+                  y1="0"
+                  x2={x - 7}
+                  y2="18"
+                  stroke="#9FC4DC"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  style={{ animationDelay: delay }}
+                />
+              ) : (
+                <circle
+                  key={i}
+                  className="ktc-flake"
+                  cx={x}
+                  cy="0"
+                  r={1.6 + drift(i, 3) * 1.8}
+                  fill="#FFFFFF"
+                  style={{ animationDelay: delay }}
+                />
+              );
+            })}
+          </g>
+        )}
 
         {/* 아래쪽도 바탕색으로 녹여 아래 글과 한 면이 되게 한다 */}
         <rect y="354" width={scene.w} height="96" fill={`url(#ktc-foot-${scene.id})`} />
@@ -432,8 +489,9 @@ function MetroScene({
 }
 
 
-export default function Home() {
+export default async function Home() {
   const now = seoulNow();
+  const weather = await seoulWeather();
   const sky = skyFor(now.hour);
 
   return (
@@ -492,7 +550,13 @@ export default function Home() {
             <p className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-[#DDD5C6] bg-[#F8F5EE] py-1.5 pl-3 pr-4 text-sm text-[#3D4A44]">
               <span aria-hidden className="h-2 w-2 flex-none rounded-full bg-[#00A84D]" />
               It&apos;s{" "}
-              <b className="font-semibold tabular-nums">{now.label}</b> in Seoul right now
+              <b className="font-semibold tabular-nums">{now.label}</b>
+              {weather.tempC !== null && (
+                <>
+                  , <b className="font-semibold tabular-nums">{weather.tempC}°</b>
+                </>
+              )}{" "}
+              in Seoul right now
             </p>
           </div>
 
@@ -548,8 +612,8 @@ export default function Home() {
           {/* 누르는 자리를 그림 위에 겹쳐야 해서 relative 가 필요하다 */}
           <div className="relative">
             {/* ── 노선도. 넓은 화면과 폰이 서로 다른 장면을 쓴다 ── */}
-            <MetroScene scene={NARROW} sky={sky} className="mt-4 block h-auto w-full md:hidden" />
-            <MetroScene scene={WIDE} sky={sky} className="mt-4 hidden h-auto w-full md:block" />
+            <MetroScene scene={NARROW} sky={sky} weather={weather.sky} className="mt-4 block h-auto w-full md:hidden" />
+            <MetroScene scene={WIDE} sky={sky} weather={weather.sky} className="mt-4 hidden h-auto w-full md:block" />
 
             <fieldset className="absolute inset-0 m-0 border-0 p-0">
               <legend className="sr-only">Choose a day to preview its concierge tip</legend>
