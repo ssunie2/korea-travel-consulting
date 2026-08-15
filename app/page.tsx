@@ -163,14 +163,14 @@ const TIPS = [
  * 폰에서 세로가 367px 로 살아나고, 그 안의 모든 것이 같이 커진다.
  *
  * 세로 450 은 하늘을 넉넉히 보이게 하려고 잡은 값이다(원래 300). 노선은 y=309,
- * 전동차는 그 위 `trainY` 에 놓여 DAY 글자를 살짝 띄우고 달린다.
+ * 전동차는 그 아래 `trainY` 에 놓여 노선과 겹치지 않고 달린다.
  */
 type Scene = {
   id: string;
   w: number;
   stations: { x: number; label: string }[];
   orbX: number;
-  /** 전동차 높이. DAY 글자 바로 위를 달리게 맞춘 값 (장면마다 다르다) */
+  /** 전동차 높이. 노선 아래를 달리게 맞춘 값 */
   trainY: number;
   rideClass: string;
   clouds: { x: number; y: number; s: number; o?: number }[];
@@ -187,7 +187,7 @@ const WIDE: Scene = {
     { x: 900, label: "DAY 4" },
   ],
   orbX: 820,
-  trainY: 85,
+  trainY: 192,
   rideClass: "ktc-train",
   clouds: [
     { x: 60, y: 112, s: 1.05 },
@@ -223,7 +223,7 @@ const NARROW: Scene = {
     { x: 414, label: "DAY 4" },
   ],
   orbX: 385,
-  trainY: 69,
+  trainY: 192,
   rideClass: "ktc-train-n",
   clouds: [
     { x: 12, y: 118, s: 0.85 },
@@ -242,9 +242,7 @@ const NARROW: Scene = {
 /**
  * 서울 전동차. 두 장면이 똑같은 그림을 쓴다.
  *
- * `y` 로 높이를 받는 이유: **DAY 글자 바로 위를 달려야 하는데**, 글자는 HTML 이 그리고
- * 그 간격이 px 로 고정돼 있다. 좌표계 폭이 다른 두 장면에서는 같은 px 이 서로 다른
- * 좌표값이 되므로, 장면마다 높이를 따로 준다.
+ * `y` 로 높이를 받아 노선과 겹치지 않게 세로 위치를 맞춘다.
  */
 function Train({ y }: { y: number }) {
   return (
