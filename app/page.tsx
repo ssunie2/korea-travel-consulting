@@ -28,12 +28,6 @@ function seoulNow() {
   return { hour, label: `${get("hour")}:${get("minute")}` };
 }
 
-/**
- * 하늘색. 배경 그림(남산·경복궁)은 걷어내고 하늘과 노선만 남겼다.
- * `paper` 는 페이지 바탕색이다 — 그림 위아래를 이 색으로 녹여서 경계선을 없앤다.
- */
-const PAPER = "#F2EDE3";
-
 const SKY = {
   dawn: { top: "#F2A9A0", bottom: "#FBD9C0", orb: "#FFD1A8", orbOpacity: 0.9, stars: 0.35, haze: 0.2 },
   day: { top: "#8FD0F0", bottom: "#BEE6F8", orb: "#FFD52E", orbOpacity: 1, stars: 0, haze: 0 },
@@ -52,8 +46,8 @@ function skyFor(hour: number) {
 // 움직임은 CSS로만 준다. 자바스크립트가 없어도 그림은 그대로 나온다.
 const MOTION = `
 @keyframes ktc-drift { from { transform: translateX(-40px) } to { transform: translateX(60px) } }
-@keyframes ktc-ride  { from { transform: translateX(-300px) } to { transform: translateX(1060px) } }
-@keyframes ktc-ride-n { from { transform: translateX(-290px) } to { transform: translateX(500px) } }
+@keyframes ktc-ride  { from { transform: translateX(-130px) } to { transform: translateX(1060px) } }
+@keyframes ktc-ride-n { from { transform: translateX(-130px) } to { transform: translateX(500px) } }
 @keyframes ktc-tw    { 0%,100% { opacity:.2 } 50% { opacity:1 } }
 .ktc-clouds { animation: ktc-drift 24s ease-in-out infinite alternate }
 .ktc-train   { animation: ktc-ride 13s linear infinite }
@@ -75,8 +69,8 @@ const MOTION = `
 }
 @media (prefers-reduced-motion: reduce) {
   .ktc-clouds, .ktc-star, .ktc-drop, .ktc-flake { animation: none }
-  .ktc-train   { animation: none; transform: translateX(340px) }
-  .ktc-train-n { animation: none; transform: translateX(60px) }
+  .ktc-train   { animation: none; transform: translateX(430px) }
+  .ktc-train-n { animation: none; transform: translateX(180px) }
 }
 `;
 
@@ -115,10 +109,10 @@ const paid = [
  * 같은 비율로 정거장을 놓기 때문에 이 한 벌로 둘 다 덮는다.
  */
 const STATIONS = [
-  { day: 1, x: 150 },
-  { day: 2, x: 420 },
-  { day: 3, x: 680 },
-  { day: 4, x: 900 },
+  { day: 1, x: 150, en: "INCHEON", ko: "인천공항" },
+  { day: 2, x: 420, en: "GYEONGBOKGUNG", ko: "경복궁" },
+  { day: 3, x: 680, en: "BUKCHON", ko: "북촌" },
+  { day: 4, x: 900, en: "NAMSAN", ko: "남산" },
 ];
 
 /**
@@ -159,187 +153,20 @@ const TIPS = [
 ];
 
 /**
- * 장면 한 벌. 넓은 화면과 폰이 **다른 그림**을 쓴다.
+ * 장면 한 벌. 넓은 화면과 폰이 좌표계 폭만 다르게 쓴다.
  *
- * 같은 그림을 폭만 줄이면 세로도 같이 눌려서, 폰에서는 높이가 112px 밖에 안 남는다.
- * 애써 그린 전철이 손톱만해지고 DAY 글자를 못 읽는다.
- * 그래서 폰은 **좌표계 폭을 460 으로 좁힌** 장면을 따로 쓴다. 높이는 둘 다 450 이라
- * 폰에서 세로가 367px 로 살아나고, 그 안의 모든 것이 같이 커진다.
- *
- * 세로 450 은 하늘을 넉넉히 보이게 하려고 잡은 값이다(원래 300). 노선은 y=309,
- * 전동차는 그 아래 `trainY` 에 놓여 노선과 겹치지 않고 달린다.
+ * 폭을 460 으로 좁히면 같은 높이에 담기는 가로 범위가 줄어, 폰에서 선과 글자가 커진다.
+ * 정거장 x 는 두 장면이 **같은 비율**(15 / 42 / 68 / 90%)이다. 누르는 자리는 % 로
+ * 한 벌만 얹기 때문에, 비율이 어긋나면 폰에서 손가락이 빗나간다.
  */
 type Scene = {
   id: string;
   w: number;
-  stations: { x: number; label: string }[];
-  orbX: number;
-  /** 전동차 높이. 노선 아래를 달리게 맞춘 값 */
-  trainY: number;
   rideClass: string;
-  clouds: { x: number; y: number; s: number; o?: number }[];
-  stars: { cx: number; cy: number; r: number; delay: string }[];
 };
 
-const WIDE: Scene = {
-  id: "w",
-  w: 1000,
-  stations: [
-    { x: 150, label: "DAY 1" },
-    { x: 420, label: "DAY 2" },
-    { x: 680, label: "DAY 3" },
-    { x: 900, label: "DAY 4" },
-  ],
-  orbX: 820,
-  trainY: 192,
-  rideClass: "ktc-train",
-  clouds: [
-    { x: 60, y: 112, s: 1.05 },
-    { x: 470, y: 92, s: 1.3 },
-    { x: 285, y: 182, s: 0.68, o: 0.8 },
-    { x: 855, y: 196, s: 0.58, o: 0.7 },
-  ],
-  stars: [
-    { cx: 120, cy: 150, r: 2.2, delay: "0s" },
-    { cx: 260, cy: 176, r: 1.8, delay: ".7s" },
-    { cx: 430, cy: 206, r: 2, delay: "1.4s" },
-    { cx: 610, cy: 162, r: 1.7, delay: ".4s" },
-    { cx: 770, cy: 226, r: 2.3, delay: "2s" },
-    { cx: 900, cy: 186, r: 1.9, delay: "1.1s" },
-    { cx: 330, cy: 254, r: 1.6, delay: "2.6s" },
-    { cx: 690, cy: 244, r: 1.6, delay: ".2s" },
-  ],
-};
-
-/**
- * 폰. 정거장 4개를 그대로 두되 **화면 폭을 460으로 좁혀** 모든 걸 2배로 키운다.
- *
- * x 값은 넓은 화면과 **같은 비율**(15% / 42% / 68% / 90%)로 맞췄다.
- * 누르는 자리(radio)는 % 로 한 벌만 얹는데, 비율이 어긋나면 폰에서 손가락이 빗나간다.
- */
-const NARROW: Scene = {
-  id: "n",
-  w: 460,
-  stations: [
-    { x: 69, label: "DAY 1" },
-    { x: 193, label: "DAY 2" },
-    { x: 313, label: "DAY 3" },
-    { x: 414, label: "DAY 4" },
-  ],
-  orbX: 385,
-  trainY: 192,
-  rideClass: "ktc-train-n",
-  clouds: [
-    { x: 12, y: 118, s: 0.85 },
-    { x: 210, y: 92, s: 1.0 },
-    { x: 118, y: 190, s: 0.58, o: 0.8 },
-  ],
-  stars: [
-    { cx: 60, cy: 152, r: 2.2, delay: "0s" },
-    { cx: 150, cy: 182, r: 1.8, delay: ".7s" },
-    { cx: 244, cy: 216, r: 2, delay: "1.4s" },
-    { cx: 340, cy: 166, r: 1.7, delay: ".4s" },
-    { cx: 424, cy: 232, r: 2.3, delay: "2s" },
-  ],
-};
-
-/**
- * 서울 전동차. 두 장면이 똑같은 그림을 쓴다.
- *
- * `y` 로 높이를 받아 노선과 겹치지 않게 세로 위치를 맞춘다.
- */
-function Train({ y }: { y: number }) {
-  return (
-    <>
-              {/* 그린 뒤에 키운다 — 좌표를 다 고치는 것보다 낫고, 세로 위치는 translate 로 맞춘다 */}
-              <g transform={`translate(0,${y}) scale(1.25)`}>
-              {/* ── 팬터그래프 (지붕 위 집전장치) ── */}
-              <g stroke="#3D4A44" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M44 117 L57 105 L70 117" />
-                <line x1="47" y1="117" x2="67" y2="117" />
-                <line x1="45" y1="104" x2="69" y2="104" strokeWidth="2.2" />
-              </g>
-              {/* 지붕 냉방장치 */}
-              <rect x="20" y="114" width="22" height="4" rx="1.5" fill="#B7C2C9" />
-              <rect x="126" y="114" width="24" height="4" rx="1.5" fill="#B7C2C9" />
-              <rect x="170" y="114" width="20" height="4" rx="1.5" fill="#B7C2C9" />
-
-              {/* ── 대차와 바퀴 ── */}
-              <g fill="#2A3D35">
-                <rect x="14" y="147" width="22" height="6" rx="2" />
-                <rect x="66" y="147" width="22" height="6" rx="2" />
-                <rect x="120" y="147" width="22" height="6" rx="2" />
-                <rect x="180" y="147" width="22" height="6" rx="2" />
-              </g>
-              <g fill="#12211C">
-                {[19, 31, 71, 83, 125, 137, 185, 197].map((cx) => (
-                  <circle key={cx} cx={cx} cy="152" r="3.2" />
-                ))}
-              </g>
-
-              {/* ── 연결기 ── */}
-              <rect x="99" y="132" width="10" height="5" rx="2" fill="#69707A" />
-
-              {/* ── 뒷칸 ── */}
-              <g>
-                <rect x="4" y="118" width="96" height="30" rx="4" fill="#EDF1F3" stroke="#12211C" strokeWidth="1.8" />
-                <rect x="7" y="118" width="90" height="3.5" rx="1.75" fill="#C8D2D8" />
-                {/* 노선 색 띠 */}
-                <rect x="5" y="138" width="94" height="5" fill="#00A84D" />
-                {/* 창 — 출입문 사이사이 */}
-                <g fill="#5E9FC9">
-                  <rect x="25" y="124" width="15" height="11" rx="1.5" />
-                  <rect x="44" y="124" width="15" height="11" rx="1.5" />
-                  <rect x="82" y="124" width="14" height="11" rx="1.5" />
-                </g>
-                {/* 출입문 — 가운데가 갈라지는 두 짝 */}
-                <g fill="#DCE4E8" stroke="#8B9299" strokeWidth="0.9">
-                  <rect x="10" y="121" width="11" height="21" rx="1" />
-                  <rect x="63" y="121" width="11" height="21" rx="1" />
-                </g>
-                <g stroke="#8B9299" strokeWidth="0.9">
-                  <line x1="15.5" y1="121" x2="15.5" y2="142" />
-                  <line x1="68.5" y1="121" x2="68.5" y2="142" />
-                </g>
-              </g>
-
-              {/* ── 앞칸 (운전실) ── */}
-              <g>
-                <path
-                  d="M108 122 Q108 118 112 118 H201 Q210 118 212 126 L213 140 Q213 148 205 148 H112 Q108 148 108 144 Z"
-                  fill="#EDF1F3"
-                  stroke="#12211C"
-                  strokeWidth="1.8"
-                />
-                <rect x="111" y="118" width="88" height="3.5" rx="1.75" fill="#C8D2D8" />
-                <rect x="109" y="138" width="101" height="5" fill="#00A84D" />
-                {/* 행선 표시 */}
-                <rect x="186" y="121" width="20" height="4" rx="1" fill="#12211C" />
-                <rect x="188" y="122" width="16" height="2" rx="1" fill="#FFD52E" />
-                {/* 창 */}
-                <g fill="#5E9FC9">
-                  <rect x="129" y="124" width="15" height="11" rx="1.5" />
-                  <rect x="148" y="124" width="15" height="11" rx="1.5" />
-                </g>
-                {/* 운전실 창 — 더 크고 앞쪽으로 기울어 있다 */}
-                <path d="M184 127 H204 L207 135 H184 Z" fill="#5E9FC9" />
-                {/* 출입문 */}
-                <g fill="#DCE4E8" stroke="#8B9299" strokeWidth="0.9">
-                  <rect x="114" y="121" width="11" height="21" rx="1" />
-                  <rect x="167" y="121" width="11" height="21" rx="1" />
-                </g>
-                <g stroke="#8B9299" strokeWidth="0.9">
-                  <line x1="119.5" y1="121" x2="119.5" y2="142" />
-                  <line x1="172.5" y1="121" x2="172.5" y2="142" />
-                </g>
-                {/* 전조등 */}
-                <circle cx="204" cy="145" r="2.4" fill="#FFF6D0" stroke="#12211C" strokeWidth="0.8" />
-                <circle cx="196" cy="145" r="2.4" fill="#FFF6D0" stroke="#12211C" strokeWidth="0.8" />
-              </g>
-              </g>
-    </>
-  );
-}
+const WIDE: Scene = { id: "w", w: 1000, rideClass: "ktc-train" };
+const NARROW: Scene = { id: "n", w: 460, rideClass: "ktc-train-n" };
 
 /**
  * 비·눈 자리. **Math.random 을 쓰면 안 된다** — 서버와 브라우저가 다른 값을 뽑으면
@@ -347,6 +174,13 @@ function Train({ y }: { y: number }) {
  */
 const drift = (i: number, k: number) => ((i * 9301 + k * 49297) % 233280) / 233280;
 
+/**
+ * 노선. **그림을 그리지 않는다.**
+ *
+ * 해·구름·전동차를 빼고 선 하나와 지나가는 빛만 남겼다. 지하철 안내 표지가 하는 방식이고,
+ * 역 이름과 지역명은 그림이 아니라 **글자**가 맡는다(아래 HTML 이 그린다).
+ * 시간대와 날씨는 배경 톤과 빗줄기로만 아주 옅게 남는다.
+ */
 function MetroScene({
   scene,
   sky,
@@ -358,88 +192,37 @@ function MetroScene({
   weather: Sky;
   className: string;
 }) {
-  const last = scene.stations.at(-1)!.label;
+  const wet = weather === "rain" || weather === "snow";
+
   return (
     <svg
-      viewBox={`0 0 ${scene.w} 450`}
+      viewBox={`0 0 ${scene.w} 220`}
       className={className}
       role="img"
-      aria-label={`A subway line. DAY 1 through ${last} are the stations, and a train runs along it. The sky matches the current time in Seoul.`}
+      aria-label="A subway line. DAY 1 through DAY 4 are the stations, and a train passes along it."
     >
       <defs>
-        <linearGradient id={`ktc-foot-${scene.id}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={PAPER} stopOpacity="0" />
-          <stop offset=".55" stopColor={PAPER} stopOpacity=".8" />
-          <stop offset="1" stopColor={PAPER} stopOpacity="1" />
+        <linearGradient id={`ktc-wash-${scene.id}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={sky.top} stopOpacity="0" />
+          <stop offset="1" stopColor={sky.top} stopOpacity={weather === "clear" ? 0.1 : 0.17} />
         </linearGradient>
-        {/*
-          하늘 한 장. **바탕색(크림)에서 시작해서** 파랑으로 넘어간다.
-          전에는 파란 하늘 위에 크림색을 반투명으로 덮어 위쪽을 지웠는데,
-          두 색이 알파로 섞이는 구간이 탁해지면서 오히려 경계가 도드라졌다.
-          색을 직접 이어붙이면 섞이는 자리가 없고, 위쪽 글 영역과 한 면이 된다.
-        */}
-        <linearGradient id={`ktc-sky-${scene.id}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={PAPER} />
-          <stop offset="0.30" stopColor={sky.top} />
-          <stop offset="0.66" stopColor={sky.bottom} />
-          <stop offset="1" stopColor={sky.bottom} />
+        <linearGradient id={`ktc-trail-${scene.id}`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#C24632" stopOpacity="0" />
+          <stop offset="1" stopColor="#C24632" stopOpacity=".5" />
         </linearGradient>
         <clipPath id={`ktc-cut-${scene.id}`}>
-          <rect width={scene.w} height="450" />
+          <rect width={scene.w} height="220" />
         </clipPath>
       </defs>
 
       <g clipPath={`url(#ktc-cut-${scene.id})`}>
-        <rect width={scene.w} height="450" fill={`url(#ktc-sky-${scene.id})`} />
+        {/* 하늘을 안 그린다. 시간대는 바닥에 깔리는 아주 옅은 톤으로만 남는다 */}
+        <rect width={scene.w} height="220" fill={`url(#ktc-wash-${scene.id})`} />
 
-        {sky.stars > 0 && (
-          <g opacity={sky.stars} fill="#FFFFFF">
-            {scene.stars.map((s) => (
-              <circle
-                key={`${s.cx}-${s.cy}`}
-                className="ktc-star"
-                cx={s.cx}
-                cy={s.cy}
-                r={s.r}
-                style={{ animationDelay: s.delay }}
-              />
-            ))}
-          </g>
-        )}
-
-        {/* 해 또는 달 */}
-        {/* 흐리거나 비·눈이면 해와 달이 구름 뒤로 들어간다 */}
-        <circle
-          cx={scene.orbX}
-          cy="150"
-          r="30"
-          fill={sky.orb}
-          opacity={weather === "clear" ? sky.orbOpacity : sky.orbOpacity * 0.3}
-        />
-
-        {/*
-          구름. 둥근 사각형을 쌓으면 뭉툭해 보여서, **덩어리 세 개와 아랫면**으로 그린다.
-          겹쳐도 얼룩이 안 지는 이유는 투명도를 낱개가 아니라 g 에 한 번만 주기 때문이다.
-        */}
-        <g
-          className="ktc-clouds"
-          fill="#FFFFFF"
-          opacity={Math.min(1, 0.62 + sky.haze * 0.38 + (weather === "clear" ? 0 : 0.28))}
-        >
-          {scene.clouds.map((c) => (
-            <g key={`${c.x}-${c.y}`} transform={`translate(${c.x},${c.y}) scale(${c.s})`} opacity={c.o}>
-              <circle cx="28" cy="24" r="17" />
-              <circle cx="58" cy="17" r="23" />
-              <circle cx="88" cy="27" r="15" />
-              <rect x="10" y="26" width="92" height="18" rx="9" />
-            </g>
-          ))}
-        </g>
-
-        {/* 비 또는 눈 */}
-        {weather !== "clear" && weather !== "cloud" && (
-          <g>
-            {Array.from({ length: Math.round(scene.w / 26) }, (_, i) => {
+        {/* 비 또는 눈. 가는 선과 점으로만 — 그림이 되면 A안이 아니다 */}
+        {wet && (
+          <g opacity="0.5">
+            {Array.from({ length: Math.round(scene.w / 24) }, (_, i) => {
               const x = drift(i, 1) * scene.w;
               const delay = `${(drift(i, 2) * 2).toFixed(2)}s`;
               return weather === "rain" ? (
@@ -448,10 +231,10 @@ function MetroScene({
                   className="ktc-drop"
                   x1={x}
                   y1="0"
-                  x2={x - 7}
-                  y2="18"
-                  stroke="#9FC4DC"
-                  strokeWidth="2"
+                  x2={x - 5}
+                  y2="14"
+                  stroke="#3E6FB0"
+                  strokeWidth="1"
                   strokeLinecap="round"
                   style={{ animationDelay: delay }}
                 />
@@ -461,8 +244,8 @@ function MetroScene({
                   className="ktc-flake"
                   cx={x}
                   cy="0"
-                  r={1.6 + drift(i, 3) * 1.8}
-                  fill="#FFFFFF"
+                  r={1 + drift(i, 3) * 1.1}
+                  fill="#8FA8B8"
                   style={{ animationDelay: delay }}
                 />
               );
@@ -470,24 +253,18 @@ function MetroScene({
           </g>
         )}
 
-        {/* 아래쪽도 바탕색으로 녹여 아래 글과 한 면이 되게 한다 */}
-        <rect y="354" width={scene.w} height="96" fill={`url(#ktc-foot-${scene.id})`} />
-
-        {/*
-          노선만 그린다. **정거장 동그라미와 DAY 글자는 SVG 가 아니라 위에 겹친 HTML 이 그린다.**
-          누를 수 있어야 하고(라디오 버튼), 고른 역에 표시가 남아야 해서다.
-          여기서 같이 그리면 글자가 두 겹으로 겹쳐 보인다 — 실제로 그렇게 났었다.
-        */}
-        <path d={`M0 309 L${scene.w} 309`} stroke="#00A84D" strokeWidth="10" strokeLinecap="round" />
-
+        {/* 열차. 차체를 그리지 않고 **지나가는 빛과 잔상**으로 암시한다 */}
         <g className={scene.rideClass}>
-          <Train y={scene.trainY} />
+          <rect x="0" y="75" width="86" height="6" rx="3" fill={`url(#ktc-trail-${scene.id})`} />
+          <rect x="78" y="72" width="30" height="12" rx="6" fill="#C24632" />
         </g>
+
+        {/* 노선 — 10px 이던 것을 2.5px 로. 굵기가 유아틱함의 절반이었다 */}
+        <line x1="0" y1="120" x2={scene.w} y2="120" stroke="#12211C" strokeWidth="2.5" />
       </g>
     </svg>
   );
 }
-
 
 export default async function Home() {
   const now = seoulNow();
@@ -503,7 +280,7 @@ export default async function Home() {
       {/* ── 노선 띠. 역명판의 맨 윗줄이다 ──────────────── */}
       <div
         aria-hidden
-        className="h-3 w-full"
+        className="h-[3px] w-full"
         style={{
           background:
             "linear-gradient(90deg,#00A84D 0 40%,#EF7C1C 40% 72%,#0052A4 72% 100%)",
@@ -515,9 +292,9 @@ export default async function Home() {
         <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-center md:gap-14 md:pt-12">
           <div>
             <div className="flex items-center gap-3">
-              <span className="grid h-12 w-12 flex-none place-items-center rounded-full bg-[#00A84D] text-center font-[family-name:var(--font-geist-mono)] text-[0.7rem] font-bold leading-tight text-white">
+              <span className="grid h-12 w-12 flex-none place-items-center rounded-full border border-[#12211C] text-center font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-tight tracking-tight text-[#12211C]">
                 DAY
-                <br />1
+                <br />01
               </span>
               <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.18em] text-[#4A5D54]">
                 Before you fly
@@ -541,22 +318,15 @@ export default async function Home() {
               >
                 Get your free draft
               </Link>
-              <span className="rounded bg-[#FFD52E] px-2.5 py-1.5 font-[family-name:var(--font-geist-mono)] text-[0.65rem] font-bold uppercase tracking-[0.08em] text-[#12211C]">
-                Free
+              <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.18em] text-[#4A5D54]">
+                No account · Free
               </span>
             </div>
 
             {/* 지금 서울 몇 시인지. 손님은 시차 반대편에 있다 */}
-            <p className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-[#DDD5C6] bg-[#F8F5EE] py-1.5 pl-3 pr-4 text-sm text-[#3D4A44]">
-              <span aria-hidden className="h-2 w-2 flex-none rounded-full bg-[#00A84D]" />
-              It&apos;s{" "}
-              <b className="font-semibold tabular-nums">{now.label}</b>
-              {weather.tempC !== null && (
-                <>
-                  , <b className="font-semibold tabular-nums">{weather.tempC}°</b>
-                </>
-              )}{" "}
-              in Seoul right now
+            <p className="mt-7 inline-flex items-center gap-2 border-t border-[#DDD5C6] pt-3 font-[family-name:var(--font-geist-mono)] text-[0.7rem] tracking-[0.1em] text-[#4A5D54]">
+              Seoul <b className="font-semibold tabular-nums text-[#1B211E]">{now.label}</b>
+              <span aria-hidden>·</span> 37.5665° N
             </p>
           </div>
 
@@ -608,12 +378,33 @@ export default async function Home() {
           </figure>
         </div>
 
-        <div className="ktc-route">
+        <div className="ktc-route mt-14">
+          {/* 안내 표지의 머리줄. 노선 이름과 **지금 서울 상태**가 여기 한 줄에 온다 */}
+          <div className="mx-auto max-w-6xl px-6">
+            <p className="whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-[0.14em] text-[#4A5D54] sm:text-[0.72rem] sm:tracking-[0.3em]">
+              Seoul Metro · 4 Days
+              {weather.tempC !== null && (
+                <>
+                  <span aria-hidden className="mx-2 text-[#B9B0A0]">·</span>
+                  {weather.tempC}°
+                </>
+              )}
+              <span aria-hidden className="mx-2 text-[#B9B0A0]">·</span>
+              {weather.sky === "clear"
+                ? "Clear"
+                : weather.sky === "cloud"
+                  ? "Cloudy"
+                  : weather.sky === "rain"
+                    ? "Rain"
+                    : "Snow"}
+            </p>
+          </div>
+          <div aria-hidden className="mt-3 h-px w-full bg-[#DDD5C6]" />
+
           {/* 누르는 자리를 그림 위에 겹쳐야 해서 relative 가 필요하다 */}
           <div className="relative">
-            {/* ── 노선도. 넓은 화면과 폰이 서로 다른 장면을 쓴다 ── */}
-            <MetroScene scene={NARROW} sky={sky} weather={weather.sky} className="mt-4 block h-auto w-full md:hidden" />
-            <MetroScene scene={WIDE} sky={sky} weather={weather.sky} className="mt-4 hidden h-auto w-full md:block" />
+            <MetroScene scene={NARROW} sky={sky} weather={weather.sky} className="block h-auto w-full md:hidden" />
+            <MetroScene scene={WIDE} sky={sky} weather={weather.sky} className="hidden h-auto w-full md:block" />
 
             <fieldset className="absolute inset-0 m-0 border-0 p-0">
               <legend className="sr-only">Choose a day to preview its concierge tip</legend>
@@ -621,11 +412,13 @@ export default async function Home() {
                 <label
                   key={station.day}
                   style={{ left: `${station.x / 10}%` }}
-                  className="absolute top-[68.67%] h-16 w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                  className="group absolute top-[54.5%] h-14 w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:w-28"
                 >
-                  <span className="absolute bottom-[calc(50%+1rem)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.55rem] font-bold text-[#12211C] sm:text-xs">
+                  {/* 날짜 — 점 위 */}
+                  <span className="absolute bottom-[calc(50%+0.65rem)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold tracking-[0.16em] text-[#1B211E] group-has-[:checked]:text-[#C24632] sm:text-[0.8rem] sm:tracking-[0.2em]">
                     DAY {station.day}
                   </span>
+
                   <input
                     id={`ktc-day-${station.day}`}
                     type="radio"
@@ -635,10 +428,20 @@ export default async function Home() {
                     aria-controls={`ktc-tip-${station.day}`}
                     className="peer sr-only"
                   />
+
+                  {/* 역 — 작고 정확한 점. 고른 역에만 가는 테두리가 하나 더 */}
                   <span
                     aria-hidden
-                    className="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[5px] border-[#00A84D] bg-[#F2EDE3] transition-shadow peer-checked:ring-4 peer-checked:ring-[#EF7C1C] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#0052A4] sm:h-7 sm:w-7 sm:border-[7px]"
+                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#12211C] peer-checked:bg-[#C24632] peer-checked:ring-1 peer-checked:ring-[#C24632] peer-checked:ring-offset-4 peer-checked:ring-offset-[#F2EDE3] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#3E6FB0] sm:h-3 sm:w-3"
                   />
+
+                  {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
+                  <span className="absolute top-[calc(50%+0.8rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] tracking-[0.1em] text-[#4A5D54] sm:text-[0.65rem] sm:tracking-[0.14em]">
+                    {station.en}
+                  </span>
+                  <span className="absolute top-[calc(50%+1.7rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] text-[#8B9299] sm:text-[0.6rem]">
+                    {station.ko}
+                  </span>
                 </label>
               ))}
             </fieldset>
@@ -651,7 +454,7 @@ export default async function Home() {
                 key={tip.day}
                 id={`ktc-tip-${tip.day}`}
                 aria-live="polite"
-                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-[1.5rem] border-[3px] border-[#12211C] bg-[#12211C] shadow-[0_24px_60px_-28px_rgba(18,33,28,0.6)] md:grid-cols-[.8fr_1.2fr]`}
+                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-[3px] border border-[#12211C] bg-[#12211C] shadow-[0_24px_60px_-28px_rgba(18,33,28,0.6)] md:grid-cols-[.8fr_1.2fr]`}
               >
                 <figcaption className="flex flex-col justify-between gap-8 bg-[#12211C] p-6 text-[#F2EDE3] sm:p-8">
                   <div>
