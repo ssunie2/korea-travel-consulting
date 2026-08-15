@@ -264,12 +264,9 @@ export default async function Home() {
                 aria-hidden
                 className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,22,32,.12)_35%,rgba(8,22,32,.82)_100%)]"
               />
-              <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-[#12171A] sm:p-7">
+              <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-[#F2EDE3] sm:p-7">
                 <div>
-                  <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[#C6D6CE]">
-                    Seoul after six · 37.5665° N
-                  </p>
-                  <p className="mt-2 max-w-[12ch] font-[family-name:var(--font-display)] text-3xl leading-none sm:text-4xl">
+                  <p className="max-w-[12ch] font-[family-name:var(--font-display)] text-3xl leading-none sm:text-4xl">
                     Old roofs. New Seoul.
                   </p>
                 </div>
