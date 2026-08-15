@@ -348,7 +348,7 @@ export default async function Home() {
                   {/* 역 — 작고 정확한 점. 고른 역에만 가는 테두리가 하나 더 */}
                   <span
                     aria-hidden
-                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8EAEB] peer-checked:bg-[#E86B54] peer-checked:ring-1 peer-checked:ring-[#E86B54] peer-checked:ring-offset-4 peer-checked:ring-offset-[#12171A] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#7FA8DC] sm:h-3 sm:w-3"
+                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8EAEB] peer-checked:bg-[#E86B54] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#7FA8DC] sm:h-3 sm:w-3"
                   />
 
                   {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
