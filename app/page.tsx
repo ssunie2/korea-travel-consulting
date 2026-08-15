@@ -200,7 +200,7 @@ export default async function Home() {
           <div>
             {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
             <div>
-              <p className="font-[family-name:var(--font-geist-mono)] text-[1.35rem] lowercase leading-none tracking-[-0.02em] text-[#E8EAEB]">
+              <p className="font-[family-name:var(--font-geist-sans)] text-[1.6rem] font-semibold lowercase leading-none tracking-[-0.035em] text-[#E8EAEB]">
                 mohallae
               </p>
               <p className="mt-2 font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.18em] text-[#8B9691]">
@@ -209,7 +209,7 @@ export default async function Home() {
               </p>
             </div>
 
-            <h1 className="mt-5 max-w-[15ch] font-[family-name:var(--font-display)] text-[clamp(2.75rem,7vw,5rem)] leading-[0.95] tracking-tight">
+            <h1 className="mt-12 max-w-[15ch] font-[family-name:var(--font-display)] text-[clamp(2.75rem,7vw,5rem)] leading-[0.95] tracking-tight">
               Plan Korea like you know{" "}
               <span className="text-[#E86B54]">someone who lives here.</span>
             </h1>
