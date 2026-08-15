@@ -14,7 +14,7 @@ const CONTACT = "hello@example.com";
 const UPDATED = "12 August 2026";
 
 export const metadata = {
-  title: "Privacy Policy — Korea Travel Consulting",
+  title: "Privacy Policy — mohallae",
   description: "What we collect, why, how long we keep it, and how to have it deleted.",
 };
 
@@ -76,7 +76,7 @@ export default function PrivacyPolicy() {
           href="/"
           className="-my-2 py-2 font-[family-name:var(--font-display)] text-xl tracking-tight underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
         >
-          Korea Travel Consulting
+          mohallae
         </Link>
       </header>
 
@@ -300,7 +300,7 @@ export default function PrivacyPolicy() {
           </h2>
           {/* TODO(출시 전): 사업자등록 후 상호·대표자·등록번호·주소를 여기에 넣는다. */}
           <p className="mt-4 leading-relaxed text-[#3D4A44]">
-            Korea Travel Consulting —{" "}
+            mohallae —{" "}
             <a
               href={`mailto:${CONTACT}`}
               className="underline underline-offset-4 hover:text-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"

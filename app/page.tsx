@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Instrument_Serif } from "next/font/google";
-import { seoulWeather, type Sky } from "@/lib/weather";
+import { seoulWeather } from "@/lib/weather";
 
 // 표제용 서체. layout.tsx 를 건드리지 않으려고 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -24,38 +24,15 @@ function seoulNow() {
   }).formatToParts(new Date());
 
   const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "00";
-  const hour = Number(get("hour"));
-  return { hour, label: `${get("hour")}:${get("minute")}` };
-}
-
-const SKY = {
-  dawn: { top: "#F2A9A0", bottom: "#FBD9C0", orb: "#FFD1A8", orbOpacity: 0.9, stars: 0.35, haze: 0.2 },
-  day: { top: "#8FD0F0", bottom: "#BEE6F8", orb: "#FFD52E", orbOpacity: 1, stars: 0, haze: 0 },
-  dusk: { top: "#EE8A5E", bottom: "#FFC98B", orb: "#FF8A4C", orbOpacity: 1, stars: 0.25, haze: 0.15 },
-  night: { top: "#0E1E38", bottom: "#1B2E4D", orb: "#EDEFF5", orbOpacity: 0.95, stars: 1, haze: 0.1 },
-} as const;
-
-function skyFor(hour: number) {
-  if (hour < 6) return SKY.night;
-  if (hour < 8) return SKY.dawn;
-  if (hour < 17) return SKY.day;
-  if (hour < 20) return SKY.dusk;
-  return SKY.night;
+  return { label: `${get("hour")}:${get("minute")}` };
 }
 
 // 움직임은 CSS로만 준다. 자바스크립트가 없어도 그림은 그대로 나온다.
 const MOTION = `
-@keyframes ktc-drift { from { transform: translateX(-40px) } to { transform: translateX(60px) } }
 @keyframes ktc-ride  { from { transform: translateX(-130px) } to { transform: translateX(1060px) } }
 @keyframes ktc-ride-n { from { transform: translateX(-130px) } to { transform: translateX(500px) } }
-@keyframes ktc-tw    { 0%,100% { opacity:.2 } 50% { opacity:1 } }
-.ktc-clouds { animation: ktc-drift 24s ease-in-out infinite alternate }
 .ktc-train   { animation: ktc-ride 13s linear infinite }
 .ktc-train-n { animation: ktc-ride-n 9s linear infinite }
-.ktc-star   { animation: ktc-tw 3.4s ease-in-out infinite }
-@keyframes ktc-fall { from { transform: translateY(-40px) } to { transform: translateY(340px) } }
-.ktc-drop  { animation: ktc-fall 1s linear infinite }
-.ktc-flake { animation: ktc-fall 5s linear infinite }
 .ktc-tip { display: none }
 .ktc-route:has(#ktc-day-1:checked) .ktc-tip-1,
 .ktc-route:has(#ktc-day-2:checked) .ktc-tip-2,
@@ -68,7 +45,6 @@ const MOTION = `
   .ktc-route:has(#ktc-day-4:checked) .ktc-tip-4 { display: grid }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ktc-clouds, .ktc-star, .ktc-drop, .ktc-flake { animation: none }
   .ktc-train   { animation: none; transform: translateX(430px) }
   .ktc-train-n { animation: none; transform: translateX(180px) }
 }
@@ -169,31 +145,13 @@ const WIDE: Scene = { id: "w", w: 1000, rideClass: "ktc-train" };
 const NARROW: Scene = { id: "n", w: 460, rideClass: "ktc-train-n" };
 
 /**
- * 비·눈 자리. **Math.random 을 쓰면 안 된다** — 서버와 브라우저가 다른 값을 뽑으면
- * 화면이 한 번 깜빡이며 다시 그려진다. 그래서 번호에서 값을 만들어 늘 같은 자리에 떨어뜨린다.
- */
-const drift = (i: number, k: number) => ((i * 9301 + k * 49297) % 233280) / 233280;
-
-/**
  * 노선. **그림을 그리지 않는다.**
  *
  * 해·구름·전동차를 빼고 선 하나와 지나가는 빛만 남겼다. 지하철 안내 표지가 하는 방식이고,
  * 역 이름과 지역명은 그림이 아니라 **글자**가 맡는다(아래 HTML 이 그린다).
  * 시간대와 날씨는 배경 톤과 빗줄기로만 아주 옅게 남는다.
  */
-function MetroScene({
-  scene,
-  sky,
-  weather,
-  className,
-}: {
-  scene: Scene;
-  sky: (typeof SKY)[keyof typeof SKY];
-  weather: Sky;
-  className: string;
-}) {
-  const wet = weather === "rain" || weather === "snow";
-
+function MetroScene({ scene, className }: { scene: Scene; className: string }) {
   return (
     <svg
       viewBox={`0 0 ${scene.w} 220`}
@@ -202,13 +160,9 @@ function MetroScene({
       aria-label="A subway line. DAY 1 through DAY 4 are the stations, and a train passes along it."
     >
       <defs>
-        <linearGradient id={`ktc-wash-${scene.id}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={sky.top} stopOpacity="0" />
-          <stop offset="1" stopColor={sky.top} stopOpacity={weather === "clear" ? 0.1 : 0.17} />
-        </linearGradient>
         <linearGradient id={`ktc-trail-${scene.id}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#C24632" stopOpacity="0" />
-          <stop offset="1" stopColor="#C24632" stopOpacity=".5" />
+          <stop offset="0" stopColor="#E86B54" stopOpacity="0" />
+          <stop offset="1" stopColor="#E86B54" stopOpacity=".5" />
         </linearGradient>
         <clipPath id={`ktc-cut-${scene.id}`}>
           <rect width={scene.w} height="220" />
@@ -216,51 +170,14 @@ function MetroScene({
       </defs>
 
       <g clipPath={`url(#ktc-cut-${scene.id})`}>
-        {/* 하늘을 안 그린다. 시간대는 바닥에 깔리는 아주 옅은 톤으로만 남는다 */}
-        <rect width={scene.w} height="220" fill={`url(#ktc-wash-${scene.id})`} />
-
-        {/* 비 또는 눈. 가는 선과 점으로만 — 그림이 되면 A안이 아니다 */}
-        {wet && (
-          <g opacity="0.5">
-            {Array.from({ length: Math.round(scene.w / 24) }, (_, i) => {
-              const x = drift(i, 1) * scene.w;
-              const delay = `${(drift(i, 2) * 2).toFixed(2)}s`;
-              return weather === "rain" ? (
-                <line
-                  key={i}
-                  className="ktc-drop"
-                  x1={x}
-                  y1="0"
-                  x2={x - 5}
-                  y2="14"
-                  stroke="#3E6FB0"
-                  strokeWidth="1"
-                  strokeLinecap="round"
-                  style={{ animationDelay: delay }}
-                />
-              ) : (
-                <circle
-                  key={i}
-                  className="ktc-flake"
-                  cx={x}
-                  cy="0"
-                  r={1 + drift(i, 3) * 1.1}
-                  fill="#8FA8B8"
-                  style={{ animationDelay: delay }}
-                />
-              );
-            })}
-          </g>
-        )}
-
         {/* 열차. 차체를 그리지 않고 **지나가는 빛과 잔상**으로 암시한다 */}
         <g className={scene.rideClass}>
           <rect x="0" y="75" width="86" height="6" rx="3" fill={`url(#ktc-trail-${scene.id})`} />
-          <rect x="78" y="72" width="30" height="12" rx="6" fill="#C24632" />
+          <rect x="78" y="72" width="30" height="12" rx="6" fill="#E86B54" />
         </g>
 
         {/* 노선 — 10px 이던 것을 2.5px 로. 굵기가 유아틱함의 절반이었다 */}
-        <line x1="0" y1="120" x2={scene.w} y2="120" stroke="#12211C" strokeWidth="2.5" />
+        <line x1="0" y1="120" x2={scene.w} y2="120" stroke="#E8EAEB" strokeWidth="2.5" />
       </g>
     </svg>
   );
@@ -269,44 +186,35 @@ function MetroScene({
 export default async function Home() {
   const now = seoulNow();
   const weather = await seoulWeather();
-  const sky = skyFor(now.hour);
 
   return (
     <div
-      className={`${display.variable} flex-1 bg-[#F2EDE3] text-[#1B211E] font-[family-name:var(--font-geist-sans)] selection:bg-[#D8503C] selection:text-[#F2EDE3]`}
+      className={`${display.variable} flex-1 bg-[#12171A] text-[#E8EAEB] font-[family-name:var(--font-geist-sans)] selection:bg-[#E86B54] selection:text-[#12171A]`}
     >
       <style dangerouslySetInnerHTML={{ __html: MOTION }} />
 
-      {/* ── 노선 띠. 역명판의 맨 윗줄이다 ──────────────── */}
-      <div
-        aria-hidden
-        className="h-[3px] w-full"
-        style={{
-          background:
-            "linear-gradient(90deg,#00A84D 0 40%,#EF7C1C 40% 72%,#0052A4 72% 100%)",
-        }}
-      />
 
       {/* ── 역명판 + 하늘 ─────────────────────────────── */}
       <section>
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-center md:gap-14 md:pt-12">
+        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12">
           <div>
-            <div className="flex items-center gap-3">
-              <span className="grid h-12 w-12 flex-none place-items-center rounded-full border border-[#12211C] text-center font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-tight tracking-tight text-[#12211C]">
-                DAY
-                <br />01
-              </span>
-              <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.18em] text-[#4A5D54]">
-                Before you fly
-              </span>
+            {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
+            <div>
+              <p className="font-[family-name:var(--font-geist-sans)] text-[1.6rem] font-semibold lowercase leading-none tracking-[-0.035em] text-[#E8EAEB]">
+                mohallae
+              </p>
+              <p className="mt-2 font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.18em] text-[#8B9691]">
+                모할래 <span aria-hidden className="mx-1 text-[#4A5450]">·</span>
+                <span className="uppercase">Before you fly</span>
+              </p>
             </div>
 
-            <h1 className="mt-5 max-w-[15ch] font-[family-name:var(--font-display)] text-[clamp(2.75rem,7vw,5rem)] leading-[0.95] tracking-tight">
+            <h1 className="mt-12 max-w-[15ch] font-[family-name:var(--font-display)] text-[clamp(2.75rem,7vw,5rem)] leading-[0.95] tracking-tight">
               Plan Korea like you know{" "}
-              <span className="text-[#00A84D]">someone who lives here.</span>
+              <span className="text-[#E86B54]">someone who lives here.</span>
             </h1>
 
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#3D4A44]">
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#A6B0AC]">
               Tell us about your trip and we&apos;ll write you a free day-by-day draft — with one
               tip a guidebook won&apos;t give you.
             </p>
@@ -314,24 +222,24 @@ export default async function Home() {
             <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3">
               <Link
                 href="/plan"
-                className="inline-flex items-center rounded-full bg-[#12211C] px-8 py-3.5 text-base text-[#F2EDE3] transition-colors hover:bg-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#3E6FB0]"
+                className="inline-flex items-center rounded-full bg-[#E8EAEB] px-8 py-3.5 text-base text-[#12171A] transition-colors hover:bg-[#E86B54] hover:text-[#12171A] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#7FA8DC]"
               >
                 Get your free draft
               </Link>
-              <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.18em] text-[#4A5D54]">
+              <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.18em] text-[#8B9691]">
                 No account · Free
               </span>
             </div>
 
             {/* 지금 서울 몇 시인지. 손님은 시차 반대편에 있다 */}
-            <p className="mt-7 inline-flex items-center gap-2 border-t border-[#DDD5C6] pt-3 font-[family-name:var(--font-geist-mono)] text-[0.7rem] tracking-[0.1em] text-[#4A5D54]">
-              Seoul <b className="font-semibold tabular-nums text-[#1B211E]">{now.label}</b>
+            <p className="mt-7 inline-flex items-center gap-2 border-t border-[#2A3330] pt-3 font-[family-name:var(--font-geist-mono)] text-[0.7rem] tracking-[0.1em] text-[#8B9691]">
+              Seoul <b className="font-semibold tabular-nums text-[#E8EAEB]">{now.label}</b>
               <span aria-hidden>·</span> 37.5665° N
             </p>
           </div>
 
           {/* 한옥의 결은 사진으로, 노선의 그래픽은 아래 SVG로 이어 붙인다. */}
-          <figure className="relative mx-auto w-full max-w-[31rem] overflow-hidden rounded-[1.75rem] border-[3px] border-[#12211C] bg-[#12211C] shadow-[0_28px_70px_-28px_rgba(18,33,28,0.65)] md:justify-self-end">
+          <figure className="relative mx-auto w-full max-w-[31rem] overflow-hidden rounded-[1.75rem] border border-[#2A3330] bg-[#0E1316] shadow-[0_28px_70px_-28px_rgba(0,0,0,0.7)] md:justify-self-end">
             {/*
               TODO(출시 전): 이 이미지는 **AI 가 만든 그림이지 실제 사진이 아니다.**
               1024×1536(AI 표준 출력 크기), 카메라 정보 전무, 확대하면 사람 형체와
@@ -359,19 +267,16 @@ export default async function Home() {
               />
               <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-[#F2EDE3] sm:p-7">
                 <div>
-                  <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[#C6D6CE]">
-                    Seoul after six · 37.5665° N
-                  </p>
-                  <p className="mt-2 max-w-[12ch] font-[family-name:var(--font-display)] text-3xl leading-none sm:text-4xl">
+                  <p className="max-w-[12ch] font-[family-name:var(--font-display)] text-3xl leading-none sm:text-4xl">
                     Old roofs. New Seoul.
                   </p>
                 </div>
-                <span className="grid h-16 w-16 flex-none place-items-center rounded-full border-2 border-[#F2EDE3] bg-[#D8503C] text-lg font-bold tracking-[0.12em] shadow-lg">
+                <span className="grid h-16 w-16 flex-none place-items-center rounded-full border-2 border-[#12171A] bg-[#E86B54] text-lg font-bold tracking-[0.12em] shadow-lg">
                   서울
                 </span>
               </figcaption>
-              <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-[#F2EDE3]/90 px-3 py-2 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-[0.15em] text-[#12211C] backdrop-blur-sm sm:left-7 sm:top-7">
-                <span aria-hidden className="h-2 w-2 rounded-full bg-[#EF7C1C]" />
+              <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-[#12171A]/90 px-3 py-2 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-[0.15em] text-[#E8EAEB] backdrop-blur-sm sm:left-7 sm:top-7">
+                <span aria-hidden className="h-2 w-2 rounded-full bg-[#E86B54]" />
                 Local view
               </div>
             </div>
@@ -381,15 +286,15 @@ export default async function Home() {
         <div className="ktc-route mt-14">
           {/* 안내 표지의 머리줄. 노선 이름과 **지금 서울 상태**가 여기 한 줄에 온다 */}
           <div className="mx-auto max-w-6xl px-6">
-            <p className="whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-[0.14em] text-[#4A5D54] sm:text-[0.72rem] sm:tracking-[0.3em]">
+            <p className="whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-[0.14em] text-[#8B9691] sm:text-[0.72rem] sm:tracking-[0.3em]">
               Seoul Metro · 4 Days
               {weather.tempC !== null && (
                 <>
-                  <span aria-hidden className="mx-2 text-[#B9B0A0]">·</span>
+                  <span aria-hidden className="mx-2 text-[#4A5450]">·</span>
                   {weather.tempC}°
                 </>
               )}
-              <span aria-hidden className="mx-2 text-[#B9B0A0]">·</span>
+              <span aria-hidden className="mx-2 text-[#4A5450]">·</span>
               {weather.sky === "clear"
                 ? "Clear"
                 : weather.sky === "cloud"
@@ -399,12 +304,12 @@ export default async function Home() {
                     : "Snow"}
             </p>
           </div>
-          <div aria-hidden className="mt-3 h-px w-full bg-[#DDD5C6]" />
+          <div aria-hidden className="mt-3 h-px w-full bg-[#2A3330]" />
 
           {/* 누르는 자리를 그림 위에 겹쳐야 해서 relative 가 필요하다 */}
           <div className="relative">
-            <MetroScene scene={NARROW} sky={sky} weather={weather.sky} className="block h-auto w-full md:hidden" />
-            <MetroScene scene={WIDE} sky={sky} weather={weather.sky} className="hidden h-auto w-full md:block" />
+            <MetroScene scene={NARROW} className="block h-auto w-full md:hidden" />
+            <MetroScene scene={WIDE} className="hidden h-auto w-full md:block" />
 
             <fieldset className="absolute inset-0 m-0 border-0 p-0">
               <legend className="sr-only">Choose a day to preview its concierge tip</legend>
@@ -415,7 +320,7 @@ export default async function Home() {
                   className="group absolute top-[54.5%] h-14 w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:w-28"
                 >
                   {/* 날짜 — 점 위 */}
-                  <span className="absolute bottom-[calc(50%+0.65rem)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold tracking-[0.16em] text-[#1B211E] group-has-[:checked]:text-[#C24632] sm:text-[0.8rem] sm:tracking-[0.2em]">
+                  <span className="absolute bottom-[calc(50%+0.65rem)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold tracking-[0.16em] text-[#E8EAEB] group-has-[:checked]:text-[#E86B54] sm:text-[0.8rem] sm:tracking-[0.2em]">
                     DAY {station.day}
                   </span>
 
@@ -432,14 +337,14 @@ export default async function Home() {
                   {/* 역 — 작고 정확한 점. 고른 역에만 가는 테두리가 하나 더 */}
                   <span
                     aria-hidden
-                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#12211C] peer-checked:bg-[#C24632] peer-checked:ring-1 peer-checked:ring-[#C24632] peer-checked:ring-offset-4 peer-checked:ring-offset-[#F2EDE3] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#3E6FB0] sm:h-3 sm:w-3"
+                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8EAEB] peer-checked:bg-[#E86B54] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#7FA8DC] sm:h-3 sm:w-3"
                   />
 
                   {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
-                  <span className="absolute top-[calc(50%+0.8rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] tracking-[0.1em] text-[#4A5D54] sm:text-[0.65rem] sm:tracking-[0.14em]">
+                  <span className="absolute top-[calc(50%+0.8rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] tracking-[0.1em] text-[#8B9691] sm:text-[0.65rem] sm:tracking-[0.14em]">
                     {station.en}
                   </span>
-                  <span className="absolute top-[calc(50%+1.7rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] text-[#8B9299] sm:text-[0.6rem]">
+                  <span className="absolute top-[calc(50%+1.7rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] text-[#69736F] sm:text-[0.6rem]">
                     {station.ko}
                   </span>
                 </label>
@@ -454,9 +359,9 @@ export default async function Home() {
                 key={tip.day}
                 id={`ktc-tip-${tip.day}`}
                 aria-live="polite"
-                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-[3px] border border-[#12211C] bg-[#12211C] shadow-[0_24px_60px_-28px_rgba(18,33,28,0.6)] md:grid-cols-[.8fr_1.2fr]`}
+                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-[3px] border border-[#2A3330] bg-[#171D21] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.6)] md:grid-cols-[.8fr_1.2fr]`}
               >
-                <figcaption className="flex flex-col justify-between gap-8 bg-[#12211C] p-6 text-[#F2EDE3] sm:p-8">
+                <figcaption className="flex flex-col justify-between gap-8 bg-[#1B2328] p-6 text-[#E8EAEB] sm:p-8">
                   <div>
                     <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[#EF9A55]">
                       Day {tip.day} · Transfer here
@@ -469,18 +374,18 @@ export default async function Home() {
                     Concierge tip {String(tip.day).padStart(2, "0")}
                   </span>
                 </figcaption>
-                <div className="flex flex-col gap-5 bg-[#F8F5EE] p-6 sm:p-8">
+                <div className="flex flex-col gap-5 bg-[#12171A] p-6 sm:p-8">
                   <p className="font-[family-name:var(--font-display)] text-2xl leading-snug sm:text-3xl">
                     {tip.place}
                   </p>
                   <div className="flex items-start gap-3">
-                    <span className="mt-1 flex-none rounded bg-[#D8503C] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-white">
+                    <span className="mt-1 flex-none rounded bg-[#E86B54] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-white">
                       Don&apos;t
                     </span>
-                    <span className="leading-relaxed text-[#8B9299] line-through">{tip.dont}</span>
+                    <span className="leading-relaxed text-[#69736F] line-through">{tip.dont}</span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="mt-1 flex-none rounded bg-[#3E6FB0] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-white">
+                    <span className="mt-1 flex-none rounded bg-[#7FA8DC] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-white">
                       Do
                     </span>
                     <span className="leading-relaxed">{tip.do}</span>
@@ -493,21 +398,21 @@ export default async function Home() {
       </section>
 
       {/* ── how it works ────────────────────────────────── */}
-      <section className="border-t border-[#DDD5C6]">
+      <section className="border-t border-[#2A3330]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[#4A5D54]">
+          <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[#8B9691]">
             How it works
           </h2>
           <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-12">
             {steps.map((step, i) => (
               <li key={step.title}>
-                <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[#D8503C]">
+                <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[#E86B54]">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl leading-tight">
                   {step.title}
                 </h3>
-                <p className="mt-2 leading-relaxed text-[#3D4A44]">{step.body}</p>
+                <p className="mt-2 leading-relaxed text-[#A6B0AC]">{step.body}</p>
               </li>
             ))}
           </ol>
@@ -515,35 +420,35 @@ export default async function Home() {
       </section>
 
       {/* ── free vs paid ────────────────────────────────── */}
-      <section className="border-t border-[#DDD5C6] bg-[#EDE7DB]">
+      <section className="border-t border-[#2A3330] bg-[#171D21]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <h2 className="font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
             What&apos;s free, and what you&apos;re paying for
           </h2>
           <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-16">
             <div>
-              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]">
+              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#8B9691]">
                 Free draft
               </p>
               <ul className="mt-4 space-y-3">
                 {free.map((item) => (
                   <li key={item} className="flex gap-3 leading-relaxed">
-                    <span aria-hidden className="text-[#4A5D54]">
+                    <span aria-hidden className="text-[#8B9691]">
                       —
                     </span>
-                    <span className="text-[#3D4A44]">{item}</span>
+                    <span className="text-[#A6B0AC]">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#D8503C]">
+              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#E86B54]">
                 Full plan · ₩150,000
               </p>
               <ul className="mt-4 space-y-3">
                 {paid.map((item) => (
                   <li key={item} className="flex gap-3 leading-relaxed">
-                    <span aria-hidden className="text-[#D8503C]">
+                    <span aria-hidden className="text-[#E86B54]">
                       —
                     </span>
                     <span>{item}</span>
@@ -553,7 +458,7 @@ export default async function Home() {
             </div>
           </div>
           {/* 우리는 여행사가 아니다. 이 선을 손님에게도 분명히 해둔다 (규칙 6번) */}
-          <p className="mt-10 max-w-2xl leading-relaxed text-[#4A5D54]">
+          <p className="mt-10 max-w-2xl leading-relaxed text-[#8B9691]">
             We plan; you book. We don&apos;t make reservations for you or take payment for hotels,
             restaurants or tickets — we tell you exactly what to book and how.
           </p>
@@ -561,16 +466,16 @@ export default async function Home() {
       </section>
 
       {/* ── pricing + contact ───────────────────────────── */}
-      <section id="pricing" className="scroll-mt-20 border-t border-[#DDD5C6]">
+      <section id="pricing" className="scroll-mt-20 border-t border-[#2A3330]">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
           <div>
-            <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[#4A5D54]">
+            <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[#8B9691]">
               Pricing
             </p>
             <p className="mt-4 font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
               The draft is free. The full plan is ₩150,000.
             </p>
-            <p className="mt-4 max-w-md leading-relaxed text-[#3D4A44]">
+            <p className="mt-4 max-w-md leading-relaxed text-[#A6B0AC]">
               One price, however long your trip is. It&apos;s put together for you start to
               finish — so there&apos;s no call to book and nobody to wait on.
             </p>
@@ -578,15 +483,15 @@ export default async function Home() {
           <div id="contact" className="scroll-mt-20 md:justify-self-end">
             <Link
               href="/plan"
-              className="inline-flex items-center rounded-full bg-[#12211C] px-8 py-3.5 text-base text-[#F2EDE3] transition-colors hover:bg-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#3E6FB0]"
+              className="inline-flex items-center rounded-full bg-[#E8EAEB] px-8 py-3.5 text-base text-[#12171A] transition-colors hover:bg-[#E86B54] hover:text-[#12171A] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#7FA8DC]"
             >
               Start with the free draft
             </Link>
-            <p className="mt-5 leading-relaxed text-[#3D4A44]">
+            <p className="mt-5 leading-relaxed text-[#A6B0AC]">
               Rather just ask a question first?{" "}
               <Link
                 href="/contact"
-                className="underline underline-offset-4 hover:text-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+                className="underline underline-offset-4 hover:text-[#E86B54] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7FA8DC]"
               >
                 Ask us anything
               </Link>
@@ -596,9 +501,9 @@ export default async function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-[#DDD5C6]">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-[family-name:var(--font-geist-mono)] text-xs text-[#4A5D54] sm:flex-row sm:items-center sm:justify-between">
-          <span>Korea Travel Consulting</span>
+      <footer className="border-t border-[#2A3330]">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-[family-name:var(--font-geist-mono)] text-xs text-[#8B9691] sm:flex-row sm:items-center sm:justify-between">
+          <span>mohallae</span>
           <div className="flex gap-5">
             <Link href="/privacy" className="underline-offset-4 hover:underline">
               Privacy

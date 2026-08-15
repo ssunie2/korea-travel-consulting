@@ -11,7 +11,7 @@ const display = Instrument_Serif({
 });
 
 export const metadata = {
-  title: "Contact — Korea Travel Consulting",
+  title: "Contact — mohallae",
   description: "Ask us anything about planning your trip to Korea.",
 };
 
@@ -57,7 +57,7 @@ export default async function ContactPage({
           href="/"
           className="-my-3 inline-flex min-h-11 items-center font-[family-name:var(--font-display)] text-xl tracking-tight underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
         >
-          Korea Travel Consulting
+          mohallae
         </Link>
       </header>
 

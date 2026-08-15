@@ -76,7 +76,7 @@ export default async function ConsultPage({
           href="/"
           className="-my-2 py-2 font-[family-name:var(--font-display)] text-xl tracking-tight underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
         >
-          Korea Travel Consulting
+          mohallae
         </Link>
         {/* min-h-11: 손가락으로 누를 수 있는 최소 크기(44px)를 보장한다 */}
         <Link

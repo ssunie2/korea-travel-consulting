@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Korea Travel Consulting",
+  title: "mohallae — Travel Korea like you know someone who lives here",
   description: "Plan your Korea trip with local experts before you arrive.",
   // 출시 전까지 색인 금지. robots.ts 는 크롤러가 지켜줄 때만 듣지만,
   // 이 헤더는 이미 들어온 크롤러에게도 "담지 마라"고 말한다. 둘 다 둔다.
