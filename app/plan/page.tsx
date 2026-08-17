@@ -130,7 +130,7 @@ export default function PlanForm() {
       <header className="mx-auto flex max-w-2xl items-center justify-between px-6 py-6">
         <Link
           href="/"
-          className="-my-2 py-2 font-[family-name:var(--font-display)] text-xl tracking-tight underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+          className="-my-2 py-2 font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
         >
           mohallae
         </Link>
