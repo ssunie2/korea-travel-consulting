@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Instrument_Serif } from "next/font/google";
 import { seoulWeather } from "@/lib/weather";
+import { t } from "@/lib/copy";
 
 // 표제용 서체. layout.tsx 를 건드리지 않으려고 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -52,43 +53,59 @@ const MOTION = `
 
 const steps = [
   {
-    title: "Tell us about your trip",
-    body: "Dates, how long, who's coming, what you're into. Two minutes, no account.",
+    title: t({ ko: "여행 정보를 알려주세요", en: "Tell us about your trip" }),
+    body: t({ ko: "날짜, 기간, 동행, 관심사. 2분이면 되고 가입도 필요 없습니다.", en: "Dates, how long, who's coming, what you're into. Two minutes, no account." }),
   },
   {
-    title: "Get a free draft",
-    body: "A day-by-day outline, plus one concierge tip so you can judge the rest.",
+    title: t({ ko: "무료 초안을 받으세요", en: "Get a free draft" }),
+    body: t({ ko: "일자별 개요와 컨시어지 팁 하나. 나머지가 어떨지 판단하실 수 있습니다.", en: "A day-by-day outline, plus one concierge tip so you can judge the rest." }),
   },
   {
-    title: "Get the full plan",
-    body: "₩150,000. A tip at every stop, and the route that wastes the least of your time.",
+    title: t({ ko: "전체 일정을 받으세요", en: "Get the full plan" }),
+    body: t({ ko: "₩150,000. 모든 정거장에 팁이 붙고, 시간을 가장 덜 버리는 동선으로 짜드립니다.", en: "₩150,000. A tip at every stop, and the route that wastes the least of your time." }),
   },
 ];
 
-const free = [
-  "Day-by-day themes, three activities a day",
-  "One concierge tip, in full",
-  "One place to stay, one place to eat",
-  "A total budget estimate",
-];
+const free = t({
+  ko: [
+    "일자별 테마와 하루 세 가지 일정",
+    "컨시어지 팁 하나, 내용 전부",
+    "숙소 한 곳, 식당 한 곳",
+    "총예산 추정",
+  ],
+  en: [
+    "Day-by-day themes, three activities a day",
+    "One concierge tip, in full",
+    "One place to stay, one place to eat",
+    "A total budget estimate",
+  ],
+});
 
 /* 규칙 6번(#28): 예약 대행·통역은 쓰지 않는다. 우리는 알려주고, 예약은 손님이 한다. */
-const paid = [
-  "A tip on every stop — what to skip, what locals do",
-  "Five stays and five restaurants, with reasons",
-  "Costs broken down, routes and timing worked out",
-  "Exactly what to book and when — including the places that only take Korean phone reservations",
-];
+const paid = t({
+  ko: [
+    "모든 정거장에 팁 — 건너뛸 것, 현지인은 어떻게 하는지",
+    "숙소 다섯 곳과 식당 다섯 곳, 고른 이유까지",
+    "비용 항목별 분해, 동선과 시간 계산",
+    "무엇을 언제 예약하면 되는지 — 한국 전화로만 받는 곳까지",
+  ],
+  en: [
+    "A tip on every stop — what to skip, what locals do",
+    "Five stays and five restaurants, with reasons",
+    "Costs broken down, routes and timing worked out",
+    "Exactly what to book and when — including the places that only take Korean phone reservations",
+  ],
+});
 
 /**
  * 누르는 자리. `x` 는 화면 폭의 몇 %인지다 — 넓은 화면과 폰 장면이
  * 같은 비율로 정거장을 놓기 때문에 이 한 벌로 둘 다 덮는다.
  */
 const STATIONS = [
-  { day: 1, x: 150, en: "INCHEON", ko: "인천공항" },
-  { day: 2, x: 420, en: "GYEONGBOKGUNG", ko: "경복궁" },
-  { day: 3, x: 680, en: "BUKCHON", ko: "북촌" },
-  { day: 4, x: 900, en: "NAMSAN", ko: "남산" },
+  { day: 1, x: 150, en: "INCHEON", ko: "인천공항", enSub: "인천공항", koSub: "INCHEON" },
+  { day: 2, x: 420, en: "GYEONGBOKGUNG", ko: "경복궁", enSub: "경복궁", koSub: "GYEONGBOKGUNG" },
+  { day: 3, x: 680, en: "BUKCHON", ko: "북촌", enSub: "북촌", koSub: "BUKCHON" },
+  { day: 4, x: 900, en: "NAMSAN", ko: "남산", enSub: "남산", koSub: "NAMSAN" },
 ];
 
 /**
@@ -100,31 +117,43 @@ const STATIONS = [
 const TIPS = [
   {
     day: 1,
-    headline: "The first hour decides the next four days.",
-    place: "Incheon Airport",
-    dont: "Change all your cash at the airport counter.",
-    do: "Airport rates are the worst you'll see in Korea. Change just enough for the ride in, then pay by card — almost everywhere takes it, down to market stalls. Pick up a T-money card at any convenience store while you're there; it works on every bus and subway in the country.",
+    headline: t({ ko: "첫 한 시간이 남은 나흘을 정합니다.", en: "The first hour decides the next four days." }),
+    place: t({ ko: "인천공항", en: "Incheon Airport" }),
+    dont: t({ ko: "공항 환전소에서 현금을 다 바꾼다.", en: "Change all your cash at the airport counter." }),
+    do: t({
+      ko: "공항 환율이 한국에서 제일 나쁩니다. 들어오는 교통비만 바꾸고 나머지는 카드로 쓰세요 — 시장 노점까지 거의 다 받습니다. 온 김에 편의점에서 티머니 카드를 사두면 전국 버스와 지하철에서 그대로 씁니다.",
+      en: "Airport rates are the worst you'll see in Korea. Change just enough for the ride in, then pay by card — almost everywhere takes it, down to market stalls. Pick up a T-money card at any convenience store while you're there; it works on every bus and subway in the country.",
+    }),
   },
   {
     day: 2,
-    headline: "One detail can reroute a whole day.",
-    place: "Gyeongbokgung Palace",
-    dont: "Tuesday morning, 10:00 — start here.",
-    do: "It's closed on Tuesdays. Go Wednesday — and wear hanbok. The rental shops are right outside the gate, and wearing it makes admission free.",
+    headline: t({ ko: "하나만 어긋나도 하루가 통째로 바뀝니다.", en: "One detail can reroute a whole day." }),
+    place: t({ ko: "경복궁", en: "Gyeongbokgung Palace" }),
+    dont: t({ ko: "화요일 오전 10시, 여기서 시작.", en: "Tuesday morning, 10:00 — start here." }),
+    do: t({
+      ko: "화요일은 휴관입니다. 수요일에 가시고, 한복을 입으세요. 대여점이 정문 바로 앞에 있고 한복을 입으면 입장료가 무료입니다.",
+      en: "It's closed on Tuesdays. Go Wednesday — and wear hanbok. The rental shops are right outside the gate, and wearing it makes admission free.",
+    }),
   },
   {
     day: 3,
-    headline: "Some streets are someone's front door.",
-    place: "Bukchon Hanok Village",
-    dont: "Arrive at 8am for empty photos.",
-    do: "People live here, so the lanes have posted visiting hours — roughly 10:00 to 17:00, and the main alley closes to visitors on Sundays. Come inside those hours, keep your voice down, and you'll be welcome.",
+    headline: t({ ko: "어떤 골목은 누군가의 대문 앞입니다.", en: "Some streets are someone's front door." }),
+    place: t({ ko: "북촌한옥마을", en: "Bukchon Hanok Village" }),
+    dont: t({ ko: "사람 없는 사진을 찍으려고 아침 8시에 간다.", en: "Arrive at 8am for empty photos." }),
+    do: t({
+      ko: "사람이 사는 동네라 관람 시간이 정해져 있습니다 — 대략 10시부터 17시까지, 주요 골목은 일요일에 닫습니다. 그 시간 안에 오시고 목소리만 낮춰주시면 환영받습니다.",
+      en: "People live here, so the lanes have posted visiting hours — roughly 10:00 to 17:00, and the main alley closes to visitors on Sundays. Come inside those hours, keep your voice down, and you'll be welcome.",
+    }),
   },
   {
     day: 4,
-    headline: "The last stop is the one people get wrong.",
-    place: "Namsan & N Seoul Tower",
-    dont: "Take a taxi to the tower entrance.",
-    do: "Private cars can't drive up Namsan. Your options are the cable car from Myeongdong or the 01, 02 and 05 buses — those are the only vehicles allowed. Go up before sunset and come down after dark; you get both views for one trip.",
+    headline: t({ ko: "마지막 정거장에서 제일 많이 헤맵니다.", en: "The last stop is the one people get wrong." }),
+    place: t({ ko: "남산 · N서울타워", en: "Namsan & N Seoul Tower" }),
+    dont: t({ ko: "타워 입구까지 택시를 탄다.", en: "Take a taxi to the tower entrance." }),
+    do: t({
+      ko: "남산은 자가용이 못 올라갑니다. 명동에서 케이블카를 타거나 01·02·05번 버스를 타야 합니다 — 올라갈 수 있는 건 그것뿐입니다. 해 지기 전에 올라가서 어두워진 뒤에 내려오시면 낮과 밤을 한 번에 봅니다.",
+      en: "Private cars can't drive up Namsan. Your options are the cable car from Myeongdong or the 01, 02 and 05 buses — those are the only vehicles allowed. Go up before sunset and come down after dark; you get both views for one trip.",
+    }),
   },
 ];
 
@@ -205,18 +234,23 @@ export default async function Home() {
               </p>
               <p className="mt-2 font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.18em] text-[#8B9691]">
                 모할래 <span aria-hidden className="mx-1 text-[#4A5450]">·</span>
-                <span className="uppercase">Before you fly</span>
+                <span className="uppercase">{t({ ko: "떠나기 전에", en: "Before you fly" })}</span>
               </p>
             </div>
 
             <h1 className="mt-12 max-w-[15ch] font-[family-name:var(--font-display)] text-[clamp(2.75rem,7vw,5rem)] leading-[0.95] tracking-tight">
-              Plan Korea like you know{" "}
-              <span className="text-[#E86B54]">someone who lives here.</span>
+              {t({ ko: "한국에 ", en: "Plan Korea like you know " })}
+              <span className="text-[#E86B54]">
+                {t({ ko: "아는 사람 있는 것처럼", en: "someone who lives here." })}
+              </span>
+              {t({ ko: " 여행하세요.", en: "" })}
             </h1>
 
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#A6B0AC]">
-              Tell us about your trip and we&apos;ll write you a free day-by-day draft — with one
-              tip a guidebook won&apos;t give you.
+              {t({
+                ko: "여행 정보를 알려주시면 일자별 초안을 무료로 만들어 드립니다. 가이드북에 없는 팁 하나가 함께 갑니다.",
+                en: "Tell us about your trip and we'll write you a free day-by-day draft — with one tip a guidebook won't give you.",
+              })}
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3">
@@ -224,17 +258,18 @@ export default async function Home() {
                 href="/plan"
                 className="inline-flex items-center rounded-full bg-[#E8EAEB] px-8 py-3.5 text-base text-[#12171A] transition-colors hover:bg-[#E86B54] hover:text-[#12171A] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#7FA8DC]"
               >
-                Get your free draft
+                {t({ ko: "무료 초안 받기", en: "Get your free draft" })}
               </Link>
               <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.18em] text-[#8B9691]">
-                No account · Free
+                {t({ ko: "가입 없이 · 무료", en: "No account · Free" })}
               </span>
             </div>
 
             {/* 지금 서울 몇 시인지. 손님은 시차 반대편에 있다 */}
             <p className="mt-7 inline-flex items-center gap-2 border-t border-[#2A3330] pt-3 font-[family-name:var(--font-geist-mono)] text-[0.7rem] tracking-[0.1em] text-[#8B9691]">
-              Seoul <b className="font-semibold tabular-nums text-[#E8EAEB]">{now.label}</b>
-              <span aria-hidden>·</span> 37.5665° N
+              {t({ ko: "서울", en: "Seoul" })}{" "}
+              <b className="font-semibold tabular-nums text-[#E8EAEB]">{now.label}</b>
+              <span aria-hidden>·</span> {t({ ko: "북위 37.5665°", en: "37.5665° N" })}
             </p>
           </div>
 
@@ -268,7 +303,7 @@ export default async function Home() {
               <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-[#F2EDE3] sm:p-7">
                 <div>
                   <p className="max-w-[12ch] font-[family-name:var(--font-display)] text-3xl leading-none sm:text-4xl">
-                    Old roofs. New Seoul.
+                    {t({ ko: "오래된 지붕, 새로운 서울.", en: "Old roofs. New Seoul." })}
                   </p>
                 </div>
                 <span className="grid h-16 w-16 flex-none place-items-center rounded-full border-2 border-[#12171A] bg-[#E86B54] text-lg font-bold tracking-[0.12em] shadow-lg">
@@ -277,7 +312,7 @@ export default async function Home() {
               </figcaption>
               <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-[#12171A]/90 px-3 py-2 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-[0.15em] text-[#E8EAEB] backdrop-blur-sm sm:left-7 sm:top-7">
                 <span aria-hidden className="h-2 w-2 rounded-full bg-[#E86B54]" />
-                Local view
+                {t({ ko: "현지의 시선", en: "Local view" })}
               </div>
             </div>
           </figure>
@@ -287,7 +322,7 @@ export default async function Home() {
           {/* 안내 표지의 머리줄. 노선 이름과 **지금 서울 상태**가 여기 한 줄에 온다 */}
           <div className="mx-auto max-w-6xl px-6">
             <p className="whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-[0.14em] text-[#8B9691] sm:text-[0.72rem] sm:tracking-[0.3em]">
-              Seoul Metro · 4 Days
+              {t({ ko: "서울 지하철 · 4일", en: "Seoul Metro · 4 Days" })}
               {weather.tempC !== null && (
                 <>
                   <span aria-hidden className="mx-2 text-[#4A5450]">·</span>
@@ -296,12 +331,12 @@ export default async function Home() {
               )}
               <span aria-hidden className="mx-2 text-[#4A5450]">·</span>
               {weather.sky === "clear"
-                ? "Clear"
+                ? t({ ko: "맑음", en: "Clear" })
                 : weather.sky === "cloud"
-                  ? "Cloudy"
+                  ? t({ ko: "흐림", en: "Cloudy" })
                   : weather.sky === "rain"
-                    ? "Rain"
-                    : "Snow"}
+                    ? t({ ko: "비", en: "Rain" })
+                    : t({ ko: "눈", en: "Snow" })}
             </p>
           </div>
           <div aria-hidden className="mt-3 h-px w-full bg-[#2A3330]" />
@@ -312,7 +347,7 @@ export default async function Home() {
             <MetroScene scene={WIDE} className="hidden h-auto w-full md:block" />
 
             <fieldset className="absolute inset-0 m-0 border-0 p-0">
-              <legend className="sr-only">Choose a day to preview its concierge tip</legend>
+              <legend className="sr-only">{t({ ko: "날짜를 골라 그 날의 컨시어지 팁을 보세요", en: "Choose a day to preview its concierge tip" })}</legend>
               {STATIONS.map((station) => (
                 <label
                   key={station.day}
@@ -364,14 +399,14 @@ export default async function Home() {
                 <figcaption className="flex flex-col justify-between gap-8 bg-[#1B2328] p-6 text-[#E8EAEB] sm:p-8">
                   <div>
                     <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[#EF9A55]">
-                      Day {tip.day} · Transfer here
+                      {t({ ko: `DAY ${tip.day} · 환승역`, en: `Day ${tip.day} · Transfer here` })}
                     </p>
                     <p className="mt-4 font-[family-name:var(--font-display)] text-3xl leading-tight sm:text-4xl">
                       {tip.headline}
                     </p>
                   </div>
                   <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.16em] text-[#A8C3B4]">
-                    Concierge tip {String(tip.day).padStart(2, "0")}
+                    {t({ ko: `컨시어지 팁 ${String(tip.day).padStart(2, "0")}`, en: `Concierge tip ${String(tip.day).padStart(2, "0")}` })}
                   </span>
                 </figcaption>
                 <div className="flex flex-col gap-5 bg-[#12171A] p-6 sm:p-8">
@@ -380,13 +415,13 @@ export default async function Home() {
                   </p>
                   <div className="flex items-start gap-3">
                     <span className="mt-1 flex-none rounded bg-[#E86B54] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-white">
-                      Don&apos;t
+                      {t({ ko: "이렇게 마세요", en: "Don\u2019t" })}
                     </span>
                     <span className="leading-relaxed text-[#69736F] line-through">{tip.dont}</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="mt-1 flex-none rounded bg-[#7FA8DC] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-white">
-                      Do
+                      {t({ ko: "이렇게 하세요", en: "Do" })}
                     </span>
                     <span className="leading-relaxed">{tip.do}</span>
                   </div>
@@ -401,7 +436,7 @@ export default async function Home() {
       <section className="border-t border-[#2A3330]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[#8B9691]">
-            How it works
+            {t({ ko: "진행 방식", en: "How it works" })}
           </h2>
           <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-12">
             {steps.map((step, i) => (
@@ -423,12 +458,12 @@ export default async function Home() {
       <section className="border-t border-[#2A3330] bg-[#171D21]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <h2 className="font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
-            What&apos;s free, and what you&apos;re paying for
+            {t({ ko: "무엇이 무료이고, 무엇에 값을 치르는지", en: "What's free, and what you're paying for" })}
           </h2>
           <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-16">
             <div>
               <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#8B9691]">
-                Free draft
+                {t({ ko: "무료 초안", en: "Free draft" })}
               </p>
               <ul className="mt-4 space-y-3">
                 {free.map((item) => (
@@ -443,7 +478,7 @@ export default async function Home() {
             </div>
             <div>
               <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#E86B54]">
-                Full plan · ₩150,000
+                {t({ ko: "전체 일정 · ₩150,000", en: "Full plan · ₩150,000" })}
               </p>
               <ul className="mt-4 space-y-3">
                 {paid.map((item) => (
@@ -459,8 +494,10 @@ export default async function Home() {
           </div>
           {/* 우리는 여행사가 아니다. 이 선을 손님에게도 분명히 해둔다 (규칙 6번) */}
           <p className="mt-10 max-w-2xl leading-relaxed text-[#8B9691]">
-            We plan; you book. We don&apos;t make reservations for you or take payment for hotels,
-            restaurants or tickets — we tell you exactly what to book and how.
+            {t({
+              ko: "저희는 계획을 세우고, 예약은 손님이 하십니다. 숙소·식당·입장권을 대신 예약해 드리거나 그 대금을 받지 않습니다 — 무엇을 어떻게 예약하면 되는지 알려드립니다.",
+              en: "We plan; you book. We don't make reservations for you or take payment for hotels, restaurants or tickets — we tell you exactly what to book and how.",
+            })}
           </p>
         </div>
       </section>
@@ -470,14 +507,16 @@ export default async function Home() {
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
           <div>
             <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[#8B9691]">
-              Pricing
+              {t({ ko: "가격", en: "Pricing" })}
             </p>
             <p className="mt-4 font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
-              The draft is free. The full plan is ₩150,000.
+              {t({ ko: "초안은 무료입니다. 전체 일정은 ₩150,000 입니다.", en: "The draft is free. The full plan is ₩150,000." })}
             </p>
             <p className="mt-4 max-w-md leading-relaxed text-[#A6B0AC]">
-              One price, however long your trip is. It&apos;s put together for you start to
-              finish — so there&apos;s no call to book and nobody to wait on.
+              {t({
+                ko: "여행이 며칠이든 값은 하나입니다. 처음부터 끝까지 만들어져 나오니 예약할 통화도, 기다릴 사람도 없습니다.",
+                en: "One price, however long your trip is. It's put together for you start to finish — so there's no call to book and nobody to wait on.",
+              })}
             </p>
           </div>
           <div id="contact" className="scroll-mt-20 md:justify-self-end">
@@ -485,15 +524,15 @@ export default async function Home() {
               href="/plan"
               className="inline-flex items-center rounded-full bg-[#E8EAEB] px-8 py-3.5 text-base text-[#12171A] transition-colors hover:bg-[#E86B54] hover:text-[#12171A] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#7FA8DC]"
             >
-              Start with the free draft
+              {t({ ko: "무료 초안부터 받아보기", en: "Start with the free draft" })}
             </Link>
             <p className="mt-5 leading-relaxed text-[#A6B0AC]">
-              Rather just ask a question first?{" "}
+              {t({ ko: "먼저 물어보고 싶으신가요?", en: "Rather just ask a question first?" })}{" "}
               <Link
                 href="/contact"
                 className="underline underline-offset-4 hover:text-[#E86B54] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7FA8DC]"
               >
-                Ask us anything
+                {t({ ko: "무엇이든 물어보세요", en: "Ask us anything" })}
               </Link>
               .
             </p>
@@ -503,12 +542,15 @@ export default async function Home() {
 
       <footer className="border-t border-[#2A3330]">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-[family-name:var(--font-geist-mono)] text-xs text-[#8B9691] sm:flex-row sm:items-center sm:justify-between">
-          <span>mohallae</span>
+          {/* 상호는 어디서든 같은 서체로. 크기는 꼬리말 기준(text-xs)을 그대로 물려받는다 */}
+          <span className="font-[family-name:var(--font-geist-sans)] font-semibold tracking-[-0.02em]">
+            mohallae
+          </span>
           <div className="flex gap-5">
             <Link href="/privacy" className="underline-offset-4 hover:underline">
-              Privacy
+              {t({ ko: "개인정보 처리방침", en: "Privacy" })}
             </Link>
-            <span>Seoul, Korea</span>
+            <span>{t({ ko: "대한민국 서울", en: "Seoul, Korea" })}</span>
           </div>
         </div>
       </footer>
