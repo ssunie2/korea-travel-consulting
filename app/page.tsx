@@ -331,12 +331,12 @@ export default async function Home() {
               )}
               <span aria-hidden className="mx-2 text-[#4A5450]">·</span>
               {weather.sky === "clear"
-                ? "Clear"
+                ? t({ ko: "맑음", en: "Clear" })
                 : weather.sky === "cloud"
-                  ? "Cloudy"
+                  ? t({ ko: "흐림", en: "Cloudy" })
                   : weather.sky === "rain"
-                    ? "Rain"
-                    : "Snow"}
+                    ? t({ ko: "비", en: "Rain" })
+                    : t({ ko: "눈", en: "Snow" })}
             </p>
           </div>
           <div aria-hidden className="mt-3 h-px w-full bg-[#2A3330]" />
@@ -347,7 +347,7 @@ export default async function Home() {
             <MetroScene scene={WIDE} className="hidden h-auto w-full md:block" />
 
             <fieldset className="absolute inset-0 m-0 border-0 p-0">
-              <legend className="sr-only">Choose a day to preview its concierge tip</legend>
+              <legend className="sr-only">{t({ ko: "날짜를 골라 그 날의 컨시어지 팁을 보세요", en: "Choose a day to preview its concierge tip" })}</legend>
               {STATIONS.map((station) => (
                 <label
                   key={station.day}

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Instrument_Serif } from "next/font/google";
 import { supabaseServer } from "@/lib/supabase-server";
 import type { Plan } from "@/lib/types";
+import { t } from "@/lib/copy";
 
 // 표제용 서체. 랜딩(app/page.tsx)과 같은 방식으로 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -44,11 +45,11 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
     return (
       <div className={`${display.variable} flex-1 bg-[#F2EDE3] px-6 py-24 text-center text-[#1B211E]`}>
         <p className="font-[family-name:var(--font-display)] text-3xl">
-          This draft didn&apos;t finish.
+          {t({ ko: "이 초안은 끝까지 만들어지지 못했습니다.", en: "This draft didn\u2019t finish." })}
         </p>
-        <p className="mt-4 text-[#3D4A44]">Sorry — please start again, it only takes two minutes.</p>
+        <p className="mt-4 text-[#3D4A44]">{t({ ko: "죄송합니다 — 다시 시작해 주세요. 2분이면 됩니다.", en: "Sorry — please start again, it only takes two minutes." })}</p>
         <Link href="/plan" className="mt-8 inline-flex rounded-full bg-[#12211C] px-8 py-3.5 text-[#F2EDE3]">
-          Start over
+          {t({ ko: "다시 시작하기", en: "Start over" })}
         </Link>
       </div>
     );
@@ -67,7 +68,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
           mohallae
         </Link>
         <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[#4A5D54]">
-          Free draft
+          {t({ ko: "무료 초안", en: "Free draft" })}
         </span>
       </header>
 
@@ -75,7 +76,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         {/* ── 제목 ─────────────────────────────────────── */}
         <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[#4A5D54]">
           {dateRange(plan.start_date, plan.duration_days)} · {plan.travelers}{" "}
-          {plan.travelers === 1 ? "traveler" : "travelers"}
+          {t({ ko: "명", en: plan.travelers === 1 ? "traveler" : "travelers" })}
           {plan.destinations.length > 0 && ` · ${plan.destinations.join(", ")}`}
         </p>
         <h1 className="mt-4 font-[family-name:var(--font-display)] text-[clamp(2.25rem,6vw,3.5rem)] leading-[1.02] tracking-tight">
@@ -113,7 +114,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         {/* ── 맛보기 팁 하나. 이 화면에서 제일 중요한 부분이다 ── */}
         <figure className="mt-16 rounded-2xl bg-[#12211C] p-7 text-[#E8E2D6] shadow-[0_24px_60px_-24px_rgba(18,33,28,0.55)] sm:p-9">
           <figcaption className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[#A8C3B4]">
-            One concierge tip · {trip.sampleTip.activityName}
+            {t({ ko: "컨시어지 팁 하나", en: "One concierge tip" })} · {trip.sampleTip.activityName}
           </figcaption>
           <p className="mt-4 font-[family-name:var(--font-display)] text-2xl leading-snug">
             {trip.sampleTip.highlight}
@@ -121,14 +122,14 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
 
           <div className="mt-7 border-t border-[#2A3D35] pt-5">
             <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[#D8503C]">
-              What to avoid
+              {t({ ko: "피하실 것", en: "What to avoid" })}
             </p>
             <p className="mt-2 leading-relaxed text-[#C9CFC6]">{trip.sampleTip.pitfall}</p>
           </div>
 
           <div className="mt-6 border-t border-[#2A3D35] pt-5">
             <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[#7FA8DC]">
-              What someone here would tell you
+              {t({ ko: "여기 사는 사람이라면 이렇게 말합니다", en: "What someone here would tell you" })}
             </p>
             <p className="mt-2 leading-relaxed">{trip.sampleTip.insiderSecret}</p>
           </div>
@@ -138,19 +139,19 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         <dl className="mt-14 grid gap-8 border-t border-[#DDD5C6] pt-10 sm:grid-cols-3">
           <div>
             <dt className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]">
-              Where to stay
+              {t({ ko: "묵을 곳", en: "Where to stay" })}
             </dt>
             <dd className="mt-2 text-lg">{trip.picks.stay}</dd>
           </div>
           <div>
             <dt className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]">
-              Where to eat
+              {t({ ko: "먹을 곳", en: "Where to eat" })}
             </dt>
             <dd className="mt-2 text-lg">{trip.picks.dining}</dd>
           </div>
           <div>
             <dt className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]">
-              Estimated total
+              {t({ ko: "예상 총액", en: "Estimated total" })}
             </dt>
             <dd className="mt-2 text-lg">{trip.totalEstimate}</dd>
           </div>
@@ -159,23 +160,23 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         {/* ── 여기서부터가 유료 ────────────────────────── */}
         <section className="mt-16 rounded-2xl bg-[#EDE7DB] p-7 sm:p-9">
           <h2 className="font-[family-name:var(--font-display)] text-3xl leading-tight">
-            That&apos;s one tip. Every stop has one.
+            {t({ ko: "팁 하나를 보셨습니다. 모든 정거장에 하나씩 있습니다.", en: "That\u2019s one tip. Every stop has one." })}
           </h2>
           <p className="mt-4 max-w-xl leading-relaxed text-[#3D4A44]">
-            The draft above is the shape of your trip. The full plan fills it in — a tip at every
-            stop, five stays and five restaurants chosen for your budget, costs broken down, and
-            exactly what to book and when, including the places that only take Korean phone
-            reservations.
+            {t({
+              ko: "위 초안은 여행의 뼈대입니다. 전체 일정이 그 안을 채웁니다 — 모든 정거장의 팁, 예산에 맞춘 숙소 다섯 곳과 식당 다섯 곳, 비용 분해, 그리고 무엇을 언제 예약하면 되는지. 한국 전화로만 받는 곳까지 알려드립니다.",
+              en: "The draft above is the shape of your trip. The full plan fills it in — a tip at every stop, five stays and five restaurants chosen for your budget, costs broken down, and exactly what to book and when, including the places that only take Korean phone reservations.",
+            })}
           </p>
           {/* TODO(#11): A6 상담 신청 화면이 생기면 이 주소로 연결된다. 아직 없다. */}
           <Link
             href={`/plan/${plan.id}/consult`}
             className="mt-8 inline-flex items-center rounded-full bg-[#12211C] px-8 py-3.5 text-base text-[#F2EDE3] transition-colors hover:bg-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#3E6FB0]"
           >
-            Get the full plan
+            {t({ ko: "전체 일정 받기", en: "Get the full plan" })}
           </Link>
           <p className="mt-5 font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[#4A5D54]">
-            Keep this link — your draft stays here
+            {t({ ko: "이 링크를 보관하세요 — 초안은 여기 그대로 있습니다", en: "Keep this link — your draft stays here" })}
           </p>
         </section>
       </main>
