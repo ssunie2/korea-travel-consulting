@@ -331,7 +331,7 @@ export default async function Home() {
                 <label
                   key={station.day}
                   style={{ left: `${station.x / 10}%` }}
-                  className="group absolute top-[54.5%] h-14 w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:w-28 md:h-20 md:w-44"
+                  className="group absolute top-[54.5%] h-[92px] w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:h-[112px] sm:w-28 md:h-[160px] md:w-44"
                 >
                   {/*
                     전통 문양 — DAY 글자 위. 원래 전동차가 지나가던 자리다.
@@ -341,13 +341,13 @@ export default async function Home() {
                   */}
                   <span
                     aria-hidden
-                    className="ktc-mark absolute bottom-[calc(50%+2.1rem)] left-1/2 h-[16px] w-[16px] -translate-x-1/2 text-[#F09884] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+3.2rem)] sm:h-[20px] sm:w-[20px] md:bottom-[calc(50%+4.8rem)] md:h-[26px] md:w-[26px]"
+                    className="ktc-mark absolute bottom-[calc(50%+28.9px)] left-1/2 h-[24px] w-[24px] -translate-x-1/2 text-[#F09884] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+36.8px)] sm:h-[30px] sm:w-[30px] md:bottom-[calc(50%+52.2px)] md:h-[39px] md:w-[39px]"
                   >
                     <DayPattern day={station.day} />
                   </span>
 
                   {/* 날짜 — 점 위 */}
-                  <span className="absolute bottom-[calc(50%+0.65rem)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold tracking-[0.16em] text-[#E8EAEB] group-has-[:checked]:text-[#E86B54] sm:text-[0.8rem] sm:tracking-[0.2em] md:bottom-[calc(50%+0.98rem)] md:text-[1.2rem]">
+                  <span className="absolute bottom-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-none tracking-[0.16em] text-[#E8EAEB] group-has-[:checked]:text-[#E86B54] sm:bottom-[calc(50%+15px)] sm:text-[0.8rem] sm:tracking-[0.2em] md:bottom-[calc(50%+21px)] md:text-[1.2rem]">
                     DAY {station.day}
                   </span>
 
@@ -368,10 +368,10 @@ export default async function Home() {
                   />
 
                   {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
-                  <span className="absolute top-[calc(50%+0.8rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] tracking-[0.1em] text-[#8B9691] sm:text-[0.65rem] sm:tracking-[0.14em] md:top-[calc(50%+1.2rem)] md:text-[0.98rem]">
+                  <span className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] leading-none tracking-[0.1em] text-[#8B9691] sm:top-[calc(50%+15px)] sm:text-[0.65rem] sm:tracking-[0.14em] md:top-[calc(50%+21px)] md:text-[0.98rem]">
                     {station.en}
                   </span>
-                  <span className="absolute top-[calc(50%+1.7rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] text-[#69736F] sm:text-[0.6rem] md:top-[calc(50%+2.55rem)] md:text-[0.9rem]">
+                  <span className="absolute top-[calc(50%+27px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] leading-none text-[#69736F] sm:top-[calc(50%+34.4px)] sm:text-[0.6rem] md:top-[calc(50%+48.7px)] md:text-[0.9rem]">
                     {station.ko}
                   </span>
                 </label>
