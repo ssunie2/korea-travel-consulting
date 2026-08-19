@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+  <rect width="1600" height="1000" fill="#FFFFFF"/>
+  <rect x="24" y="24" width="1552" height="952" fill="none" stroke="#D8D8D8" stroke-width="2"/>
+  <g fill="#9A9A9A" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" text-anchor="middle">
+    <text x="800" y="470" font-size="34" letter-spacing="14">GYEONGBOKGUNG</text>
+    <text x="800" y="548" font-size="46" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" fill="#6E6E6E">경복궁</text>
+    <text x="800" y="620" font-size="22" letter-spacing="6" fill="#B4B4B4">사진 1 · 교체 예정</text>
+  </g>
+</svg>

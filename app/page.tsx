@@ -121,6 +121,19 @@ const paid = t({
  * 누르는 자리. `x` 는 화면 폭의 몇 %인지다 — 넓은 화면과 폰 장면이
  * 같은 비율로 정거장을 놓기 때문에 이 한 벌로 둘 다 덮는다.
  */
+/**
+ * 지나가는 창밖. **없앤 전동차를 대신하는 자리다** — 아래로 스크롤하면 옆으로 흐른다.
+ *
+ * TODO(출시 전): 지금은 흰 바탕 임시 이미지다. 진짜 사진으로 갈아야 한다.
+ * `public/placeholder-seoul-*.svg` 를 같은 이름의 사진으로 바꾸면 된다.
+ */
+const WINDOW_VIEWS = [
+  { src: "/placeholder-seoul-1.svg", en: "GYEONGBOKGUNG", ko: "경복궁", note: t({ ko: "화요일은 닫습니다", en: "Closed on Tuesdays" }) },
+  { src: "/placeholder-seoul-2.svg", en: "BUKCHON", ko: "북촌한옥마을", note: t({ ko: "사람이 사는 골목입니다", en: "People live in these lanes" }) },
+  { src: "/placeholder-seoul-3.svg", en: "GWANGJANG", ko: "광장시장", note: t({ ko: "좋은 자리는 현금만 받습니다", en: "The best stalls take cash only" }) },
+  { src: "/placeholder-seoul-4.svg", en: "NAMSAN", ko: "남산 N서울타워", note: t({ ko: "자가용은 못 올라갑니다", en: "Private cars can't drive up" }) },
+];
+
 const STATIONS = [
   // 양끝 여백 125, 정거장 사이 250. 끝을 좁혀 선이 화면 밖으로 이어지는 느낌을 남긴다
   { day: 1, x: 125, en: "INCHEON", ko: "인천공항", enSub: "인천공항", koSub: "INCHEON" },
@@ -448,22 +461,78 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── how it works ────────────────────────────────── */}
-      <section className="ktc-rise border-t border-[var(--c-line-2)]">
-        <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
+      {/* ── 창밖 — 가로로 지나간다 ─────────────────────── */}
+      <section
+        className="ktc-hstrip relative border-t border-[var(--c-line-2)]"
+        aria-label={t({ ko: "서울의 정거장들", en: "Stops around Seoul" })}
+      >
+        <div className="ktc-hstrip-sticky">
+          <div className="ktc-htrack items-center gap-5 px-6 sm:gap-8">
+            {WINDOW_VIEWS.map((v, i) => (
+              <figure key={v.en} className="ktc-hcard w-[78vw] flex-none sm:w-[52vw] lg:w-[38vw]">
+                {/* 역 번호와 선 — 노선도 말투를 여기서도 이어간다 */}
+                <div className="flex items-center gap-3">
+                  <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.2em] text-[var(--c-accent)]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span aria-hidden className="h-2 w-2 flex-none rounded-full bg-[var(--c-accent)]" />
+                  <span aria-hidden className="h-px flex-1 bg-[var(--c-line-2)]" />
+                </div>
+                {/* unoptimized: 지금 임시 이미지가 SVG 라 그렇다. 진짜 사진(jpg)으로 갈면 이 줄을 지운다 */}
+                <Image
+                  src={v.src}
+                  alt=""
+                  width={1600}
+                  height={1000}
+                  unoptimized
+                  className="mt-4 aspect-[8/5] w-full rounded-[3px] object-cover"
+                />
+                <figcaption className="mt-4">
+                  <p className="font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.18em] text-[var(--c-text-3)]">
+                    {v.en}
+                  </p>
+                  <p className="mt-1 font-[family-name:var(--font-display)] text-2xl leading-tight">{v.ko}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-[var(--c-text-2)]">{v.note}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+        {/* 지나온 만큼 차오르는 선 */}
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[var(--c-line-2)]">
+          <div className="ktc-hprogress h-full w-full bg-[var(--c-accent)]" />
+        </div>
+      </section>
+
+      {/* ── how it works — 표를 포개듯 쌓인다 ──────────────── */}
+      <section className="ktc-stack border-t border-[var(--c-line-2)]">
+        <div className="mx-auto max-w-3xl px-6 py-16 md:py-20">
+          <h2 className="ktc-rise font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
             {t({ ko: "진행 방식", en: "How it works" })}
           </h2>
-          <ol className="ktc-rise mt-10 grid gap-10 md:grid-cols-3 md:gap-12">
+          <ol className="mt-10">
             {steps.map((step, i) => (
-              <li key={step.title}>
-                <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-accent)]">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl leading-tight">
-                  {step.title}
-                </h3>
-                <p className="mt-2 leading-relaxed text-[var(--c-text-2)]">{step.body}</p>
+              <li
+                key={step.title}
+                /* --ktc-rev: 뒤로 밀린 정도. 마지막 카드는 0이라 그대로 남는다 */
+                style={{
+                  ["--ktc-rev" as string]: String(steps.length - 1 - i),
+                  ["--ktc-from" as string]: `${(i / steps.length) * 100}%`,
+                  ["--ktc-to" as string]: `${((i + 1) / steps.length) * 100}%`,
+                }}
+                className="sticky top-24 pb-6"
+              >
+                <div className="ktc-stack-card relative overflow-hidden rounded-[3px] border border-[var(--c-line-2)] bg-[var(--c-surface)] p-7 shadow-[0_28px_70px_-40px_rgba(0,0,0,0.9)] sm:p-9">
+                  <span className="font-[family-name:var(--font-geist-mono)] text-xs tracking-[0.2em] text-[var(--c-accent)]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl leading-tight sm:text-3xl">
+                    {step.title}
+                  </h3>
+                  <p className="mt-3 max-w-xl leading-relaxed text-[var(--c-text-2)]">{step.body}</p>
+                  {/* 덮이는 막. 뒤로 갈수록 짙어져 앞 카드와 구분된다 */}
+                  <div aria-hidden className="ktc-stack-veil pointer-events-none absolute inset-0 bg-[var(--c-bg)] opacity-0" />
+                </div>
               </li>
             ))}
           </ol>

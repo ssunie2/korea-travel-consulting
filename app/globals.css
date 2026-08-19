@@ -100,3 +100,113 @@ body {
     }
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   가로로 지나가는 구간 — **없앤 전동차를 여기로 옮긴 것이다.**
+   손님이 아래로 스크롤하면 사진이 옆으로 흘러간다. 창밖 풍경이 지나가듯이.
+
+   흔한 가로 슬라이드와 다르게, 우리 것은 **노선도 말투를 그대로 쓴다** —
+   위에 선이 하나 지나가고 사진마다 역 점이 찍히며, 지나온 만큼 선이 주황으로 찬다.
+   사이트 전체가 지하철 안내 표지라 새 구간만 따로 놀면 안 된다.
+
+   기본은 **그냥 옆으로 밀어 보는 띠**다. 스크롤로 움직이는 건 그걸 아는
+   브라우저에서만 얹힌다 — 못 알아들어도 사진은 다 볼 수 있다.
+   ══════════════════════════════════════════════════════════════ */
+.ktc-hstrip-sticky {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.ktc-htrack {
+  display: flex;
+  width: max-content;
+}
+.ktc-hcard {
+  scroll-snap-align: center;
+}
+/* 지나온 만큼 차오르는 선. 움직이지 않는 브라우저에서는 처음부터 다 차 있다 */
+.ktc-hprogress {
+  transform-origin: left center;
+}
+
+@keyframes ktc-move {
+  to {
+    transform: translateX(calc(-100% + 100vw));
+  }
+}
+@keyframes ktc-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ktc-hstrip {
+      /* 세로로 이만큼 스크롤하는 동안 가로로 다 지나간다. 짧으면 휙 지나가고 길면 지루하다 */
+      height: 320vh;
+      view-timeline-name: --ktc-hstrip;
+      view-timeline-axis: block;
+    }
+    .ktc-hstrip-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      /* 스크롤로 움직이므로 손으로 미는 기능은 끈다. 둘이 같이 있으면 서로 싸운다 */
+      overflow-x: hidden;
+      scroll-snap-type: none;
+    }
+    .ktc-htrack {
+      will-change: transform;
+      animation: ktc-move linear forwards;
+      animation-timeline: --ktc-hstrip;
+      animation-range: contain 0% contain 100%;
+    }
+    .ktc-hprogress {
+      animation: ktc-fill linear both;
+      animation-timeline: --ktc-hstrip;
+      animation-range: contain 0% contain 100%;
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   쌓이는 카드 — 세 단계가 표를 포개듯 겹친다.
+
+   원본 데모는 뒤로 밀린 카드를 **작게만** 만든다. 우리 것은 **어둡게까지** 한다.
+   어두운 화면이라 크기만 줄이면 뒤 카드가 앞 카드와 구분이 안 된다.
+   ══════════════════════════════════════════════════════════════ */
+@keyframes ktc-stack-back {
+  to {
+    transform: scale(calc(1 - 0.045 * var(--ktc-rev, 0)));
+  }
+}
+@keyframes ktc-stack-dim {
+  to {
+    opacity: calc(0.26 * var(--ktc-rev, 0));
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ktc-stack {
+      view-timeline-name: --ktc-stack;
+    }
+    .ktc-stack-card {
+      animation: ktc-stack-back linear forwards;
+      animation-timeline: --ktc-stack;
+      animation-range: exit-crossing var(--ktc-from) exit-crossing var(--ktc-to);
+    }
+    /* 카드 위에 덮이는 어두운 막. 뒤로 갈수록 짙어진다 */
+    .ktc-stack-veil {
+      animation: ktc-stack-dim linear forwards;
+      animation-timeline: --ktc-stack;
+      animation-range: exit-crossing var(--ktc-from) exit-crossing var(--ktc-to);
+    }
+  }
+}
