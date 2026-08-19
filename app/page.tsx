@@ -100,10 +100,11 @@ const paid = t({
  * 같은 비율로 정거장을 놓기 때문에 이 한 벌로 둘 다 덮는다.
  */
 const STATIONS = [
-  { day: 1, x: 200, en: "INCHEON", ko: "인천공항", enSub: "인천공항", koSub: "INCHEON" },
-  { day: 2, x: 400, en: "GYEONGBOKGUNG", ko: "경복궁", enSub: "경복궁", koSub: "GYEONGBOKGUNG" },
-  { day: 3, x: 600, en: "BUKCHON", ko: "북촌", enSub: "북촌", koSub: "BUKCHON" },
-  { day: 4, x: 800, en: "NAMSAN", ko: "남산", enSub: "남산", koSub: "NAMSAN" },
+  // 양끝 여백 125, 정거장 사이 250. 끝을 좁혀 선이 화면 밖으로 이어지는 느낌을 남긴다
+  { day: 1, x: 125, en: "INCHEON", ko: "인천공항", enSub: "인천공항", koSub: "INCHEON" },
+  { day: 2, x: 375, en: "GYEONGBOKGUNG", ko: "경복궁", enSub: "경복궁", koSub: "GYEONGBOKGUNG" },
+  { day: 3, x: 625, en: "BUKCHON", ko: "북촌", enSub: "북촌", koSub: "BUKCHON" },
+  { day: 4, x: 875, en: "NAMSAN", ko: "남산", enSub: "남산", koSub: "NAMSAN" },
 ];
 
 /**
