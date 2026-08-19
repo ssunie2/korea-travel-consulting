@@ -42,10 +42,32 @@ const MOTION = `
   .ktc-route:has(#ktc-day-3:checked) .ktc-tip-3,
   .ktc-route:has(#ktc-day-4:checked) .ktc-tip-4 { display: grid }
 }
-/* 문양이 켜지고 꺼질 때만 아주 짧게. 움직임을 싫어하는 설정이면 그것도 끈다 */
-.ktc-mark { transition: opacity .18s ease }
+/*
+  문양이 뜰 때. 그냥 켜면 툭 나타나서 딱딱하다.
+  **작게 돌아가 있다가 제자리로 펴지면서** 나타난다 — 둥근 문양이라 회전이 자연스럽게 읽힌다.
+
+  자리잡기(가운데 정렬)는 바깥 span 의 transform 이 맡고 있어서 건드리면 안 된다.
+  그래서 움직임은 **안쪽 svg** 에만 준다. 둘을 나눠두면 서로 덮어쓰지 않는다.
+
+  나타날 때(.55s)를 사라질 때(.28s)보다 길게 뒀다. 새로 고른 것이 주인공이고
+  물러나는 쪽이 꾸물대면 두 개가 겹쳐 보인다.
+*/
+.ktc-mark { transition: opacity .28s ease }
+.ktc-mark svg {
+  transform: scale(.62) rotate(-32deg);
+  transition: transform .3s ease;
+}
+.group:has(:checked) .ktc-mark { transition: opacity .45s ease }
+.group:has(:checked) .ktc-mark svg {
+  transform: none;
+  /* 끝에서 살짝 느려지며 놓이는 곡선. 기계적으로 도착하지 않는다 */
+  transition: transform .55s cubic-bezier(.16, 1, .3, 1);
+}
 @media (prefers-reduced-motion: reduce) {
-  .ktc-mark { transition: none }
+  .ktc-mark, .ktc-mark svg,
+  .group:has(:checked) .ktc-mark,
+  .group:has(:checked) .ktc-mark svg { transition: none }
+  .ktc-mark svg { transform: none }
 }
 `;
 
