@@ -1,6 +1,11 @@
 import { revalidatePath } from 'next/cache'
 import { supabaseServer } from '@/lib/supabase-server'
-import type { ConsultationStatus } from '@/lib/types'
+import { generateJson } from '@/lib/ai'
+import { buildFullPlanPrompt, fullItinerarySchema } from '@/lib/prompt'
+import type { ConsultationStatus, FullItinerary, Plan } from '@/lib/types'
+
+// 유료 일정 생성에 시간이 걸린다. 무료(12.7초)보다 내용이 많아 더 걸린다.
+export const maxDuration = 300
 
 // 항상 최신을 읽는다. 신청 목록은 미리 만들어두면 안 된다.
 export const dynamic = 'force-dynamic'
@@ -30,6 +35,43 @@ async function updateStatus(formData: FormData) {
   revalidatePath('/admin')
 }
 
+/**
+ * 유료 전체 일정을 만든다.
+ *
+ * **결제를 확인한 뒤 우리가 직접 누른다.** 손님이 보는 화면에는 이 버튼이 없다 —
+ * 공개된 곳에 두면 아무나 눌러서 AI 요금이 그대로 나간다.
+ * 토스 계약(#23)이 끝나면 이 자리를 결제 승인 신호로 바꾸면 된다.
+ */
+async function generateFullPlan(formData: FormData) {
+  'use server'
+  const planId = String(formData.get('planId'))
+
+  const db = supabaseServer()
+  const { data, error } = await db.from('plans').select('*').eq('id', planId).maybeSingle()
+  if (error || !data) return
+
+  const plan = data as Plan
+  const full = await generateJson<FullItinerary>(
+    buildFullPlanPrompt({
+      destinations: plan.destinations,
+      startDate: plan.start_date,
+      durationDays: plan.duration_days,
+      travelers: plan.travelers,
+      budgetPerPerson: plan.budget_per_person ?? undefined,
+      budgetCurrency: plan.budget_currency,
+      styles: plan.styles,
+      audience: plan.audience ?? undefined,
+      interests: plan.interests ?? undefined,
+      dietaryNotes: plan.dietary_notes ?? undefined,
+      language: plan.language,
+    }),
+    fullItinerarySchema
+  )
+
+  await db.from('plans').update({ full_itinerary: full }).eq('id', planId)
+  revalidatePath('/admin')
+}
+
 function when(iso: string) {
   return new Date(iso).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' })
 }
@@ -44,6 +86,10 @@ export default async function AdminPage() {
       .order('created_at', { ascending: false }),
     db.from('inquiries').select('id, created_at, email, message').order('created_at', { ascending: false }),
   ])
+
+  // 어떤 초안이 이미 유료 일정까지 만들어졌는지. 버튼을 두 번 눌러 요금이 두 번 나가는 걸 막는다.
+  const { data: ready } = await db.from('plans').select('id').not('full_itinerary', 'is', null)
+  const fullPlanReady = new Set((ready ?? []).map((p) => p.id))
 
   return (
     <main className="mx-auto max-w-5xl p-6 font-sans">
@@ -78,6 +124,20 @@ export default async function AdminPage() {
                     이 손님이 본 초안
                   </a>
                 )}
+
+                {c.plan_id && (fullPlanReady.has(c.plan_id) ? (
+                  <a href={`/plan/${c.plan_id}/full`} className="text-sm font-semibold text-green-700 underline dark:text-green-500">
+                    전체 일정 보기 (손님에게 보낼 링크)
+                  </a>
+                ) : (
+                  <form action={generateFullPlan}>
+                    <input type="hidden" name="planId" value={c.plan_id} />
+                    {/* 결제를 확인한 뒤에 누른다. 누르면 AI 요금이 나간다 */}
+                    <button type="submit" className="rounded border border-gray-400 px-3 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">
+                      전체 일정 만들기
+                    </button>
+                  </form>
+                ))}
 
                 <form action={updateStatus} className="ml-auto flex items-center gap-2">
                   <input type="hidden" name="id" value={c.id} />

@@ -106,6 +106,166 @@ Field notes:
 - totalEstimate: one line, whole trip`
 }
 
+const place = {
+  type: Type.OBJECT,
+  properties: {
+    name: { type: Type.STRING },
+    area: { type: Type.STRING },
+    priceLevel: { type: Type.STRING },
+    reason: { type: Type.STRING },
+  },
+  required: ['name', 'area', 'priceLevel', 'reason'],
+}
+
+const fivePlaces = { type: Type.ARRAY, minItems: 5, maxItems: 5, items: place }
+
+/** 유료 결과의 모양. 여기 없는 항목은 AI가 만들어낼 수 없다 */
+export const fullItinerarySchema = {
+  type: Type.OBJECT,
+  properties: {
+    tripTitle: { type: Type.STRING },
+    summary: { type: Type.STRING },
+    days: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          dayNumber: { type: Type.INTEGER },
+          theme: { type: Type.STRING },
+          area: { type: Type.STRING },
+          routeNote: { type: Type.STRING },
+          activities: {
+            type: Type.ARRAY,
+            minItems: 3,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                time: { type: Type.STRING },
+                name: { type: Type.STRING },
+                description: { type: Type.STRING },
+                duration: { type: Type.STRING },
+                location: { type: Type.STRING },
+                estimatedCost: { type: Type.STRING },
+                gettingThere: { type: Type.STRING },
+                tips: {
+                  type: Type.OBJECT,
+                  properties: {
+                    highlight: { type: Type.STRING },
+                    pitfall: { type: Type.STRING },
+                    insiderSecret: { type: Type.STRING },
+                    reservationRequired: { type: Type.BOOLEAN },
+                  },
+                  required: ['highlight', 'pitfall', 'insiderSecret', 'reservationRequired'],
+                },
+              },
+              required: ['time', 'name', 'description', 'gettingThere', 'tips'],
+            },
+          },
+          photoSpot: {
+            type: Type.OBJECT,
+            properties: {
+              name: { type: Type.STRING },
+              bestTime: { type: Type.STRING },
+              advice: { type: Type.STRING },
+            },
+            required: ['name', 'bestTime', 'advice'],
+          },
+        },
+        required: ['dayNumber', 'theme', 'area', 'routeNote', 'activities'],
+      },
+    },
+    picks: {
+      type: Type.OBJECT,
+      properties: { stay: fivePlaces, dining: fivePlaces, cafes: fivePlaces },
+      required: ['stay', 'dining', 'cafes'],
+    },
+    costBreakdown: {
+      type: Type.OBJECT,
+      properties: {
+        totalEstimate: { type: Type.STRING },
+        accommodation: { type: Type.STRING },
+        dining: { type: Type.STRING },
+        transport: { type: Type.STRING },
+        activities: { type: Type.STRING },
+        budgetFit: { type: Type.STRING },
+        valueMoves: { type: Type.ARRAY, minItems: 3, maxItems: 5, items: { type: Type.STRING } },
+      },
+      required: ['totalEstimate', 'accommodation', 'dining', 'transport', 'activities', 'budgetFit', 'valueMoves'],
+    },
+    clothing: {
+      type: Type.OBJECT,
+      properties: {
+        weatherSummary: { type: Type.STRING },
+        outfits: { type: Type.ARRAY, items: { type: Type.STRING } },
+        advice: { type: Type.STRING },
+      },
+      required: ['weatherSummary', 'outfits', 'advice'],
+    },
+    packingTips: { type: Type.ARRAY, items: { type: Type.STRING } },
+  },
+  required: ['tripTitle', 'summary', 'days', 'picks', 'costBreakdown', 'clothing', 'packingTips'],
+}
+
+/**
+ * 유료 전체 일정.
+ *
+ * 무료와의 차이는 분량이 아니라 **분석**이다.
+ * 손님이 돈을 내는 이유는 정보가 많아서가 아니라, 같은 예산으로 덜 헤매고 더 좋은 걸 하기 위해서다.
+ * 그래서 지시문의 절반이 동선과 예산에 대한 것이다.
+ */
+export function buildFullPlanPrompt(input: PlanInput): string {
+  const budget = input.budgetPerPerson
+    ? `${input.budgetPerPerson.toLocaleString()} ${input.budgetCurrency} per person for the whole trip`
+    : 'not specified — assume mid-range'
+
+  return `You are a Korean travel planner. This traveler has PAID for a full plan.
+They are not paying for more words. They are paying for two things:
+
+  1. A ROUTE that does not waste their time.
+  2. The BEST USE OF THEIR MONEY.
+
+Everything below serves those two. If a detail does not help them move better or spend better, leave it out.
+
+Trip:
+- Going to: ${input.destinations.join(', ')}
+- Start date: ${input.startDate}
+- Length: ${input.durationDays} days
+- Travelers: ${input.travelers} (${input.audience ?? 'unspecified group'})
+- Budget: ${budget}
+- Styles: ${input.styles.length ? input.styles.join(', ') : 'no preference'}
+- Interests: ${input.interests ?? 'none given'}
+${input.dietaryNotes ? `- MUST WORK AROUND: ${input.dietaryNotes}\n  Every food recommendation must respect this. Do not suggest anything they cannot eat or reach.` : ''}
+
+## 1. Route — this is the main thing
+
+- Group each day by AREA. A day should stay in one part of the city or region.
+- Never send them back to a neighbourhood they already finished.
+- Order stops so travel between them is short. Say how to get from the previous stop
+  and roughly how many minutes ("gettingThere").
+- In "routeNote", explain in one or two lines WHY this order. That sentence is what they paid for.
+- Respect opening days and hours. Do not schedule a place on the day it is closed.
+- Leave the day realistic. A tired traveler skipping half the list is a failed plan.
+
+## 2. Money — spend it where it counts
+
+- Keep the total within their budget. Say plainly whether it fits ("budgetFit").
+- In "valueMoves", give 3-5 specific swaps that get more for the same money.
+  Concrete, not generic. Not "eat street food" — name the thing, name what it replaces,
+  say what it saves.
+- Price levels on every recommendation so they can trade up or down themselves.
+
+## 3. Depth they did not get for free
+
+- EVERY activity gets tips: the must-do, a specific trap to avoid, something only a local
+  would know, and whether it needs booking ahead.
+- 5 places to stay, 5 to eat, 5 cafes — each with the reason it is on the list.
+- Cost split by accommodation / dining / transport / activities.
+- Weather for those exact dates, what to wear, what to pack.
+
+Write everything in ${languageName(input.language)}.
+Tone: a professional who has done this route many times. Specific, calm, never salesy.`
+}
+
 function languageName(code: string): string {
   const names: Record<string, string> = { en: 'English', ko: 'Korean', ja: 'Japanese', zh: 'Chinese' }
   return names[code] ?? 'English'

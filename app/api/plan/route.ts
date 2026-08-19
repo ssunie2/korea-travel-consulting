@@ -1,13 +1,8 @@
-import { GoogleGenAI } from '@google/genai'
 import { supabaseServer } from '@/lib/supabase-server'
 import { validatePlanInput } from '@/lib/validate'
+import { generateJson } from '@/lib/ai'
 import { buildFreeDraftPrompt, freeItinerarySchema } from '@/lib/prompt'
 import type { FreeItinerary } from '@/lib/types'
-
-// AI 키는 이 파일(서버) 안에서만 쓰인다. 브라우저로는 절대 나가지 않는다.
-// 실제로 재보고 고른 값이다. gemini-3.6-flash 는 같은 품질에 58초가 걸렸다.
-// 모델 이름은 종종 사라지므로(gemini-2.5-flash 가 그랬다) 코드를 안 고쳐도 되게 환경변수로 바꿀 수 있게 뒀다.
-const MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash'
 
 // AI 생성에 실측 12.7초가 걸린다. 기본 상한에 걸려 잘리면 손님은 원인 모를 실패를 본다.
 export const maxDuration = 60
@@ -46,18 +41,7 @@ export async function POST(req: Request) {
 
   let itinerary: FreeItinerary
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
-    const res = await ai.models.generateContent({
-      model: MODEL,
-      contents: buildFreeDraftPrompt(input),
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: freeItinerarySchema,
-        temperature: 0.7,
-      },
-    })
-    if (!res.text) throw new Error('empty response')
-    itinerary = JSON.parse(res.text) as FreeItinerary
+    itinerary = await generateJson<FreeItinerary>(buildFreeDraftPrompt(input), freeItinerarySchema)
   } catch (e) {
     console.error('itinerary generation failed:', e)
     return Response.json({ error: 'Could not create your plan right now. Please try again.' }, { status: 502 })
