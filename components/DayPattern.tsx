@@ -35,19 +35,20 @@ function petal(angle: number, inner: number, outer: number, width: number) {
   return `M${ix} ${iy}Q${lx} ${ly} ${ox} ${oy}Q${rx} ${ry} ${ix} ${iy}Z`;
 }
 
-/** 두 각 사이를 잇는 호 */
-function arc(from: number, to: number, radius: number) {
-  const [sx, sy] = at(from, radius);
-  const [ex, ey] = at(to, radius);
-  const big = Math.abs(to - from) > 180 ? 1 : 0;
-  return `M${sx} ${sy}A${radius} ${radius} 0 ${big} 1 ${ex} ${ey}`;
-}
-
 /** 한 각도에서 안팎을 잇는 짧은 직선 */
 function tick(angle: number, inner: number, outer: number) {
   const [sx, sy] = at(angle, inner);
   const [ex, ey] = at(angle, outer);
   return `M${sx} ${sy}L${ex} ${ey}`;
+}
+
+/** 정n각형. 육각형을 여러 개 붙일 것이라 중심을 받는다 */
+function ngon(n: number, radius: number, cx = C, cy = C) {
+  const pts = spokes(n).map((a) => {
+    const rad = ((a - 90) * Math.PI) / 180;
+    return `${cx + radius * Math.cos(rad)} ${cy + radius * Math.sin(rad)}`;
+  });
+  return `M${pts.join("L")}Z`;
 }
 
 /** 바깥 테. 두 줄 사이에 잔살을 채운 띠 — 네 문양이 공유하는 테두리다 */
@@ -117,51 +118,42 @@ function Blossom() {
   );
 }
 
-/** DAY 3 — 국화문. 살 열여섯에 그 사이사이 짧은 살, 속에 또 한 겹 */
-function Chrysanthemum() {
+/** DAY 3 — 귀갑문. 거북 등껍질에서 온 육각 칸이 벌집처럼 맞물린다 */
+function Tortoise() {
   return (
-    <svg {...shell} aria-hidden strokeWidth={1.05}>
-      <Band beads={24} inner={9.6} />
-      <g strokeWidth={0.85}>
-        {spokes(16).map((a) => (
-          <path key={a} d={tick(a, 5.9, 9)} />
-        ))}
-        {spokes(16, 11.25).map((a) => dot(a, 7.4, 0.5))}
+    <svg {...shell} aria-hidden>
+      <Band beads={12} />
+      <path d={ngon(6, 4.4)} strokeWidth={1.1} />
+      <g strokeWidth={0.95}>
+        {spokes(6).map((a) => {
+          const [x, y] = at(a, 5.4);
+          return <path key={a} d={ngon(6, 3.1, x, y)} />;
+        })}
       </g>
-      <circle cx={C} cy={C} r={5.4} strokeWidth={0.95} />
-      <g strokeWidth={0.85}>
-        {spokes(8).map((a) => (
-          <path key={a} d={petal(a, 1.9, 4.9, 24)} />
-        ))}
-      </g>
-      <circle cx={C} cy={C} r={1.15} fill="currentColor" stroke="none" />
+      <circle cx={C} cy={C} r={1.1} fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
-/** DAY 4 — 삼태극에서 온 소용돌이. 세 갈래가 바깥·안 두 겹으로 맞물린다 */
-function Whirl() {
+/**
+ * DAY 4 — 겹연화문. 넷 중 유일하게 **선이 아니라 면으로 채운다.**
+ * 셋이 모두 가는 선이라, 하나는 무게가 다른 편이 나란히 놓았을 때 구분된다.
+ */
+function LayeredLotus() {
   return (
     <svg {...shell} aria-hidden>
-      <Band beads={12} />
-      <g strokeWidth={1.65}>
-        {spokes(3).map((a) => (
-          <path key={a} d={arc(a, a + 92, 7.5)} />
-        ))}
-      </g>
-      {spokes(3).map((a) => dot(a, 7.5, 0.85))}
-      <g strokeWidth={1.15}>
-        {spokes(3, 60).map((a) => (
-          <path key={a} d={arc(a, a + 84, 4.4)} />
-        ))}
-      </g>
-      <circle cx={C} cy={C} r={1.35} fill="currentColor" stroke="none" />
+      <circle cx={C} cy={C} r={RING} />
+      {spokes(24).map((a) => dot(a, 10.15, 0.4))}
+      <circle cx={C} cy={C} r={9.1} strokeWidth={0.8} />
+      <path d={spokes(8).map((a) => petal(a, 4.5, 8.8, 19)).join("")} fill="currentColor" stroke="none" />
+      <path d={spokes(8, 22.5).map((a) => petal(a, 2.9, 6.2, 25)).join("")} fill="currentColor" stroke="none" />
+      <circle cx={C} cy={C} r={2.35} fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
 /** DAY 번호 → 문양. 넷을 넘어가면 처음으로 돌아간다 */
-const PATTERNS = [Lotus, Blossom, Chrysanthemum, Whirl];
+const PATTERNS = [Lotus, Blossom, Tortoise, LayeredLotus];
 
 export default function DayPattern({ day }: { day: number }) {
   const Shape = PATTERNS[(day - 1) % PATTERNS.length];
