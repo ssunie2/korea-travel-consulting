@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Instrument_Serif } from "next/font/google";
 import { seoulWeather } from "@/lib/weather";
 import { t } from "@/lib/copy";
+import DayPattern from "@/components/DayPattern";
 
 // 표제용 서체. layout.tsx 를 건드리지 않으려고 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -28,12 +29,8 @@ function seoulNow() {
   return { label: `${get("hour")}:${get("minute")}` };
 }
 
-// 움직임은 CSS로만 준다. 자바스크립트가 없어도 그림은 그대로 나온다.
+// 보이고 감추는 것은 CSS로만 준다. 자바스크립트가 없어도 그림은 그대로 나온다.
 const MOTION = `
-@keyframes ktc-ride  { from { transform: translateX(-130px) } to { transform: translateX(1060px) } }
-@keyframes ktc-ride-n { from { transform: translateX(-130px) } to { transform: translateX(500px) } }
-.ktc-train   { animation: ktc-ride 13s linear infinite }
-.ktc-train-n { animation: ktc-ride-n 9s linear infinite }
 .ktc-tip { display: none }
 .ktc-route:has(#ktc-day-1:checked) .ktc-tip-1,
 .ktc-route:has(#ktc-day-2:checked) .ktc-tip-2,
@@ -45,9 +42,10 @@ const MOTION = `
   .ktc-route:has(#ktc-day-3:checked) .ktc-tip-3,
   .ktc-route:has(#ktc-day-4:checked) .ktc-tip-4 { display: grid }
 }
+/* 문양이 켜지고 꺼질 때만 아주 짧게. 움직임을 싫어하는 설정이면 그것도 끈다 */
+.ktc-mark { transition: opacity .18s ease }
 @media (prefers-reduced-motion: reduce) {
-  .ktc-train   { animation: none; transform: translateX(430px) }
-  .ktc-train-n { animation: none; transform: translateX(180px) }
+  .ktc-mark { transition: none }
 }
 `;
 
@@ -167,18 +165,17 @@ const TIPS = [
 type Scene = {
   id: string;
   w: number;
-  rideClass: string;
 };
 
-const WIDE: Scene = { id: "w", w: 1000, rideClass: "ktc-train" };
-const NARROW: Scene = { id: "n", w: 460, rideClass: "ktc-train-n" };
+const WIDE: Scene = { id: "w", w: 1000 };
+const NARROW: Scene = { id: "n", w: 460 };
 
 /**
  * 노선. **그림을 그리지 않는다.**
  *
- * 해·구름·전동차를 빼고 선 하나와 지나가는 빛만 남겼다. 지하철 안내 표지가 하는 방식이고,
+ * 해·구름·전동차를 빼고 선 하나만 남겼다. 지하철 안내 표지가 하는 방식이고,
  * 역 이름과 지역명은 그림이 아니라 **글자**가 맡는다(아래 HTML 이 그린다).
- * 시간대와 날씨는 배경 톤과 빗줄기로만 아주 옅게 남는다.
+ * 지나가던 전동차도 뺐다 — 그 자리는 이제 고른 날짜의 전통 문양이 쓴다.
  */
 function MetroScene({ scene, className }: { scene: Scene; className: string }) {
   return (
@@ -186,28 +183,10 @@ function MetroScene({ scene, className }: { scene: Scene; className: string }) {
       viewBox={`0 0 ${scene.w} 220`}
       className={className}
       role="img"
-      aria-label="A subway line. DAY 1 through DAY 4 are the stations, and a train passes along it."
+      aria-label="A subway line. DAY 1 through DAY 4 are the stations."
     >
-      <defs>
-        <linearGradient id={`ktc-trail-${scene.id}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#E86B54" stopOpacity="0" />
-          <stop offset="1" stopColor="#E86B54" stopOpacity=".5" />
-        </linearGradient>
-        <clipPath id={`ktc-cut-${scene.id}`}>
-          <rect width={scene.w} height="220" />
-        </clipPath>
-      </defs>
-
-      <g clipPath={`url(#ktc-cut-${scene.id})`}>
-        {/* 열차. 차체를 그리지 않고 **지나가는 빛과 잔상**으로 암시한다 */}
-        <g className={scene.rideClass}>
-          <rect x="0" y="75" width="86" height="6" rx="3" fill={`url(#ktc-trail-${scene.id})`} />
-          <rect x="78" y="72" width="30" height="12" rx="6" fill="#E86B54" />
-        </g>
-
-        {/* 노선 — 10px 이던 것을 2.5px 로. 굵기가 유아틱함의 절반이었다 */}
-        <line x1="0" y1="120" x2={scene.w} y2="120" stroke="#E8EAEB" strokeWidth="2.5" />
-      </g>
+      {/* 노선 — 10px 이던 것을 2.5px 로. 굵기가 유아틱함의 절반이었다 */}
+      <line x1="0" y1="120" x2={scene.w} y2="120" stroke="#E8EAEB" strokeWidth="2.5" />
     </svg>
   );
 }
@@ -354,6 +333,18 @@ export default async function Home() {
                   style={{ left: `${station.x / 10}%` }}
                   className="group absolute top-[54.5%] h-14 w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:w-28"
                 >
+                  {/*
+                    전통 문양 — DAY 글자 위. 원래 전동차가 지나가던 자리다.
+                    크기는 그 전동차(주황 타원)의 좁은 폭에 맞췄다: 폰 11px, PC 17px.
+                    `opacity` 로만 켜고 끈다. `hidden` 으로 하면 켜질 때 줄이 밀린다.
+                  */}
+                  <span
+                    aria-hidden
+                    className="ktc-mark absolute bottom-[calc(50%+2.1rem)] left-1/2 h-[11px] w-[11px] -translate-x-1/2 text-[#E86B54] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+3.2rem)] sm:h-[17px] sm:w-[17px]"
+                  >
+                    <DayPattern day={station.day} />
+                  </span>
+
                   {/* 날짜 — 점 위 */}
                   <span className="absolute bottom-[calc(50%+0.65rem)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold tracking-[0.16em] text-[#E8EAEB] group-has-[:checked]:text-[#E86B54] sm:text-[0.8rem] sm:tracking-[0.2em]">
                     DAY {station.day}
