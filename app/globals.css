@@ -210,3 +210,48 @@ body {
     }
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   첫 화면 사진 카드 — 스크롤하면 맨 위 장이 걷히며 다음 장이 나온다.
+
+   참고한 데모(stacking-cards)는 카드가 **아래에서 올라와 쌓이는** 것인데,
+   우리는 반대로 **위에서 한 장씩 걷어낸다.** 표를 넘기는 동작에 가깝고,
+   왼쪽 글이 제자리에 머무는 동안 오른쪽만 바뀌어서 첫 화면이 길어지지 않는다.
+
+   걷히는 장은 **위로 밀리면서 살짝 기울고 작아진다.** 곧게 사라지면
+   그냥 꺼지는 것처럼 보이고, 조금 기울면 손으로 넘긴 것처럼 읽힌다.
+
+   못 알아듣는 브라우저에서는 **맨 위 한 장만 보인다** — 지금 쓰던 첫 화면 그대로다.
+   ══════════════════════════════════════════════════════════════ */
+@keyframes ktc-deck-lift {
+  to {
+    transform: translateY(-9%) rotate(-2.4deg) scale(0.93);
+    opacity: 0;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ktc-deck {
+      /* 다섯 장을 넘기는 데 쓸 세로 길이. 짧으면 휙 지나가고 길면 스크롤이 지루하다 */
+      height: 220vh;
+      view-timeline-name: --ktc-deck;
+      view-timeline-axis: block;
+    }
+    /*
+      붙는 건 **사진 칸 하나뿐이다.** 히어로 전체를 붙이면 폰에서 글+사진이
+      화면보다 커서, 카드가 다 넘어가기 전에 히어로가 먼저 위로 떠나간다.
+      붙는 것이 화면보다 작아야 붙어 있는 길이와 애니메이션 길이가 맞는다.
+    */
+    .ktc-deck-sticky {
+      position: sticky;
+      top: 3.5rem;
+    }
+    .ktc-deck-card {
+      transform-origin: 50% 85%;
+      animation: ktc-deck-lift linear forwards;
+      animation-timeline: --ktc-deck;
+      animation-range: contain var(--ktc-from) contain var(--ktc-to);
+    }
+  }
+}
