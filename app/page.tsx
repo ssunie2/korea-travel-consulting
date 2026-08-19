@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Instrument_Serif } from "next/font/google";
 import { seoulWeather } from "@/lib/weather";
 import { t } from "@/lib/copy";
+import DayPattern from "@/components/DayPattern";
 
 // 표제용 서체. layout.tsx 를 건드리지 않으려고 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -28,12 +29,8 @@ function seoulNow() {
   return { label: `${get("hour")}:${get("minute")}` };
 }
 
-// 움직임은 CSS로만 준다. 자바스크립트가 없어도 그림은 그대로 나온다.
+// 보이고 감추는 것은 CSS로만 준다. 자바스크립트가 없어도 그림은 그대로 나온다.
 const MOTION = `
-@keyframes ktc-ride  { from { transform: translateX(-130px) } to { transform: translateX(1060px) } }
-@keyframes ktc-ride-n { from { transform: translateX(-130px) } to { transform: translateX(500px) } }
-.ktc-train   { animation: ktc-ride 13s linear infinite }
-.ktc-train-n { animation: ktc-ride-n 9s linear infinite }
 .ktc-tip { display: none }
 .ktc-route:has(#ktc-day-1:checked) .ktc-tip-1,
 .ktc-route:has(#ktc-day-2:checked) .ktc-tip-2,
@@ -45,9 +42,32 @@ const MOTION = `
   .ktc-route:has(#ktc-day-3:checked) .ktc-tip-3,
   .ktc-route:has(#ktc-day-4:checked) .ktc-tip-4 { display: grid }
 }
+/*
+  문양이 뜰 때. 그냥 켜면 툭 나타나서 딱딱하다.
+  **작게 돌아가 있다가 제자리로 펴지면서** 나타난다 — 둥근 문양이라 회전이 자연스럽게 읽힌다.
+
+  자리잡기(가운데 정렬)는 바깥 span 의 transform 이 맡고 있어서 건드리면 안 된다.
+  그래서 움직임은 **안쪽 svg** 에만 준다. 둘을 나눠두면 서로 덮어쓰지 않는다.
+
+  나타날 때(.55s)를 사라질 때(.28s)보다 길게 뒀다. 새로 고른 것이 주인공이고
+  물러나는 쪽이 꾸물대면 두 개가 겹쳐 보인다.
+*/
+.ktc-mark { transition: opacity .28s ease }
+.ktc-mark svg {
+  transform: scale(.62) rotate(-32deg);
+  transition: transform .3s ease;
+}
+.group:has(:checked) .ktc-mark { transition: opacity .45s ease }
+.group:has(:checked) .ktc-mark svg {
+  transform: none;
+  /* 끝에서 살짝 느려지며 놓이는 곡선. 기계적으로 도착하지 않는다 */
+  transition: transform .55s cubic-bezier(.16, 1, .3, 1);
+}
 @media (prefers-reduced-motion: reduce) {
-  .ktc-train   { animation: none; transform: translateX(430px) }
-  .ktc-train-n { animation: none; transform: translateX(180px) }
+  .ktc-mark, .ktc-mark svg,
+  .group:has(:checked) .ktc-mark,
+  .group:has(:checked) .ktc-mark svg { transition: none }
+  .ktc-mark svg { transform: none }
 }
 `;
 
@@ -102,10 +122,11 @@ const paid = t({
  * 같은 비율로 정거장을 놓기 때문에 이 한 벌로 둘 다 덮는다.
  */
 const STATIONS = [
-  { day: 1, x: 150, en: "INCHEON", ko: "인천공항", enSub: "인천공항", koSub: "INCHEON" },
-  { day: 2, x: 420, en: "GYEONGBOKGUNG", ko: "경복궁", enSub: "경복궁", koSub: "GYEONGBOKGUNG" },
-  { day: 3, x: 680, en: "BUKCHON", ko: "북촌", enSub: "북촌", koSub: "BUKCHON" },
-  { day: 4, x: 900, en: "NAMSAN", ko: "남산", enSub: "남산", koSub: "NAMSAN" },
+  // 양끝 여백 125, 정거장 사이 250. 끝을 좁혀 선이 화면 밖으로 이어지는 느낌을 남긴다
+  { day: 1, x: 125, en: "INCHEON", ko: "인천공항", enSub: "인천공항", koSub: "INCHEON" },
+  { day: 2, x: 375, en: "GYEONGBOKGUNG", ko: "경복궁", enSub: "경복궁", koSub: "GYEONGBOKGUNG" },
+  { day: 3, x: 625, en: "BUKCHON", ko: "북촌", enSub: "북촌", koSub: "BUKCHON" },
+  { day: 4, x: 875, en: "NAMSAN", ko: "남산", enSub: "남산", koSub: "NAMSAN" },
 ];
 
 /**
@@ -167,18 +188,17 @@ const TIPS = [
 type Scene = {
   id: string;
   w: number;
-  rideClass: string;
 };
 
-const WIDE: Scene = { id: "w", w: 1000, rideClass: "ktc-train" };
-const NARROW: Scene = { id: "n", w: 460, rideClass: "ktc-train-n" };
+const WIDE: Scene = { id: "w", w: 1000 };
+const NARROW: Scene = { id: "n", w: 460 };
 
 /**
  * 노선. **그림을 그리지 않는다.**
  *
- * 해·구름·전동차를 빼고 선 하나와 지나가는 빛만 남겼다. 지하철 안내 표지가 하는 방식이고,
+ * 해·구름·전동차를 빼고 선 하나만 남겼다. 지하철 안내 표지가 하는 방식이고,
  * 역 이름과 지역명은 그림이 아니라 **글자**가 맡는다(아래 HTML 이 그린다).
- * 시간대와 날씨는 배경 톤과 빗줄기로만 아주 옅게 남는다.
+ * 지나가던 전동차도 뺐다 — 그 자리는 이제 고른 날짜의 전통 문양이 쓴다.
  */
 function MetroScene({ scene, className }: { scene: Scene; className: string }) {
   return (
@@ -186,28 +206,10 @@ function MetroScene({ scene, className }: { scene: Scene; className: string }) {
       viewBox={`0 0 ${scene.w} 220`}
       className={className}
       role="img"
-      aria-label="A subway line. DAY 1 through DAY 4 are the stations, and a train passes along it."
+      aria-label="A subway line. DAY 1 through DAY 4 are the stations."
     >
-      <defs>
-        <linearGradient id={`ktc-trail-${scene.id}`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#E86B54" stopOpacity="0" />
-          <stop offset="1" stopColor="#E86B54" stopOpacity=".5" />
-        </linearGradient>
-        <clipPath id={`ktc-cut-${scene.id}`}>
-          <rect width={scene.w} height="220" />
-        </clipPath>
-      </defs>
-
-      <g clipPath={`url(#ktc-cut-${scene.id})`}>
-        {/* 열차. 차체를 그리지 않고 **지나가는 빛과 잔상**으로 암시한다 */}
-        <g className={scene.rideClass}>
-          <rect x="0" y="75" width="86" height="6" rx="3" fill={`url(#ktc-trail-${scene.id})`} />
-          <rect x="78" y="72" width="30" height="12" rx="6" fill="#E86B54" />
-        </g>
-
-        {/* 노선 — 10px 이던 것을 2.5px 로. 굵기가 유아틱함의 절반이었다 */}
-        <line x1="0" y1="120" x2={scene.w} y2="120" stroke="#E8EAEB" strokeWidth="2.5" />
-      </g>
+      {/* 노선 — 10px 이던 것을 2.5px 로. 굵기가 유아틱함의 절반이었다 */}
+      <line x1="0" y1="120" x2={scene.w} y2="120" stroke="#E8EAEB" strokeWidth="2.5" />
     </svg>
   );
 }
@@ -352,10 +354,23 @@ export default async function Home() {
                 <label
                   key={station.day}
                   style={{ left: `${station.x / 10}%` }}
-                  className="group absolute top-[54.5%] h-14 w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:w-28"
+                  className="group absolute top-[54.5%] h-[92px] w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:h-[112px] sm:w-28 md:h-[160px] md:w-44"
                 >
+                  {/*
+                    전통 문양 — DAY 글자 위. 원래 전동차가 지나가던 자리다.
+                    크기는 그 전동차(주황 타원)의 좁은 폭에서 출발했고, PC 가 답답해 보여 1.5배로 키웠다.
+                    폰도 16px 로 올렸다 — 문양이 세 겹이라 11px 에서는 뭉개진다.
+                    `opacity` 로만 켜고 끈다. `hidden` 으로 하면 켜질 때 줄이 밀린다.
+                  */}
+                  <span
+                    aria-hidden
+                    className="ktc-mark absolute bottom-[calc(50%+28.9px)] left-1/2 h-[24px] w-[24px] -translate-x-1/2 text-[#F09884] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+36.8px)] sm:h-[30px] sm:w-[30px] md:bottom-[calc(50%+52.2px)] md:h-[39px] md:w-[39px]"
+                  >
+                    <DayPattern day={station.day} />
+                  </span>
+
                   {/* 날짜 — 점 위 */}
-                  <span className="absolute bottom-[calc(50%+0.65rem)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold tracking-[0.16em] text-[#E8EAEB] group-has-[:checked]:text-[#E86B54] sm:text-[0.8rem] sm:tracking-[0.2em]">
+                  <span className="absolute bottom-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-none tracking-[0.16em] text-[#E8EAEB] group-has-[:checked]:text-[#E86B54] sm:bottom-[calc(50%+15px)] sm:text-[0.8rem] sm:tracking-[0.2em] md:bottom-[calc(50%+21px)] md:text-[1.2rem]">
                     DAY {station.day}
                   </span>
 
@@ -372,14 +387,14 @@ export default async function Home() {
                   {/* 역 — 작고 정확한 점. 고른 역에만 가는 테두리가 하나 더 */}
                   <span
                     aria-hidden
-                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8EAEB] peer-checked:bg-[#E86B54] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#7FA8DC] sm:h-3 sm:w-3"
+                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8EAEB] peer-checked:bg-[#E86B54] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#7FA8DC] sm:h-3 sm:w-3 md:h-[18px] md:w-[18px]"
                   />
 
                   {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
-                  <span className="absolute top-[calc(50%+0.8rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] tracking-[0.1em] text-[#8B9691] sm:text-[0.65rem] sm:tracking-[0.14em]">
+                  <span className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] leading-none tracking-[0.1em] text-[#8B9691] sm:top-[calc(50%+15px)] sm:text-[0.65rem] sm:tracking-[0.14em] md:top-[calc(50%+21px)] md:text-[0.98rem]">
                     {station.en}
                   </span>
-                  <span className="absolute top-[calc(50%+1.7rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] text-[#69736F] sm:text-[0.6rem]">
+                  <span className="absolute top-[calc(50%+27px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] leading-none text-[#69736F] sm:top-[calc(50%+34.4px)] sm:text-[0.6rem] md:top-[calc(50%+48.7px)] md:text-[0.9rem]">
                     {station.ko}
                   </span>
                 </label>
