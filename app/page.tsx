@@ -331,22 +331,23 @@ export default async function Home() {
                 <label
                   key={station.day}
                   style={{ left: `${station.x / 10}%` }}
-                  className="group absolute top-[54.5%] h-14 w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:w-28"
+                  className="group absolute top-[54.5%] h-14 w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:w-28 md:h-20 md:w-44"
                 >
                   {/*
                     전통 문양 — DAY 글자 위. 원래 전동차가 지나가던 자리다.
-                    크기는 그 전동차(주황 타원)의 좁은 폭에 맞췄다: 폰 11px, PC 17px.
+                    크기는 그 전동차(주황 타원)의 좁은 폭에서 출발했고, PC 가 답답해 보여 1.5배로 키웠다.
+                    폰도 16px 로 올렸다 — 문양이 세 겹이라 11px 에서는 뭉개진다.
                     `opacity` 로만 켜고 끈다. `hidden` 으로 하면 켜질 때 줄이 밀린다.
                   */}
                   <span
                     aria-hidden
-                    className="ktc-mark absolute bottom-[calc(50%+2.1rem)] left-1/2 h-[11px] w-[11px] -translate-x-1/2 text-[#E86B54] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+3.2rem)] sm:h-[17px] sm:w-[17px]"
+                    className="ktc-mark absolute bottom-[calc(50%+2.1rem)] left-1/2 h-[16px] w-[16px] -translate-x-1/2 text-[#F09884] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+3.2rem)] sm:h-[20px] sm:w-[20px] md:bottom-[calc(50%+4.8rem)] md:h-[26px] md:w-[26px]"
                   >
                     <DayPattern day={station.day} />
                   </span>
 
                   {/* 날짜 — 점 위 */}
-                  <span className="absolute bottom-[calc(50%+0.65rem)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold tracking-[0.16em] text-[#E8EAEB] group-has-[:checked]:text-[#E86B54] sm:text-[0.8rem] sm:tracking-[0.2em]">
+                  <span className="absolute bottom-[calc(50%+0.65rem)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold tracking-[0.16em] text-[#E8EAEB] group-has-[:checked]:text-[#E86B54] sm:text-[0.8rem] sm:tracking-[0.2em] md:bottom-[calc(50%+0.98rem)] md:text-[1.2rem]">
                     DAY {station.day}
                   </span>
 
@@ -363,14 +364,14 @@ export default async function Home() {
                   {/* 역 — 작고 정확한 점. 고른 역에만 가는 테두리가 하나 더 */}
                   <span
                     aria-hidden
-                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8EAEB] peer-checked:bg-[#E86B54] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#7FA8DC] sm:h-3 sm:w-3"
+                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8EAEB] peer-checked:bg-[#E86B54] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#7FA8DC] sm:h-3 sm:w-3 md:h-[18px] md:w-[18px]"
                   />
 
                   {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
-                  <span className="absolute top-[calc(50%+0.8rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] tracking-[0.1em] text-[#8B9691] sm:text-[0.65rem] sm:tracking-[0.14em]">
+                  <span className="absolute top-[calc(50%+0.8rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] tracking-[0.1em] text-[#8B9691] sm:text-[0.65rem] sm:tracking-[0.14em] md:top-[calc(50%+1.2rem)] md:text-[0.98rem]">
                     {station.en}
                   </span>
-                  <span className="absolute top-[calc(50%+1.7rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] text-[#69736F] sm:text-[0.6rem]">
+                  <span className="absolute top-[calc(50%+1.7rem)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] text-[#69736F] sm:text-[0.6rem] md:top-[calc(50%+2.55rem)] md:text-[0.9rem]">
                     {station.ko}
                   </span>
                 </label>
