@@ -67,3 +67,36 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/**
+ * 스크롤하면 아래에서 살짝 떠오르며 나타난다. `ktc-rise` 를 붙인 덩어리에만 걸린다.
+ *
+ * **자바스크립트를 쓰지 않는다.** 브라우저가 스크롤 위치를 직접 읽어 그린다
+ * (`animation-timeline: view()`). 라이브러리를 깔지 않는 규칙(6장)에 맞고,
+ * 스크롤할 때마다 코드가 도는 방식보다 훨씬 가볍다.
+ *
+ * **못 알아듣는 브라우저에서는 그냥 처음부터 보인다.** `@supports` 로 감쌌기 때문에
+ * 이 기능이 없으면 규칙 자체가 적용되지 않는다 — 글이 안 보이는 사고가 날 수 없다.
+ * 그래서 "숨겼다가 보여주기"가 아니라 "보이는 것을 더 예쁘게"에 가깝다.
+ */
+@keyframes ktc-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ktc-rise {
+      animation: ktc-rise-in linear both;
+      animation-timeline: view();
+      /* 화면에 들어오기 시작해서 8%쯤 올라왔을 때 끝난다. 늦게 끝나면 읽는 중에 움직여서 거슬린다 */
+      animation-range: entry 0% cover 8%;
+    }
+  }
+}

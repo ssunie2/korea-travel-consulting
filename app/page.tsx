@@ -276,7 +276,7 @@ export default async function Home() {
           </div>
 
           {/* 한옥의 결은 사진으로, 노선의 그래픽은 아래 SVG로 이어 붙인다. */}
-          <figure className="relative mx-auto w-full max-w-[31rem] overflow-hidden rounded-[1.75rem] border border-[var(--c-line-2)] bg-[var(--c-deep)] shadow-[0_28px_70px_-28px_rgba(0,0,0,0.7)] md:justify-self-end">
+          <figure className="ktc-rise relative mx-auto w-full max-w-[31rem] overflow-hidden rounded-[1.75rem] border border-[var(--c-line-2)] bg-[var(--c-deep)] shadow-[0_28px_70px_-28px_rgba(0,0,0,0.7)] md:justify-self-end">
             {/*
               TODO(출시 전): 이 이미지는 **AI 가 만든 그림이지 실제 사진이 아니다.**
               1024×1536(AI 표준 출력 크기), 카메라 정보 전무, 확대하면 사람 형체와
@@ -449,12 +449,12 @@ export default async function Home() {
       </section>
 
       {/* ── how it works ────────────────────────────────── */}
-      <section className="border-t border-[var(--c-line-2)]">
+      <section className="ktc-rise border-t border-[var(--c-line-2)]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
             {t({ ko: "진행 방식", en: "How it works" })}
           </h2>
-          <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-12">
+          <ol className="ktc-rise mt-10 grid gap-10 md:grid-cols-3 md:gap-12">
             {steps.map((step, i) => (
               <li key={step.title}>
                 <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-accent)]">
@@ -471,7 +471,7 @@ export default async function Home() {
       </section>
 
       {/* ── free vs paid ────────────────────────────────── */}
-      <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
+      <section className="ktc-rise border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <h2 className="font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
             {t({ ko: "무엇이 무료이고, 무엇에 값을 치르는지", en: "What's free, and what you're paying for" })}
@@ -519,7 +519,7 @@ export default async function Home() {
       </section>
 
       {/* ── pricing + contact ───────────────────────────── */}
-      <section id="pricing" className="scroll-mt-20 border-t border-[var(--c-line-2)]">
+      <section id="pricing" className="ktc-rise scroll-mt-20 border-t border-[var(--c-line-2)]">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
           <div>
             <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">

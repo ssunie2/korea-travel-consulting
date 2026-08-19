@@ -69,11 +69,11 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
         <p className="mt-5 text-lg leading-relaxed text-[var(--c-text-2)]">{trip.summary}</p>
 
         {/* ── 예산 — 우리가 파는 것 중 하나. 위에 둔다 ── */}
-        <section className="mt-12 rounded-2xl bg-[var(--c-surface)] p-7 sm:p-9">
+        <section className="ktc-rise mt-12 rounded-2xl bg-[var(--c-surface)] p-7 sm:p-9">
           <h2 className={mono}>Your money</h2>
           <p className="mt-3 text-lg leading-relaxed">{trip.costBreakdown.budgetFit}</p>
 
-          <dl className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
+          <dl className="ktc-rise mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
             {[
               ["Total", trip.costBreakdown.totalEstimate],
               ["Stay", trip.costBreakdown.accommodation],
@@ -106,7 +106,7 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
         </section>
 
         {/* ── 일자별 ── */}
-        <ol className="mt-16 space-y-16">
+        <ol className="ktc-rise mt-16 space-y-16">
           {trip.days.map((day) => (
             <li key={day.dayNumber}>
               <div className="flex items-baseline gap-4">
@@ -177,14 +177,14 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
         </ol>
 
         {/* ── 추천 ── */}
-        <section className="mt-16 grid gap-10 border-t border-[var(--c-line-2)] pt-12 sm:grid-cols-3 sm:gap-8">
+        <section className="ktc-rise mt-16 grid gap-10 border-t border-[var(--c-line-2)] pt-12 sm:grid-cols-3 sm:gap-8">
           <Places title="Where to stay" items={trip.picks.stay} />
           <Places title="Where to eat" items={trip.picks.dining} />
           <Places title="Cafes" items={trip.picks.cafes} />
         </section>
 
         {/* ── 날씨·짐 ── */}
-        <section className="mt-14 grid gap-10 border-t border-[var(--c-line-2)] pt-12 sm:grid-cols-2">
+        <section className="ktc-rise mt-14 grid gap-10 border-t border-[var(--c-line-2)] pt-12 sm:grid-cols-2">
           <div>
             <h2 className={mono}>What to wear</h2>
             <p className="mt-3 leading-relaxed text-[var(--c-text-2)]">{trip.clothing.weatherSummary}</p>
