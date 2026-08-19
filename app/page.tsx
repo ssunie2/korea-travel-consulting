@@ -352,19 +352,28 @@ export default async function Home() {
                   unoptimized
                   priority={i === 0}
                 />
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,22,32,.12)_35%,rgba(8,22,32,.82)_100%)]"
-                />
-                <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-7">
-                  {/* 사진 위에 얹히는 글이다. 바탕 토큰을 따라가면 안 된다 — 어두운 사진 위에서 안 보인다 */}
-                  <p className="max-w-[12ch] font-[family-name:var(--font-display)] text-3xl leading-none text-[var(--c-text)] sm:text-4xl">
-                    {card.line}
-                  </p>
-                  <span className="grid h-16 w-16 flex-none place-items-center rounded-full border-2 border-[var(--c-bg)] bg-[var(--c-accent)] text-lg font-bold tracking-[0.12em] text-[var(--c-bg)] shadow-lg">
-                    {card.badge}
-                  </span>
-                </figcaption>
+                {/* 아래를 어둡게 까는 건 글을 읽히게 하려는 것이다. 글이 없는 장은 사진을 가릴 뿐이다 */}
+                {i === 0 && (
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,22,32,.12)_35%,rgba(8,22,32,.82)_100%)]"
+                  />
+                )}
+                {/*
+                  글은 **첫 장에만** 둔다. 다섯 장에 다 얹으면 넘길 때마다 문장이 바뀌어
+                  읽으려다 말고, 사진도 글에 가린다. 뒤 장은 사진이 하게 둔다.
+                */}
+                {i === 0 && (
+                  <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-7">
+                    {/* 사진 위에 얹히는 글이다. 바탕 토큰을 따라가면 안 된다 — 어두운 사진 위에서 안 보인다 */}
+                    <p className="max-w-[12ch] font-[family-name:var(--font-display)] text-3xl leading-none text-[var(--c-text)] sm:text-4xl">
+                      {card.line}
+                    </p>
+                    <span className="grid h-16 w-16 flex-none place-items-center rounded-full border-2 border-[var(--c-bg)] bg-[var(--c-accent)] text-lg font-bold tracking-[0.12em] text-[var(--c-bg)] shadow-lg">
+                      {card.badge}
+                    </span>
+                  </figcaption>
+                )}
                 <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-[var(--c-bg)]/90 px-3 py-2 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-[0.15em] text-[var(--c-text)] backdrop-blur-sm sm:left-7 sm:top-7">
                   <span aria-hidden className="h-2 w-2 rounded-full bg-[var(--c-accent)]" />
                   {t({ ko: "현지의 시선", en: "Local view" })}

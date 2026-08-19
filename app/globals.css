@@ -234,7 +234,7 @@ body {
   @media (prefers-reduced-motion: no-preference) {
     .ktc-deck {
       /* 다섯 장을 넘기는 데 쓸 세로 길이. 짧으면 휙 지나가고 길면 스크롤이 지루하다 */
-      height: 220vh;
+      height: 170vh;
       view-timeline-name: --ktc-deck;
       view-timeline-axis: block;
     }
@@ -246,6 +246,17 @@ body {
     .ktc-deck-sticky {
       position: sticky;
       top: 3.5rem;
+    }
+    /*
+      카드가 붙어 있는 동안 그 아래는 원래 빈 어둠이었다. 스크롤할 게 남았다는 신호가
+      없어서 화면이 끊겨 보인다. **다음 내용을 그 빈 만큼 끌어올려** 카드 밑에 붙인다.
+
+      끌어올리는 양 = 화면 높이 − 카드가 붙는 위치 − 카드 높이.
+      카드는 폭의 1.5배(2:3)이고 폭은 31rem 을 넘지 않으므로 그대로 계산된다.
+    */
+    .ktc-deck {
+      --ktc-card-h: calc(min(100vw - 3rem, 31rem) * 1.5);
+      margin-bottom: calc(-1 * max(0px, 100vh - 3.5rem - var(--ktc-card-h)));
     }
     .ktc-deck-card {
       transform-origin: 50% 85%;
