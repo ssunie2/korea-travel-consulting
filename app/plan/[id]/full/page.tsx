@@ -13,7 +13,7 @@ const display = Instrument_Serif({
 
 export const dynamic = "force-dynamic";
 
-const mono = "font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]";
+const mono = "font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]";
 
 function Places({ title, items }: { title: string; items: PlaceRecommendation[] }) {
   return (
@@ -23,10 +23,10 @@ function Places({ title, items }: { title: string; items: PlaceRecommendation[] 
         {items.map((p) => (
           <li key={p.name}>
             <p className="text-lg leading-tight">{p.name}</p>
-            <p className="mt-0.5 font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-widest text-[#4A5D54]">
+            <p className="mt-0.5 font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-widest text-[var(--c-text-3)]">
               {p.area} · {p.priceLevel}
             </p>
-            <p className="mt-1 leading-relaxed text-[#3D4A44]">{p.reason}</p>
+            <p className="mt-1 leading-relaxed text-[var(--c-text-2)]">{p.reason}</p>
           </li>
         ))}
       </ul>
@@ -48,16 +48,16 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
 
   return (
     <div
-      className={`${display.variable} flex-1 bg-[#F2EDE3] text-[#1B211E] font-[family-name:var(--font-geist-sans)] selection:bg-[#D8503C] selection:text-[#F2EDE3]`}
+      className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
     >
       <header className="mx-auto flex max-w-3xl items-center justify-between px-6 py-6">
         <Link
           href="/"
-          className="-my-2 py-2 font-[family-name:var(--font-display)] text-xl tracking-tight underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+          className="-my-2 py-2 font-[family-name:var(--font-display)] text-xl tracking-tight underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
         >
           Korea Travel Consulting
         </Link>
-        <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[#D8503C]">
+        <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[var(--c-accent)]">
           Full plan
         </span>
       </header>
@@ -66,10 +66,10 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
         <h1 className="font-[family-name:var(--font-display)] text-[clamp(2.25rem,6vw,3.5rem)] leading-[1.02] tracking-tight">
           {trip.tripTitle}
         </h1>
-        <p className="mt-5 text-lg leading-relaxed text-[#3D4A44]">{trip.summary}</p>
+        <p className="mt-5 text-lg leading-relaxed text-[var(--c-text-2)]">{trip.summary}</p>
 
         {/* ── 예산 — 우리가 파는 것 중 하나. 위에 둔다 ── */}
-        <section className="mt-12 rounded-2xl bg-[#EDE7DB] p-7 sm:p-9">
+        <section className="mt-12 rounded-2xl bg-[var(--c-surface)] p-7 sm:p-9">
           <h2 className={mono}>Your money</h2>
           <p className="mt-3 text-lg leading-relaxed">{trip.costBreakdown.budgetFit}</p>
 
@@ -82,7 +82,7 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
               ["Activities", trip.costBreakdown.activities],
             ].map(([k, v]) => (
               <div key={k}>
-                <dt className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[#4A5D54]">
+                <dt className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[var(--c-text-3)]">
                   {k}
                 </dt>
                 <dd className="mt-1">{v}</dd>
@@ -90,13 +90,13 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
             ))}
           </dl>
 
-          <h3 className="mt-8 font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[#D8503C]">
+          <h3 className="mt-8 font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-accent)]">
             Same money, better trip
           </h3>
           <ul className="mt-3 space-y-2">
             {trip.costBreakdown.valueMoves.map((m, i) => (
               <li key={i} className="flex gap-3 leading-relaxed">
-                <span aria-hidden className="text-[#D8503C]">
+                <span aria-hidden className="text-[var(--c-accent)]">
                   —
                 </span>
                 <span>{m}</span>
@@ -110,53 +110,53 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
           {trip.days.map((day) => (
             <li key={day.dayNumber}>
               <div className="flex items-baseline gap-4">
-                <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[#D8503C]">
+                <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-accent)]">
                   {String(day.dayNumber).padStart(2, "0")}
                 </span>
                 <h2 className="font-[family-name:var(--font-display)] text-2xl leading-tight">{day.theme}</h2>
               </div>
 
               {/* 왜 이 순서인지 — 손님이 돈을 낸 이유 */}
-              <p className="mt-3 border-l-2 border-[#3E6FB0] pl-4 leading-relaxed text-[#3D4A44]">
-                <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[#3E6FB0]">
+              <p className="mt-3 border-l-2 border-[var(--c-focus)] pl-4 leading-relaxed text-[var(--c-text-2)]">
+                <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[var(--c-focus)]">
                   {day.area}
                 </span>
                 <br />
                 {day.routeNote}
               </p>
 
-              <ul className="mt-6 space-y-8 border-l border-[#DDD5C6] pl-6">
+              <ul className="mt-6 space-y-8 border-l border-[var(--c-line-2)] pl-6">
                 {day.activities.map((a, i) => (
                   <li key={i}>
-                    <p className="font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.15em] text-[#4A5D54]">
+                    <p className="font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.15em] text-[var(--c-text-3)]">
                       {a.time}
                       {a.duration && ` · ${a.duration}`}
                       {a.estimatedCost && ` · ${a.estimatedCost}`}
                     </p>
                     <p className="mt-1 text-lg">{a.name}</p>
                     {a.gettingThere && (
-                      <p className="mt-1 text-sm text-[#3E6FB0]">↳ {a.gettingThere}</p>
+                      <p className="mt-1 text-sm text-[var(--c-focus)]">↳ {a.gettingThere}</p>
                     )}
-                    <p className="mt-2 leading-relaxed text-[#3D4A44]">{a.description}</p>
+                    <p className="mt-2 leading-relaxed text-[var(--c-text-2)]">{a.description}</p>
 
-                    <div className="mt-4 rounded-xl bg-[#12211C] p-5 text-[#E8E2D6]">
+                    <div className="mt-4 rounded-xl bg-[var(--c-deep)] p-5 text-[var(--c-text-on-deep)]">
                       <p className="leading-relaxed">{a.tips.highlight}</p>
-                      <p className="mt-3 border-t border-[#2A3D35] pt-3 leading-relaxed text-[#C9CFC6]">
-                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[#D8503C]">
+                      <p className="mt-3 border-t border-[var(--c-line)] pt-3 leading-relaxed text-[var(--c-text-on-deep)]">
+                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[var(--c-accent)]">
                           Avoid
                         </span>
                         <br />
                         {a.tips.pitfall}
                       </p>
-                      <p className="mt-3 border-t border-[#2A3D35] pt-3 leading-relaxed">
-                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[#7FA8DC]">
+                      <p className="mt-3 border-t border-[var(--c-line)] pt-3 leading-relaxed">
+                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[var(--c-focus)]">
                           Local knows
                         </span>
                         <br />
                         {a.tips.insiderSecret}
                       </p>
                       {a.tips.reservationRequired && (
-                        <p className="mt-3 font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[#D8503C]">
+                        <p className="mt-3 font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[var(--c-accent)]">
                           Book ahead
                         </p>
                       )}
@@ -166,7 +166,7 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
               </ul>
 
               {day.photoSpot && (
-                <p className="mt-6 leading-relaxed text-[#3D4A44]">
+                <p className="mt-6 leading-relaxed text-[var(--c-text-2)]">
                   <span className={mono}>Photo · {day.photoSpot.name}</span>
                   <br />
                   {day.photoSpot.bestTime} — {day.photoSpot.advice}
@@ -177,17 +177,17 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
         </ol>
 
         {/* ── 추천 ── */}
-        <section className="mt-16 grid gap-10 border-t border-[#DDD5C6] pt-12 sm:grid-cols-3 sm:gap-8">
+        <section className="mt-16 grid gap-10 border-t border-[var(--c-line-2)] pt-12 sm:grid-cols-3 sm:gap-8">
           <Places title="Where to stay" items={trip.picks.stay} />
           <Places title="Where to eat" items={trip.picks.dining} />
           <Places title="Cafes" items={trip.picks.cafes} />
         </section>
 
         {/* ── 날씨·짐 ── */}
-        <section className="mt-14 grid gap-10 border-t border-[#DDD5C6] pt-12 sm:grid-cols-2">
+        <section className="mt-14 grid gap-10 border-t border-[var(--c-line-2)] pt-12 sm:grid-cols-2">
           <div>
             <h2 className={mono}>What to wear</h2>
-            <p className="mt-3 leading-relaxed text-[#3D4A44]">{trip.clothing.weatherSummary}</p>
+            <p className="mt-3 leading-relaxed text-[var(--c-text-2)]">{trip.clothing.weatherSummary}</p>
             <ul className="mt-3 space-y-1">
               {trip.clothing.outfits.map((o, i) => (
                 <li key={i} className="leading-relaxed">
@@ -195,7 +195,7 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
                 </li>
               ))}
             </ul>
-            <p className="mt-3 leading-relaxed text-[#3D4A44]">{trip.clothing.advice}</p>
+            <p className="mt-3 leading-relaxed text-[var(--c-text-2)]">{trip.clothing.advice}</p>
           </div>
           <div>
             <h2 className={mono}>Pack this</h2>

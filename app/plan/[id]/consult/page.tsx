@@ -14,9 +14,9 @@ const display = Instrument_Serif({
 
 export const dynamic = "force-dynamic";
 
-const label = "font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]";
+const label = "font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]";
 const field =
-  "mt-2 w-full rounded-lg border border-[#CFC6B4] bg-white px-4 py-3 text-base text-[#1B211E] focus:border-[#3E6FB0] focus:outline-2 focus:outline-offset-0 focus:outline-[#3E6FB0]";
+  "mt-2 w-full rounded-lg border border-[var(--c-line)] bg-[var(--c-surface)] px-4 py-3 text-base text-[var(--c-text)] focus:border-[var(--c-focus)] focus:outline-2 focus:outline-offset-0 focus:outline-[var(--c-focus)]";
 
 /**
  * 신청을 받는다.
@@ -70,19 +70,19 @@ export default async function ConsultPage({
 
   const shell = (children: React.ReactNode) => (
     <div
-      className={`${display.variable} flex-1 bg-[#F2EDE3] text-[#1B211E] font-[family-name:var(--font-geist-sans)] selection:bg-[#D8503C] selection:text-[#F2EDE3]`}
+      className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
     >
       <header className="mx-auto flex max-w-2xl items-center justify-between px-6 py-6">
         <Link
           href="/"
-          className="-my-2 py-2 font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+          className="-my-2 py-2 font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
         >
           mohallae
         </Link>
         {/* min-h-11: 손가락으로 누를 수 있는 최소 크기(44px)를 보장한다 */}
         <Link
           href={`/plan/${plan.id}`}
-          className="-my-3 inline-flex min-h-11 items-center font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[#4A5D54] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+          className="-my-3 inline-flex min-h-11 items-center font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[var(--c-text-3)] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
         >
           {t({ ko: "초안으로 돌아가기", en: "Back to draft" })}
         </Link>
@@ -98,15 +98,15 @@ export default async function ConsultPage({
           {t({ ko: "접수했습니다.", en: "We\u2019ve got it." })}
         </h1>
         {/* 규칙 6번: 사람이 상담하지 않는다. 사람이 답장한다는 약속을 두면 안 된다 */}
-        <p className="mt-5 text-lg leading-relaxed text-[#3D4A44]">
+        <p className="mt-5 text-lg leading-relaxed text-[var(--c-text-2)]">
           {t({
             ko: <>전체 일정은 <strong>₩150,000</strong> 입니다. 결제 링크와 일정을 이메일로 보내드립니다 — 처음부터 끝까지 만들어져 나오니 예약할 통화도, 기다릴 사람도 없습니다.</>,
             en: <>Your full plan is <strong>₩150,000</strong>. We&apos;ll email you the link to pay and the plan itself — it&apos;s put together for you start to finish, so there&apos;s no call to book and nobody to wait on.</>,
           })}
         </p>
-        <p className="mt-8 leading-relaxed text-[#3D4A44]">
+        <p className="mt-8 leading-relaxed text-[var(--c-text-2)]">
           {t({ ko: "무료 초안은 그대로 있습니다 —", en: "Your free draft stays where it is —" })}{" "}
-          <Link href={`/plan/${plan.id}`} className="underline underline-offset-4 hover:text-[#D8503C]">
+          <Link href={`/plan/${plan.id}`} className="underline underline-offset-4 hover:text-[var(--c-accent)]">
             {t({ ko: "이 링크를 보관하세요", en: "keep this link" })}
           </Link>
           .
@@ -120,21 +120,21 @@ export default async function ConsultPage({
       <h1 className="font-[family-name:var(--font-display)] text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight">
         {t({ ko: "전체 일정 받기", en: "Get the full plan" })}
       </h1>
-      <p className="mt-5 leading-relaxed text-[#3D4A44]">
+      <p className="mt-5 leading-relaxed text-[var(--c-text-2)]">
         {t({
           ko: "알려주신 정보로 시간을 가장 덜 버리는 동선과 예산이 가장 잘 쓰이는 지점을 계산합니다. 모든 정거장에 팁, 숙소 다섯 곳과 식당 다섯 곳, 비용 분해, 그리고 무엇을 언제 예약하면 되는지 — 한국 전화로만 받는 곳까지 알려드립니다.",
           en: "We take what you told us and work out the route that wastes the least time, and where your money goes furthest. A tip at every stop, five places to stay and five to eat, costs broken down, and exactly what to book and when — including the places that only take Korean phone reservations.",
         })}
       </p>
       {/* 규칙 6번: 사람이 상담하지 않는다. 사람이 답장한다는 약속을 두면 안 된다 */}
-      <p className="mt-3 leading-relaxed text-[#3D4A44]">
+      <p className="mt-3 leading-relaxed text-[var(--c-text-2)]">
         {t({
           ko: <><strong>₩150,000</strong> — 여행이 며칠이든 값은 하나입니다. 이메일만 남겨주시면 링크를 보내드립니다.</>,
           en: <><strong>₩150,000</strong> — one price, however long your trip is. Leave your email and we&apos;ll send you the link.</>,
         })}
       </p>
       {/* 우리는 여행업자가 아니다. 예약은 손님이 직접 한다 — 이 선을 손님에게도 분명히 해둔다 */}
-      <p className="mt-3 leading-relaxed text-[#4A5D54]">
+      <p className="mt-3 leading-relaxed text-[var(--c-text-3)]">
         {t({
           ko: "저희는 계획을 세우고, 예약은 손님이 하십니다. 숙소·식당·입장권을 대신 예약해 드리거나 그 대금을 받지 않습니다 — 무엇을 어떻게 예약하면 되는지 알려드립니다.",
           en: "We plan; you book. We don't make reservations for you or take payment for hotels, restaurants or tickets — we tell you exactly what to book and how.",
@@ -142,7 +142,7 @@ export default async function ConsultPage({
       </p>
 
       {error && (
-        <p role="alert" className="mt-8 rounded-lg border border-[#D8503C] bg-[#F8E7E3] px-4 py-3 text-[#8E2C1B]">
+        <p role="alert" className="mt-8 rounded-lg border border-[var(--c-accent)] bg-[var(--c-error-bg)] px-4 py-3 text-[var(--c-error-text)]">
           {error === "1"
             ? t({ ko: "이름과 이메일을 확인해 주세요.", en: "Please check your name and email." })
             : t({ ko: "저장하지 못했습니다. 다시 시도해 주세요.", en: "We couldn't save that. Please try again." })}
@@ -174,16 +174,16 @@ export default async function ConsultPage({
 
         <button
           type="submit"
-          className="inline-flex items-center rounded-full bg-[#12211C] px-8 py-3.5 text-base text-[#F2EDE3] transition-colors hover:bg-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#3E6FB0]"
+          className="inline-flex items-center rounded-full bg-[var(--c-accent)] px-8 py-3.5 text-base text-white transition-colors hover:bg-[var(--c-text)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
         >
           {t({ ko: "신청 보내기", en: "Send my request" })}
         </button>
 
-        <p className="mt-4 text-sm leading-relaxed text-[#4A5D54]">
+        <p className="mt-4 text-sm leading-relaxed text-[var(--c-text-3)]">
           {t({ ko: "보내시면", en: "By sending this you agree to our" })}{" "}
           <Link
             href="/privacy"
-            className="underline underline-offset-4 hover:text-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+            className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
           >
             {t({ ko: "개인정보 처리방침", en: "privacy policy" })}
           </Link>
