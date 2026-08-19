@@ -4,6 +4,7 @@ import { Instrument_Serif } from "next/font/google";
 import { supabaseServer } from "@/lib/supabase-server";
 import type { Plan } from "@/lib/types";
 import { t } from "@/lib/copy";
+import CopyLinkButton from "@/components/CopyLinkButton";
 
 // 표제용 서체. 랜딩(app/page.tsx)과 같은 방식으로 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -168,16 +169,13 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
               en: "The draft above is the shape of your trip. The full plan fills it in — a tip at every stop, five stays and five restaurants chosen for your budget, costs broken down, and exactly what to book and when, including the places that only take Korean phone reservations.",
             })}
           </p>
-          {/* TODO(#11): A6 상담 신청 화면이 생기면 이 주소로 연결된다. 아직 없다. */}
           <Link
             href={`/plan/${plan.id}/consult`}
             className="mt-8 inline-flex items-center rounded-full bg-[#12211C] px-8 py-3.5 text-base text-[#F2EDE3] transition-colors hover:bg-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#3E6FB0]"
           >
             {t({ ko: "전체 일정 받기", en: "Get the full plan" })}
           </Link>
-          <p className="mt-5 font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[#4A5D54]">
-            {t({ ko: "이 링크를 보관하세요 — 초안은 여기 그대로 있습니다", en: "Keep this link — your draft stays here" })}
-          </p>
+          <CopyLinkButton />
         </section>
       </main>
     </div>
