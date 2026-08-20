@@ -17,31 +17,31 @@
  */
 :root {
   /* 바탕 — 뒤로 갈수록 한 단씩 밝다 */
-  --c-bg: #1A2024;
-  --c-surface: #212A2E;
-  --c-surface-2: #273236;
+  --c-bg: #16302C;
+  --c-surface: #1C3A35;
+  --c-surface-2: #24463F;
   /* 제일 어두운 칸. 어두운 바탕 위에서 한 번 더 눌러 강조할 때 쓴다 (컨시어지 팁) */
-  --c-deep: #131A1D;
+  --c-deep: #102421;
 
   /* 글자 — 아래로 갈수록 흐리다 */
-  --c-text: #E8EAEB;
-  --c-text-2: #B6BFBB;
-  --c-text-3: #939E99;
-  --c-text-4: #8A948F;
+  --c-text: #F1EADA;
+  --c-text-2: #C2CFC7;
+  --c-text-3: #9AAFA4;
+  --c-text-4: #8FA298;
   /* 어두운 칸 안에서 쓰는 글자 */
-  --c-text-on-deep: #D9DEDA;
+  --c-text-on-deep: #DCE7DF;
 
   /* 선 */
-  --c-line: #35403F;
-  --c-line-2: #2A3330;
+  --c-line: #3C6259;
+  --c-line-2: #2E524B;
 
   /* 강조 */
-  --c-accent: #E86B54;
-  --c-accent-soft: #F09884;
-  --c-accent-dim: #A8C3B4;
+  --c-accent: #E0603F;
+  --c-accent-soft: #E9846B;
+  --c-accent-dim: #5AA88E;
 
   /* 누른 자리 표시(포커스). 눈에 띄어야 해서 강조색과 다른 계열로 둔다 */
-  --c-focus: #7FA8DC;
+  --c-focus: #D1AA55;
 
   /* 잘못됐을 때 */
   --c-error-bg: #3A1E19;

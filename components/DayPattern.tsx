@@ -81,9 +81,9 @@ const dot = (angle: number, radius: number, r: number) => {
 };
 
 /** DAY 1 — 연화문. 겹꽃잎: 바깥 여덟 장 안쪽 여덟 장이 서로 엇갈린다 */
-function Lotus() {
+function LotusContent() {
   return (
-    <svg {...shell} aria-hidden>
+    <>
       <Band beads={16} />
       {spokes(8).map((a) => (
         <path key={a} d={petal(a, 5.4, 8.9, 21)} />
@@ -94,8 +94,12 @@ function Lotus() {
         ))}
       </g>
       <circle cx={C} cy={C} r={1.5} fill="currentColor" stroke="none" />
-    </svg>
+    </>
   );
+}
+
+function Lotus() {
+  return <svg {...shell} aria-hidden><LotusContent /></svg>;
 }
 
 /** DAY 2 — 꽃살문. 큰 꽃잎 넷 사이에 작은 꽃잎 넷, 그 끝마다 씨앗 하나 */
@@ -119,9 +123,9 @@ function Blossom() {
 }
 
 /** DAY 3 — 귀갑문. 거북 등껍질에서 온 육각 칸이 벌집처럼 맞물린다 */
-function Tortoise() {
+function TortoiseContent() {
   return (
-    <svg {...shell} aria-hidden>
+    <>
       <Band beads={12} />
       <path d={ngon(6, 4.4)} strokeWidth={1.1} />
       <g strokeWidth={0.95}>
@@ -131,8 +135,12 @@ function Tortoise() {
         })}
       </g>
       <circle cx={C} cy={C} r={1.1} fill="currentColor" stroke="none" />
-    </svg>
+    </>
   );
+}
+
+function Tortoise() {
+  return <svg {...shell} aria-hidden><TortoiseContent /></svg>;
 }
 
 /**
@@ -158,4 +166,43 @@ const PATTERNS = [Lotus, Blossom, Tortoise, LayeredLotus];
 export default function DayPattern({ day }: { day: number }) {
   const Shape = PATTERNS[(day - 1) % PATTERNS.length];
   return <Shape />;
+}
+
+/** 클로드 시안의 최종 배경. 문양과 좌표, 투명도를 그대로 옮긴 고정 레이어다. */
+export function BackgroundMotifs() {
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden text-white">
+      <svg
+        className="absolute inset-0 h-full w-full opacity-[.055]"
+        preserveAspectRatio="xMidYMid slice"
+        viewBox="0 0 100 100"
+      >
+        <defs>
+          <symbol id="ktc-bg-lotus" viewBox="0 0 24 24">
+            <g fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <LotusContent />
+            </g>
+          </symbol>
+          <symbol id="ktc-bg-tortoise" viewBox="0 0 24 24">
+            <g fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <TortoiseContent />
+            </g>
+          </symbol>
+        </defs>
+
+        <use href="#ktc-bg-lotus" x="-180" y="-120" width="62" height="62" />
+        <use href="#ktc-bg-lotus" x="8" y="62" width="70" height="70" />
+        <use href="#ktc-bg-tortoise" x="-140" y="84" width="46" height="46" />
+      </svg>
+
+      <svg
+        className="absolute -right-[9%] -top-[11%] w-[min(48vw,430px)] opacity-[.07] max-[760px]:-right-[22%] max-[760px]:-top-[6%] max-[760px]:w-[70vw]"
+        viewBox="0 0 24 24"
+      >
+        <g fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round">
+          <TortoiseContent />
+        </g>
+      </svg>
+    </div>
+  );
 }
