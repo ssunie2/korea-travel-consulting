@@ -233,30 +233,22 @@ body {
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .ktc-deck {
-      /* 다섯 장을 넘기는 데 쓸 세로 길이. 짧으면 휙 지나가고 길면 스크롤이 지루하다 */
-      height: 170vh;
+      /*
+        **붙어 있는 길이와 넘기는 길이를 정확히 같게 맞춘다.**
+        붙는 칸을 화면 높이로 두면 (덱높이 − 화면높이) 가 둘 다에 똑같이 쓰인다.
+        그래서 마지막 장이 놓이는 순간 붙는 게 풀리고 **곧바로 다음 내용이 올라온다.**
+        빈 스크롤이 생길 수가 없다.
+      */
+      height: 260vh;
       view-timeline-name: --ktc-deck;
       view-timeline-axis: block;
     }
-    /*
-      붙는 건 **사진 칸 하나뿐이다.** 히어로 전체를 붙이면 폰에서 글+사진이
-      화면보다 커서, 카드가 다 넘어가기 전에 히어로가 먼저 위로 떠나간다.
-      붙는 것이 화면보다 작아야 붙어 있는 길이와 애니메이션 길이가 맞는다.
-    */
     .ktc-deck-sticky {
       position: sticky;
-      top: 3.5rem;
-    }
-    /*
-      카드가 붙어 있는 동안 그 아래는 원래 빈 어둠이었다. 스크롤할 게 남았다는 신호가
-      없어서 화면이 끊겨 보인다. **다음 내용을 그 빈 만큼 끌어올려** 카드 밑에 붙인다.
-
-      끌어올리는 양 = 화면 높이 − 카드가 붙는 위치 − 카드 높이.
-      카드는 폭의 1.5배(2:3)이고 폭은 31rem 을 넘지 않으므로 그대로 계산된다.
-    */
-    .ktc-deck {
-      --ktc-card-h: calc(min(100vw - 3rem, 31rem) * 1.5);
-      margin-bottom: calc(-1 * max(0px, 100vh - 3.5rem - var(--ktc-card-h)));
+      top: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
     }
     .ktc-deck-card {
       transform-origin: 50% 85%;
