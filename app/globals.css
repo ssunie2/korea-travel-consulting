@@ -255,11 +255,26 @@ body {
       position: relative;
       z-index: 1;
     }
+    /*
+      **붙는 상자의 길이 = 카드 + 넘기는 데 쓸 스크롤.**
+      상자가 끝나면 카드가 풀리고 노선도가 그 뒤로 이어진다 — 겹치거나 숨을 수 없다.
+      상자 맨 위가 카드 자리라, 카드가 온전히 자리잡은 뒤부터 넘어간다.
+    */
+    .ktc-deck {
+      --ktc-card-h: calc(min(100vw - 3rem, 31rem) * 1.5);
+      height: calc(var(--ktc-card-h) + 110vh);
+      view-timeline-name: --ktc-deck;
+      view-timeline-axis: block;
+    }
+    .ktc-deck-sticky {
+      position: sticky;
+      top: 4rem;
+    }
     .ktc-deck-card {
       transform-origin: 50% 85%;
       animation: ktc-deck-lift linear forwards;
       animation-timeline: --ktc-deck;
-      animation-range: contain var(--ktc-from) contain var(--ktc-to);
+      animation-range: contain calc(var(--ktc-i) * 25%) contain calc((var(--ktc-i) + 1) * 25%);
     }
   }
 }
