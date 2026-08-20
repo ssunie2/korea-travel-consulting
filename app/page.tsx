@@ -269,7 +269,11 @@ export default async function Home() {
       <section>
         <div className="mx-auto max-w-6xl px-6 pt-8 md:grid md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12">
           {/* PC 에서는 글도 카드와 같이 머문다. 글만 흘러가면 카드가 허공에 뜬 것처럼 보인다 */}
-          <div className="md:sticky md:top-0 md:flex md:min-h-screen md:flex-col md:justify-center">
+          {/*
+            **글은 붙이지 않는다.** 붙여두면 카드가 다 넘어간 뒤에도 제자리에 남아,
+            뒤따라 올라오는 노선도·팁 위에 겹쳐 보인다. 그냥 같이 올라가게 둔다.
+          */}
+          <div>
             {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
             <div>
               <p className="font-[family-name:var(--font-geist-sans)] text-[1.6rem] font-semibold lowercase leading-none tracking-[-0.035em] text-[var(--c-text)]">
