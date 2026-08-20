@@ -341,8 +341,9 @@ export default async function Home() {
             그래서 뒤에 오는 노선도가 카드 뒤로 숨을 일이 없다 — 상자 다음에 오니까.
             상자 맨 위가 곧 카드 자리라, 카드가 제자리에 붙은 뒤부터 넘어가기 시작한다.
           */}
-          <div className="w-full min-w-0 md:justify-self-end">
-              <div className="ktc-deck relative mx-auto mt-10 aspect-[2/3] w-full max-w-[31rem] md:mt-0">
+          <div className="ktc-deck w-full min-w-0 md:justify-self-end">
+            <div className="ktc-deck-sticky mt-10 w-full min-w-0 md:mt-0">
+              <div className="relative mx-auto aspect-[2/3] w-[calc(100%+1.5rem)] max-w-[31rem] sm:w-full">
             {HERO_CARDS.map((card, i) => (
               <figure
                 key={card.src}
@@ -352,8 +353,10 @@ export default async function Home() {
                      "카드가 제자리에 붙는 시점"이 화면 크기마다 달라서, 그 값을 CSS 에 둔다 */
                   ["--ktc-i" as string]: String(i),
                 }}
-                /* 다섯 장이 돌아가며 나온다. 마지막 다음은 다시 첫 장이다 */
-                className="ktc-deck-card absolute inset-0 overflow-hidden rounded-[1.75rem] border border-[var(--c-line-2)] bg-[var(--c-deep)] shadow-[0_28px_70px_-28px_rgba(0,0,0,0.7)]"
+                className={`absolute inset-0 overflow-hidden rounded-[1.75rem] border border-[var(--c-line-2)] bg-[var(--c-deep)] shadow-[0_28px_70px_-28px_rgba(0,0,0,0.7)] ${
+                  /* 마지막 장은 걷히지 않는다. 걷히면 뒤에 아무것도 없어 빈 자리가 남는다 */
+                  i < HERO_CARDS.length - 1 ? "ktc-deck-card" : ""
+                }`}
               >
                 <Image
                   src={card.src}
@@ -401,6 +404,7 @@ export default async function Home() {
                 </div>
                 </figure>
               ))}
+              </div>
             </div>
           </div>
 
