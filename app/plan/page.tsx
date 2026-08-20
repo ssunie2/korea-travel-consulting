@@ -37,9 +37,9 @@ const LANGUAGES = [
   { code: "zh", label: "中文" },
 ];
 
-const label = "font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]";
+const label = "font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]";
 const field =
-  "mt-2 w-full rounded-lg border border-[#CFC6B4] bg-white px-4 py-3 text-base text-[#1B211E] focus:border-[#3E6FB0] focus:outline-2 focus:outline-offset-0 focus:outline-[#3E6FB0]";
+  "mt-2 w-full rounded-lg border border-[var(--c-line)] bg-[var(--c-surface)] px-4 py-3 text-base text-[var(--c-text)] focus:border-[var(--c-focus)] focus:outline-2 focus:outline-offset-0 focus:outline-[var(--c-focus)]";
 
 // 서버가 돌려주는 문장은 개발자용이라 손님에게 그대로 보이면 안 된다.
 const MESSAGES: Record<number, string> = {
@@ -125,16 +125,16 @@ export default function PlanForm() {
 
   return (
     <div
-      className={`${display.variable} flex-1 bg-[#F2EDE3] text-[#1B211E] font-[family-name:var(--font-geist-sans)] selection:bg-[#D8503C] selection:text-[#F2EDE3]`}
+      className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
     >
       <header className="mx-auto flex max-w-2xl items-center justify-between px-6 py-6">
         <Link
           href="/"
-          className="-my-2 py-2 font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+          className="-my-2 py-2 font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
         >
           mohallae
         </Link>
-        <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[#4A5D54]">
+        <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[var(--c-text-3)]">
           {t({ ko: "무료 초안", en: "Free draft" })}
         </span>
       </header>
@@ -143,7 +143,7 @@ export default function PlanForm() {
         <h1 className="font-[family-name:var(--font-display)] text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight">
           {t({ ko: "여행에 대해 알려주세요", en: "Tell us about your trip" })}
         </h1>
-        <p className="mt-4 leading-relaxed text-[#3D4A44]">
+        <p className="mt-4 leading-relaxed text-[var(--c-text-2)]">
           {t({
             ko: "2분이면 됩니다. 가입도 카드도 필요 없습니다. 일자별 개요와 가이드북에 없는 팁 하나를 받으십니다.",
             en: "Two minutes. No account, no card. You'll get a day-by-day outline and one tip a guidebook won't give you.",
@@ -163,10 +163,10 @@ export default function PlanForm() {
                     type="button"
                     aria-pressed={on}
                     onClick={() => toggle(d.v, setDestinations)}
-                    className={`rounded-full border px-4 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3E6FB0] ${
+                    className={`rounded-full border px-4 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)] ${
                       on
-                        ? "border-[#12211C] bg-[#12211C] text-[#F2EDE3]"
-                        : "border-[#CFC6B4] bg-white hover:border-[#12211C]"
+                        ? "border-[var(--c-deep)] bg-[var(--c-text)] text-[var(--c-bg)]"
+                        : "border-[var(--c-line)] bg-[var(--c-surface)] hover:border-[var(--c-text-3)]"
                     }`}
                   >
                     {t({ ko: d.ko, en: d.v })}
@@ -220,10 +220,10 @@ export default function PlanForm() {
                     type="button"
                     aria-pressed={on}
                     onClick={() => toggle(st.v, setStyles)}
-                    className={`rounded-full border px-4 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3E6FB0] ${
+                    className={`rounded-full border px-4 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)] ${
                       on
-                        ? "border-[#12211C] bg-[#12211C] text-[#F2EDE3]"
-                        : "border-[#CFC6B4] bg-white hover:border-[#12211C]"
+                        ? "border-[var(--c-deep)] bg-[var(--c-text)] text-[var(--c-bg)]"
+                        : "border-[var(--c-line)] bg-[var(--c-surface)] hover:border-[var(--c-text-3)]"
                     }`}
                   >
                     {t({ ko: st.ko, en: st.v })}
@@ -279,7 +279,7 @@ export default function PlanForm() {
           </label>
 
           {error && (
-            <p role="alert" className="rounded-lg border border-[#D8503C] bg-[#F8E7E3] px-4 py-3 text-[#8E2C1B]">
+            <p role="alert" className="rounded-lg border border-[var(--c-accent)] bg-[var(--c-error-bg)] px-4 py-3 text-[var(--c-error-text)]">
               {error}
             </p>
           )}
@@ -289,11 +289,11 @@ export default function PlanForm() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center rounded-full bg-[#12211C] px-8 py-3.5 text-base text-[#F2EDE3] transition-colors hover:bg-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#3E6FB0] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-[#12211C]"
+              className="inline-flex items-center rounded-full bg-[var(--c-text)] px-8 py-3.5 text-base text-[var(--c-bg)] transition-colors hover:bg-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-[var(--c-text)]"
             >
               {submitting ? t({ ko: "초안을 쓰는 중…", en: "Writing your draft…" }) : t({ ko: "무료 초안 받기", en: "Get your free draft" })}
             </button>
-            <span aria-live="polite" className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[#4A5D54]">
+            <span aria-live="polite" className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[var(--c-text-3)]">
               {submitting ? t({ ko: "몇 초 걸립니다", en: "This takes a few seconds" }) : t({ ko: "가입 필요 없음", en: "No account needed" })}
             </span>
           </div>

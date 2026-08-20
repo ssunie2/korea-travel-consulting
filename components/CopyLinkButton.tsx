@@ -35,7 +35,7 @@ export default function CopyLinkButton() {
       <button
         type="button"
         onClick={copy}
-        className="inline-flex min-h-11 items-center rounded-full border border-[#CFC6B4] px-6 py-3 font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#1B211E] transition-colors hover:border-[#12211C] hover:bg-[#12211C] hover:text-[#F2EDE3] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#3E6FB0]"
+        className="inline-flex min-h-11 items-center rounded-full border border-[var(--c-line)] px-6 py-3 font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text)] transition-colors hover:border-[var(--c-deep)] hover:bg-[var(--c-text)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
       >
         {state === "done"
           ? t({ ko: "복사했습니다", en: "Copied" })
@@ -43,7 +43,7 @@ export default function CopyLinkButton() {
       </button>
 
       {/* aria-live: 버튼 글자만 바뀌면 화면을 못 보는 손님은 복사됐는지 알 수 없다 */}
-      <p aria-live="polite" className="mt-3 font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[#4A5D54]">
+      <p aria-live="polite" className="mt-3 font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[var(--c-text-3)]">
         {state === "failed"
           ? t({
               ko: "복사하지 못했습니다 — 주소창의 주소를 그대로 저장해 두세요.",

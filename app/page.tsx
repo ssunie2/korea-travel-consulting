@@ -3,7 +3,12 @@ import Image from "next/image";
 import { Instrument_Serif } from "next/font/google";
 import { seoulWeather } from "@/lib/weather";
 import { t } from "@/lib/copy";
-import DayPattern from "@/components/DayPattern";
+import DayPattern, { BackgroundMotifs } from "@/components/DayPattern";
+import namsan from "@/public/landing/namsan.webp";
+import bukchon from "@/public/landing/bukchon.webp";
+import gwangjangMarket from "@/public/landing/gwangjang-market.webp";
+import hanRiver from "@/public/landing/han-river.webp";
+import gyeongbokgung from "@/public/landing/gyeongbokgung.webp";
 
 // 표제용 서체. layout.tsx 를 건드리지 않으려고 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -41,6 +46,26 @@ const MOTION = `
   .ktc-route:has(#ktc-day-2:checked) .ktc-tip-2,
   .ktc-route:has(#ktc-day-3:checked) .ktc-tip-3,
   .ktc-route:has(#ktc-day-4:checked) .ktc-tip-4 { display: grid }
+}
+/* 사진 카드는 브라우저가 스크롤 위치를 읽어 한 장씩 천천히 걷는다. */
+@keyframes ktc-deck-lift {
+  to { transform: translateY(-6%) rotate(-3.2deg) scale(.955); opacity: 0 }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ktc-deck {
+      height: calc(100vh + 260vh);
+      view-timeline-name: --ktc-deck;
+      view-timeline-axis: block;
+    }
+    .ktc-deck-sticky { position: sticky; top: 3rem }
+    .ktc-deck-card {
+      transform-origin: 50% 85%;
+      animation: ktc-deck-lift linear forwards;
+      animation-timeline: --ktc-deck;
+      animation-range: contain var(--ktc-from) contain var(--ktc-to);
+    }
+  }
 }
 /*
   문양이 뜰 때. 그냥 켜면 툭 나타나서 딱딱하다.
@@ -116,6 +141,50 @@ const paid = t({
     "Exactly what to book and when — including the places that only take Korean phone reservations",
   ],
 });
+
+/** 클로드 시안에서 고른 사진 다섯 장. 밝은 장면부터 차례로 보여준다. */
+const HERO_CARDS = [
+  {
+    src: namsan,
+    number: "01",
+    place: t({ ko: "남산", en: "Namsan" }),
+    localName: t({ ko: "NAMSAN", en: "남산" }),
+    line: t({ ko: "서울의 능선을 따라", en: "Above Seoul's ridgelines" }),
+    alt: t({ ko: "파란 하늘 아래 남산과 N서울타워", en: "Namsan and N Seoul Tower beneath a blue sky" }),
+  },
+  {
+    src: bukchon,
+    number: "02",
+    place: t({ ko: "북촌", en: "Bukchon" }),
+    localName: t({ ko: "BUKCHON", en: "북촌" }),
+    line: t({ ko: "한옥 골목 사이로", en: "Through the hanok lanes" }),
+    alt: t({ ko: "한옥 골목 사이로 보이는 남산", en: "Namsan seen between the hanok lanes of Bukchon" }),
+  },
+  {
+    src: gwangjangMarket,
+    number: "03",
+    place: t({ ko: "광장시장", en: "Gwangjang Market" }),
+    localName: t({ ko: "GWANGJANG", en: "광장시장" }),
+    line: t({ ko: "시장 불빛과 한 끼", en: "Market lights and a warm meal" }),
+    alt: t({ ko: "따뜻한 조명 아래 손님들이 앉아 있는 광장시장", en: "Diners seated beneath warm lights at Gwangjang Market" }),
+  },
+  {
+    src: hanRiver,
+    number: "04",
+    place: t({ ko: "한강", en: "Han River" }),
+    localName: t({ ko: "HAN RIVER", en: "한강" }),
+    line: t({ ko: "해 질 무렵 강변에서", en: "By the river at sunset" }),
+    alt: t({ ko: "노을 진 한강의 반포대교와 남산", en: "Banpo Bridge and Namsan at sunset over the Han River" }),
+  },
+  {
+    src: gyeongbokgung,
+    number: "05",
+    place: t({ ko: "경복궁", en: "Gyeongbokgung" }),
+    localName: t({ ko: "GYEONGBOKGUNG", en: "경복궁" }),
+    line: t({ ko: "밤의 궁궐 지붕", en: "Palace roofs after dark" }),
+    alt: t({ ko: "불이 켜진 경복궁과 어두운 산", en: "Illuminated Gyeongbokgung Palace beneath a dark mountain" }),
+  },
+];
 
 /**
  * 누르는 자리. `x` 는 화면 폭의 몇 %인지다 — 넓은 화면과 폰 장면이
@@ -209,7 +278,7 @@ function MetroScene({ scene, className }: { scene: Scene; className: string }) {
       aria-label="A subway line. DAY 1 through DAY 4 are the stations."
     >
       {/* 노선 — 10px 이던 것을 2.5px 로. 굵기가 유아틱함의 절반이었다 */}
-      <line x1="0" y1="120" x2={scene.w} y2="120" stroke="#E8EAEB" strokeWidth="2.5" />
+      <line x1="0" y1="120" x2={scene.w} y2="120" stroke="var(--c-text)" strokeWidth="2.5" />
     </svg>
   );
 }
@@ -220,35 +289,54 @@ export default async function Home() {
 
   return (
     <div
-      className={`${display.variable} flex-1 bg-[#12171A] text-[#E8EAEB] font-[family-name:var(--font-geist-sans)] selection:bg-[#E86B54] selection:text-[#12171A]`}
+      className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
     >
       <style dangerouslySetInnerHTML={{ __html: MOTION }} />
-
-
+      <BackgroundMotifs />
+      <div className="relative z-[1]">
       {/* ── 역명판 + 하늘 ─────────────────────────────── */}
       <section>
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12">
+        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12 md:[&>div:first-child]:sticky md:[&>div:first-child]:top-[12vh]">
           <div>
             {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
             <div>
-              <p className="font-[family-name:var(--font-geist-sans)] text-[1.6rem] font-semibold lowercase leading-none tracking-[-0.035em] text-[#E8EAEB]">
+              <p className="font-[family-name:var(--font-geist-sans)] text-[1.6rem] font-semibold lowercase leading-none tracking-[-0.035em] text-[var(--c-text)]">
                 mohallae
               </p>
-              <p className="mt-2 font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.18em] text-[#8B9691]">
-                모할래 <span aria-hidden className="mx-1 text-[#4A5450]">·</span>
-                <span className="uppercase">{t({ ko: "떠나기 전에", en: "Before you fly" })}</span>
+              <p className="mt-2 font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.18em] text-[var(--c-text-3)]">
+                모할래? <span aria-hidden className="mx-1 text-[var(--c-text-4)]">·</span>
+                <span className="lowercase">what shall we do?</span>
               </p>
             </div>
 
-            <h1 className="mt-12 max-w-[15ch] font-[family-name:var(--font-display)] text-[clamp(2.75rem,7vw,5rem)] leading-[0.95] tracking-tight">
-              {t({ ko: "한국에 ", en: "Plan Korea like you know " })}
-              <span className="text-[#E86B54]">
-                {t({ ko: "아는 사람 있는 것처럼", en: "someone who lives here." })}
+            <h1
+              className="mt-12 font-[family-name:var(--font-display)] text-[clamp(2.25rem,5.2vw,3.75rem)] leading-[1.24] tracking-tight"
+              style={{ wordSpacing: ".16em" }}
+            >
+              <span className="whitespace-nowrap">
+                {t({ ko: "한국에 ", en: "Plan Korea like you know " })}
+                <span
+                  className="inline-block whitespace-nowrap text-[var(--c-accent)]"
+                  style={{
+                    fontFamily: '"AppleMyungjo", "Nanum Myeongjo", Georgia, "Times New Roman", serif',
+                    wordSpacing: "normal",
+                    textDecorationLine: "underline",
+                    textDecorationColor: "#C29338",
+                    textDecorationThickness: "3px",
+                    textUnderlineOffset: ".17em",
+                    textDecorationSkipInk: "none",
+                  }}
+                >
+                  {t({ ko: "아는 사람", en: "someone" })}
+                </span>
               </span>
-              {t({ ko: " 여행하세요.", en: "" })}
+              <br />
+              <span className="whitespace-nowrap">
+                {t({ ko: "있는 것처럼 여행하세요.", en: "who lives here." })}
+              </span>
             </h1>
 
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-[#A6B0AC]">
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-[var(--c-text-2)]">
               {t({
                 ko: "여행 정보를 알려주시면 일자별 초안을 무료로 만들어 드립니다. 가이드북에 없는 팁 하나가 함께 갑니다.",
                 en: "Tell us about your trip and we'll write you a free day-by-day draft — with one tip a guidebook won't give you.",
@@ -258,80 +346,31 @@ export default async function Home() {
             <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3">
               <Link
                 href="/plan"
-                className="inline-flex items-center rounded-full bg-[#E8EAEB] px-8 py-3.5 text-base text-[#12171A] transition-colors hover:bg-[#E86B54] hover:text-[#12171A] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#7FA8DC]"
+                className="inline-flex items-center rounded-full bg-[var(--c-text)] px-8 py-3.5 text-base text-[var(--c-bg)] transition-colors hover:bg-[var(--c-accent)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
               >
                 {t({ ko: "무료 초안 받기", en: "Get your free draft" })}
               </Link>
-              <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.18em] text-[#8B9691]">
-                {t({ ko: "가입 없이 · 무료", en: "No account · Free" })}
+              <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.18em] text-[var(--c-text-3)]">
+                {t({ ko: "가입 없음", en: "No account" })}
               </span>
             </div>
 
             {/* 지금 서울 몇 시인지. 손님은 시차 반대편에 있다 */}
-            <p className="mt-7 inline-flex items-center gap-2 border-t border-[#2A3330] pt-3 font-[family-name:var(--font-geist-mono)] text-[0.7rem] tracking-[0.1em] text-[#8B9691]">
+            <p className="mt-7 inline-flex items-center gap-2 border-t border-[var(--c-line-2)] pt-3 font-[family-name:var(--font-geist-mono)] text-[0.7rem] tracking-[0.1em] text-[var(--c-text-3)]">
               {t({ ko: "서울", en: "Seoul" })}{" "}
-              <b className="font-semibold tabular-nums text-[#E8EAEB]">{now.label}</b>
+              <b className="font-semibold tabular-nums text-[var(--c-text)]">{now.label}</b>
               <span aria-hidden>·</span> {t({ ko: "북위 37.5665°", en: "37.5665° N" })}
             </p>
-          </div>
 
-          {/* 한옥의 결은 사진으로, 노선의 그래픽은 아래 SVG로 이어 붙인다. */}
-          <figure className="relative mx-auto w-full max-w-[31rem] overflow-hidden rounded-[1.75rem] border border-[#2A3330] bg-[#0E1316] shadow-[0_28px_70px_-28px_rgba(0,0,0,0.7)] md:justify-self-end">
-            {/*
-              TODO(출시 전): 이 이미지는 **AI 가 만든 그림이지 실제 사진이 아니다.**
-              1024×1536(AI 표준 출력 크기), 카메라 정보 전무, 확대하면 사람 형체와
-              기와가 뭉개져 있다. 북촌로11길에서 남산을 본 구도를 흉내낸 것이다.
-
-              우리가 파는 게 "실제로 가보면 이렇다"는 정보라서, 첫 화면에 존재하지 않는
-              골목을 걸어두면 들키는 순간 무너지는 게 사진 한 장이 아니다.
-              **손님을 받기 전에 직접 찍은 사진이나 라이선스가 분명한 실사진으로 바꾼다.**
-              선경이 알고 있고, 지금은 자리를 채워두는 용도로만 둔다.
-            */}
-            {/* 2:3 — 원본 비율 그대로다. 잘리는 데 없이 세로가 길어진다 */}
-            <div className="relative aspect-[2/3]">
-              <Image
-                src="/seoul-blue-hour.jpg"
-                alt="A hanok-lined street in Seoul at blue hour, with Namsan Tower in the distance"
-                fill
-                sizes="(min-width: 768px) 42vw, 100vw"
-                className="object-cover"
-                preload
-                unoptimized
-              />
-              <div
-                aria-hidden
-                className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,22,32,.12)_35%,rgba(8,22,32,.82)_100%)]"
-              />
-              <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-[#F2EDE3] sm:p-7">
-                <div>
-                  <p className="max-w-[12ch] font-[family-name:var(--font-display)] text-3xl leading-none sm:text-4xl">
-                    {t({ ko: "오래된 지붕, 새로운 서울.", en: "Old roofs. New Seoul." })}
-                  </p>
-                </div>
-                <span className="grid h-16 w-16 flex-none place-items-center rounded-full border-2 border-[#12171A] bg-[#E86B54] text-lg font-bold tracking-[0.12em] shadow-lg">
-                  서울
-                </span>
-              </figcaption>
-              <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-[#12171A]/90 px-3 py-2 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-[0.15em] text-[#E8EAEB] backdrop-blur-sm sm:left-7 sm:top-7">
-                <span aria-hidden className="h-2 w-2 rounded-full bg-[#E86B54]" />
-                {t({ ko: "현지의 시선", en: "Local view" })}
-              </div>
-            </div>
-          </figure>
-        </div>
-
-        <div className="ktc-route mt-14">
-          {/* 안내 표지의 머리줄. 노선 이름과 **지금 서울 상태**가 여기 한 줄에 온다 */}
-          <div className="mx-auto max-w-6xl px-6">
-            <p className="whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-[0.14em] text-[#8B9691] sm:text-[0.72rem] sm:tracking-[0.3em]">
+            <p className="mt-3 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.08em] text-[var(--c-text-3)] sm:tracking-[0.3em]">
               {t({ ko: "서울 지하철 · 4일", en: "Seoul Metro · 4 Days" })}
               {weather.tempC !== null && (
                 <>
-                  <span aria-hidden className="mx-2 text-[#4A5450]">·</span>
+                  <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
                   {weather.tempC}°
                 </>
               )}
-              <span aria-hidden className="mx-2 text-[#4A5450]">·</span>
+              <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
               {weather.sky === "clear"
                 ? t({ ko: "맑음", en: "Clear" })
                 : weather.sky === "cloud"
@@ -341,8 +380,54 @@ export default async function Home() {
                     : t({ ko: "눈", en: "Snow" })}
             </p>
           </div>
-          <div aria-hidden className="mt-3 h-px w-full bg-[#2A3330]" />
 
+          {/* 밝은 사진부터 시작해 스크롤할 때 한 장씩 걷히는 서울 카드 묶음. */}
+          <div className="ktc-deck mt-14 w-full md:justify-self-end">
+            <div className="ktc-deck-sticky relative mx-auto aspect-[4/5] w-full max-w-[31rem]">
+              {HERO_CARDS.map((card, index) => (
+                <figure
+                  key={card.number}
+                  style={{
+                    zIndex: HERO_CARDS.length - index,
+                    ["--ktc-from" as string]: `${6 + index * 20}%`,
+                    ["--ktc-to" as string]: `${26 + index * 20}%`,
+                  }}
+                  className={`absolute inset-0 overflow-hidden border border-[var(--c-line-2)] bg-[var(--c-deep)] shadow-[0_28px_70px_-28px_rgba(0,0,0,.72)] ${
+                    index < HERO_CARDS.length - 1 ? "ktc-deck-card" : ""
+                  }`}
+                >
+                  <Image
+                    src={card.src}
+                    alt={card.alt}
+                    fill
+                    sizes="(min-width: 768px) 42vw, calc(100vw - 3rem)"
+                    className="object-cover"
+                    placeholder="blur"
+                    preload={index === 0}
+                  />
+                  <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,27,24,.04)_48%,rgba(10,27,24,.9)_100%)]" />
+                  <span className="absolute left-5 top-5 font-[family-name:var(--font-geist-mono)] text-xs tracking-[.2em] text-white/85 sm:left-7 sm:top-7">
+                    {card.number}
+                  </span>
+                  <div aria-hidden className="absolute right-5 top-5 flex gap-1.5 sm:right-7 sm:top-7">
+                    {HERO_CARDS.map((_, dot) => (
+                      <span key={dot} className={`h-px w-5 ${dot === index ? "bg-[var(--c-accent)]" : "bg-white/40"}`} />
+                    ))}
+                  </div>
+                  <figcaption className="absolute inset-x-0 bottom-0 p-5 text-white sm:p-7">
+                    <div className="flex items-end justify-between gap-4 border-b border-white/45 pb-4">
+                      <p className="font-[family-name:var(--font-display)] text-4xl leading-none sm:text-5xl">{card.place}</p>
+                      <span className="font-[family-name:var(--font-geist-mono)] text-[.62rem] tracking-[.14em] text-white/70">{card.localName}</span>
+                    </div>
+                    <p className="mt-3 font-[family-name:var(--font-geist-mono)] text-[.68rem] tracking-[.08em] text-white/75">{card.line}</p>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="ktc-route mt-14">
           {/* 누르는 자리를 그림 위에 겹쳐야 해서 relative 가 필요하다 */}
           <div className="relative">
             <MetroScene scene={NARROW} className="block h-auto w-full md:hidden" />
@@ -364,13 +449,13 @@ export default async function Home() {
                   */}
                   <span
                     aria-hidden
-                    className="ktc-mark absolute bottom-[calc(50%+28.9px)] left-1/2 h-[24px] w-[24px] -translate-x-1/2 text-[#F09884] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+36.8px)] sm:h-[30px] sm:w-[30px] md:bottom-[calc(50%+52.2px)] md:h-[39px] md:w-[39px]"
+                    className="ktc-mark absolute bottom-[calc(50%+28.9px)] left-1/2 h-[24px] w-[24px] -translate-x-1/2 text-[var(--c-accent-soft)] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+36.8px)] sm:h-[30px] sm:w-[30px] md:bottom-[calc(50%+52.2px)] md:h-[39px] md:w-[39px]"
                   >
                     <DayPattern day={station.day} />
                   </span>
 
                   {/* 날짜 — 점 위 */}
-                  <span className="absolute bottom-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-none tracking-[0.16em] text-[#E8EAEB] group-has-[:checked]:text-[#E86B54] sm:bottom-[calc(50%+15px)] sm:text-[0.8rem] sm:tracking-[0.2em] md:bottom-[calc(50%+21px)] md:text-[1.2rem]">
+                  <span className="absolute bottom-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-none tracking-[0.16em] text-[var(--c-text)] group-has-[:checked]:text-[var(--c-accent)] sm:bottom-[calc(50%+15px)] sm:text-[0.8rem] sm:tracking-[0.2em] md:bottom-[calc(50%+21px)] md:text-[1.2rem]">
                     DAY {station.day}
                   </span>
 
@@ -387,14 +472,14 @@ export default async function Home() {
                   {/* 역 — 작고 정확한 점. 고른 역에만 가는 테두리가 하나 더 */}
                   <span
                     aria-hidden
-                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8EAEB] peer-checked:bg-[#E86B54] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[#7FA8DC] sm:h-3 sm:w-3 md:h-[18px] md:w-[18px]"
+                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--c-text)] peer-checked:bg-[var(--c-accent)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[var(--c-focus)] sm:h-3 sm:w-3 md:h-[18px] md:w-[18px]"
                   />
 
                   {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
-                  <span className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] leading-none tracking-[0.1em] text-[#8B9691] sm:top-[calc(50%+15px)] sm:text-[0.65rem] sm:tracking-[0.14em] md:top-[calc(50%+21px)] md:text-[0.98rem]">
+                  <span className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.75rem] leading-none tracking-[0.02em] text-[var(--c-text-3)] sm:top-[calc(50%+15px)] sm:text-[0.65rem] sm:tracking-[0.14em] sm:tracking-[0.14em] md:top-[calc(50%+21px)] md:text-[0.98rem]">
                     {station.en}
                   </span>
-                  <span className="absolute top-[calc(50%+27px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.5rem] leading-none text-[#69736F] sm:top-[calc(50%+34.4px)] sm:text-[0.6rem] md:top-[calc(50%+48.7px)] md:text-[0.9rem]">
+                  <span className="absolute top-[calc(50%+27px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.75rem] leading-none text-[var(--c-text-4)] sm:top-[calc(50%+34.4px)] sm:text-[0.6rem] md:top-[calc(50%+48.7px)] md:text-[0.9rem]">
                     {station.ko}
                   </span>
                 </label>
@@ -409,33 +494,33 @@ export default async function Home() {
                 key={tip.day}
                 id={`ktc-tip-${tip.day}`}
                 aria-live="polite"
-                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-[3px] border border-[#2A3330] bg-[#171D21] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.6)] md:grid-cols-[.8fr_1.2fr]`}
+                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-[3px] border border-[var(--c-line-2)] bg-[var(--c-surface)] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.6)] md:grid-cols-[.8fr_1.2fr]`}
               >
-                <figcaption className="flex flex-col justify-between gap-8 bg-[#1B2328] p-6 text-[#E8EAEB] sm:p-8">
+                <figcaption className="flex flex-col justify-between gap-8 bg-[var(--c-surface-2)] p-6 text-[var(--c-text)] sm:p-8">
                   <div>
-                    <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[#EF9A55]">
+                    <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-accent-soft)]">
                       {t({ ko: `DAY ${tip.day} · 환승역`, en: `Day ${tip.day} · Transfer here` })}
                     </p>
                     <p className="mt-4 font-[family-name:var(--font-display)] text-3xl leading-tight sm:text-4xl">
                       {tip.headline}
                     </p>
                   </div>
-                  <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.16em] text-[#A8C3B4]">
+                  <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.16em] text-[var(--c-accent-dim)]">
                     {t({ ko: `컨시어지 팁 ${String(tip.day).padStart(2, "0")}`, en: `Concierge tip ${String(tip.day).padStart(2, "0")}` })}
                   </span>
                 </figcaption>
-                <div className="flex flex-col gap-5 bg-[#12171A] p-6 sm:p-8">
+                <div className="flex flex-col gap-5 bg-[var(--c-bg)] p-6 sm:p-8">
                   <p className="font-[family-name:var(--font-display)] text-2xl leading-snug sm:text-3xl">
                     {tip.place}
                   </p>
                   <div className="flex items-start gap-3">
-                    <span className="mt-1 flex-none rounded bg-[#E86B54] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-white">
+                    <span className="mt-1 flex-none rounded bg-[var(--c-accent)] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-[var(--c-bg)]">
                       {t({ ko: "이렇게 마세요", en: "Don\u2019t" })}
                     </span>
-                    <span className="leading-relaxed text-[#69736F] line-through">{tip.dont}</span>
+                    <span className="leading-relaxed text-[var(--c-text-4)] line-through">{tip.dont}</span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="mt-1 flex-none rounded bg-[#7FA8DC] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-white">
+                    <span className="mt-1 flex-none rounded bg-[var(--c-focus)] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-[var(--c-bg)]">
                       {t({ ko: "이렇게 하세요", en: "Do" })}
                     </span>
                     <span className="leading-relaxed">{tip.do}</span>
@@ -448,21 +533,21 @@ export default async function Home() {
       </section>
 
       {/* ── how it works ────────────────────────────────── */}
-      <section className="border-t border-[#2A3330]">
+      <section className="border-t border-[var(--c-line-2)]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[#8B9691]">
+          <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
             {t({ ko: "진행 방식", en: "How it works" })}
           </h2>
           <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-12">
             {steps.map((step, i) => (
               <li key={step.title}>
-                <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[#E86B54]">
+                <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-accent)]">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl leading-tight">
                   {step.title}
                 </h3>
-                <p className="mt-2 leading-relaxed text-[#A6B0AC]">{step.body}</p>
+                <p className="mt-2 leading-relaxed text-[var(--c-text-2)]">{step.body}</p>
               </li>
             ))}
           </ol>
@@ -470,35 +555,35 @@ export default async function Home() {
       </section>
 
       {/* ── free vs paid ────────────────────────────────── */}
-      <section className="border-t border-[#2A3330] bg-[#171D21]">
+      <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <h2 className="font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
             {t({ ko: "무엇이 무료이고, 무엇에 값을 치르는지", en: "What's free, and what you're paying for" })}
           </h2>
           <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-16">
             <div>
-              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#8B9691]">
+              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
                 {t({ ko: "무료 초안", en: "Free draft" })}
               </p>
               <ul className="mt-4 space-y-3">
                 {free.map((item) => (
                   <li key={item} className="flex gap-3 leading-relaxed">
-                    <span aria-hidden className="text-[#8B9691]">
+                    <span aria-hidden className="text-[var(--c-text-3)]">
                       —
                     </span>
-                    <span className="text-[#A6B0AC]">{item}</span>
+                    <span className="text-[var(--c-text-2)]">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#E86B54]">
+              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent)]">
                 {t({ ko: "전체 일정 · ₩150,000", en: "Full plan · ₩150,000" })}
               </p>
               <ul className="mt-4 space-y-3">
                 {paid.map((item) => (
                   <li key={item} className="flex gap-3 leading-relaxed">
-                    <span aria-hidden className="text-[#E86B54]">
+                    <span aria-hidden className="text-[var(--c-accent)]">
                       —
                     </span>
                     <span>{item}</span>
@@ -508,7 +593,7 @@ export default async function Home() {
             </div>
           </div>
           {/* 우리는 여행사가 아니다. 이 선을 손님에게도 분명히 해둔다 (규칙 6번) */}
-          <p className="mt-10 max-w-2xl leading-relaxed text-[#8B9691]">
+          <p className="mt-10 max-w-2xl leading-relaxed text-[var(--c-text-3)]">
             {t({
               ko: "저희는 계획을 세우고, 예약은 손님이 하십니다. 숙소·식당·입장권을 대신 예약해 드리거나 그 대금을 받지 않습니다 — 무엇을 어떻게 예약하면 되는지 알려드립니다.",
               en: "We plan; you book. We don't make reservations for you or take payment for hotels, restaurants or tickets — we tell you exactly what to book and how.",
@@ -518,16 +603,16 @@ export default async function Home() {
       </section>
 
       {/* ── pricing + contact ───────────────────────────── */}
-      <section id="pricing" className="scroll-mt-20 border-t border-[#2A3330]">
+      <section id="pricing" className="scroll-mt-20 border-t border-[var(--c-line-2)]">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
           <div>
-            <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[#8B9691]">
+            <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
               {t({ ko: "가격", en: "Pricing" })}
             </p>
             <p className="mt-4 font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
               {t({ ko: "초안은 무료입니다. 전체 일정은 ₩150,000 입니다.", en: "The draft is free. The full plan is ₩150,000." })}
             </p>
-            <p className="mt-4 max-w-md leading-relaxed text-[#A6B0AC]">
+            <p className="mt-4 max-w-md leading-relaxed text-[var(--c-text-2)]">
               {t({
                 ko: "여행이 며칠이든 값은 하나입니다. 처음부터 끝까지 만들어져 나오니 예약할 통화도, 기다릴 사람도 없습니다.",
                 en: "One price, however long your trip is. It's put together for you start to finish — so there's no call to book and nobody to wait on.",
@@ -537,15 +622,15 @@ export default async function Home() {
           <div id="contact" className="scroll-mt-20 md:justify-self-end">
             <Link
               href="/plan"
-              className="inline-flex items-center rounded-full bg-[#E8EAEB] px-8 py-3.5 text-base text-[#12171A] transition-colors hover:bg-[#E86B54] hover:text-[#12171A] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#7FA8DC]"
+              className="inline-flex items-center rounded-full bg-[var(--c-text)] px-8 py-3.5 text-base text-[var(--c-bg)] transition-colors hover:bg-[var(--c-accent)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
             >
               {t({ ko: "무료 초안부터 받아보기", en: "Start with the free draft" })}
             </Link>
-            <p className="mt-5 leading-relaxed text-[#A6B0AC]">
+            <p className="mt-5 leading-relaxed text-[var(--c-text-2)]">
               {t({ ko: "먼저 물어보고 싶으신가요?", en: "Rather just ask a question first?" })}{" "}
               <Link
                 href="/contact"
-                className="underline underline-offset-4 hover:text-[#E86B54] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7FA8DC]"
+                className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
               >
                 {t({ ko: "무엇이든 물어보세요", en: "Ask us anything" })}
               </Link>
@@ -555,8 +640,8 @@ export default async function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-[#2A3330]">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-[family-name:var(--font-geist-mono)] text-xs text-[#8B9691] sm:flex-row sm:items-center sm:justify-between">
+      <footer className="border-t border-[var(--c-line-2)]">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-text-3)] sm:flex-row sm:items-center sm:justify-between">
           {/* 상호는 어디서든 같은 서체로. 크기는 꼬리말 기준(text-xs)을 그대로 물려받는다 */}
           <span className="font-[family-name:var(--font-geist-sans)] font-semibold tracking-[-0.02em]">
             mohallae
@@ -569,6 +654,7 @@ export default async function Home() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }

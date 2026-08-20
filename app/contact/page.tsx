@@ -16,9 +16,9 @@ export const metadata = {
   description: "Ask us anything about planning your trip to Korea.",
 };
 
-const label = "font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]";
+const label = "font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]";
 const field =
-  "mt-2 w-full rounded-lg border border-[#CFC6B4] bg-white px-4 py-3 text-base text-[#1B211E] focus:border-[#3E6FB0] focus:outline-2 focus:outline-offset-0 focus:outline-[#3E6FB0]";
+  "mt-2 w-full rounded-lg border border-[var(--c-line)] bg-[var(--c-surface)] px-4 py-3 text-base text-[var(--c-text)] focus:border-[var(--c-focus)] focus:outline-2 focus:outline-offset-0 focus:outline-[var(--c-focus)]";
 
 /** 상담 신청(#11)과 같은 방식. 서버 액션이라 자바스크립트 없이도 문의가 들어온다. */
 async function submit(formData: FormData) {
@@ -51,12 +51,12 @@ export default async function ContactPage({
 
   return (
     <div
-      className={`${display.variable} flex-1 bg-[#F2EDE3] text-[#1B211E] font-[family-name:var(--font-geist-sans)] selection:bg-[#D8503C] selection:text-[#F2EDE3]`}
+      className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
     >
       <header className="mx-auto flex max-w-2xl items-center justify-between px-6 py-6">
         <Link
           href="/"
-          className="-my-3 inline-flex min-h-11 items-center font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+          className="-my-3 inline-flex min-h-11 items-center font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
         >
           mohallae
         </Link>
@@ -68,15 +68,15 @@ export default async function ContactPage({
             <h1 className="font-[family-name:var(--font-display)] text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight">
               {t({ ko: "받았습니다.", en: "Thanks — we\u2019ve got it." })}
             </h1>
-            <p className="mt-5 text-lg leading-relaxed text-[#3D4A44]">
+            <p className="mt-5 text-lg leading-relaxed text-[var(--c-text-2)]">
               {t({
                 ko: "보내주신 내용은 전부 읽습니다. 답이 필요한 질문이면 이메일로 알려드리겠습니다.",
                 en: "We read everything. If your question needs an answer, we'll email you back.",
               })}
             </p>
-            <p className="mt-8 leading-relaxed text-[#3D4A44]">
+            <p className="mt-8 leading-relaxed text-[var(--c-text-2)]">
               {t({ ko: "그동안", en: "In the meantime," })}{" "}
-              <Link href="/plan" className="underline underline-offset-4 hover:text-[#D8503C]">
+              <Link href="/plan" className="underline underline-offset-4 hover:text-[var(--c-accent)]">
                 {t({ ko: "여행 초안을 무료로 받아보세요", en: "get a free draft of your trip" })}
               </Link>{" "}
               {t({ ko: "— 2분이면 되고 값은 들지 않습니다.", en: "— it takes two minutes and costs nothing." })}
@@ -87,7 +87,7 @@ export default async function ContactPage({
             <h1 className="font-[family-name:var(--font-display)] text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight">
               {t({ ko: "무엇이든 물어보세요", en: "Ask us anything" })}
             </h1>
-            <p className="mt-5 leading-relaxed text-[#3D4A44]">
+            <p className="mt-5 leading-relaxed text-[var(--c-text-2)]">
               {t({
                 ko: "여행 정보를 다 적기엔 아직 이르신가요? 그냥 물어보셔도 됩니다. 2월 한국이 무리인지, 서울과 부산에 나흘이면 되는지, 할랄이나 휠체어를 맞출 수 있는지 — 무엇이든요.",
                 en: "Not ready to fill in a form about your trip? Just ask. Whether Korea in February is a mistake, whether four days is enough for Seoul and Busan, whether we can work around halal or a wheelchair — anything.",
@@ -95,7 +95,7 @@ export default async function ContactPage({
             </p>
 
             {error && (
-              <p role="alert" className="mt-8 rounded-lg border border-[#D8503C] bg-[#F8E7E3] px-4 py-3 text-[#8E2C1B]">
+              <p role="alert" className="mt-8 rounded-lg border border-[var(--c-accent)] bg-[var(--c-error-bg)] px-4 py-3 text-[var(--c-error-text)]">
                 {error === "1"
                   ? t({ ko: "답장받으실 이메일과 내용을 적어주세요.", en: "Please leave an email we can reply to, and a message." })
                   : t({ ko: "보내지 못했습니다. 다시 시도해 주세요.", en: "We couldn't send that. Please try again." })}
@@ -115,16 +115,16 @@ export default async function ContactPage({
 
               <button
                 type="submit"
-                className="inline-flex items-center rounded-full bg-[#12211C] px-8 py-3.5 text-base text-[#F2EDE3] transition-colors hover:bg-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#3E6FB0]"
+                className="inline-flex items-center rounded-full bg-[var(--c-text)] px-8 py-3.5 text-base text-[var(--c-bg)] transition-colors hover:bg-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
               >
                 {t({ ko: "보내기", en: "Send" })}
               </button>
 
-              <p className="mt-4 text-sm leading-relaxed text-[#4A5D54]">
+              <p className="mt-4 text-sm leading-relaxed text-[var(--c-text-3)]">
                 {t({ ko: "보내시면", en: "By sending this you agree to our" })}{" "}
                 <Link
                   href="/privacy"
-                  className="underline underline-offset-4 hover:text-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+                  className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
                 >
                   {t({ ko: "개인정보 처리방침", en: "privacy policy" })}
                 </Link>

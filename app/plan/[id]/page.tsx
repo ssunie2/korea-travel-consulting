@@ -44,12 +44,12 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
   // AI 생성이 실패한 채 저장된 경우. 빈 화면 대신 다시 해볼 길을 준다.
   if (!trip) {
     return (
-      <div className={`${display.variable} flex-1 bg-[#F2EDE3] px-6 py-24 text-center text-[#1B211E]`}>
+      <div className={`${display.variable} flex-1 bg-[var(--c-bg)] px-6 py-24 text-center text-[var(--c-text)]`}>
         <p className="font-[family-name:var(--font-display)] text-3xl">
           {t({ ko: "이 초안은 끝까지 만들어지지 못했습니다.", en: "This draft didn\u2019t finish." })}
         </p>
-        <p className="mt-4 text-[#3D4A44]">{t({ ko: "죄송합니다 — 다시 시작해 주세요. 2분이면 됩니다.", en: "Sorry — please start again, it only takes two minutes." })}</p>
-        <Link href="/plan" className="mt-8 inline-flex rounded-full bg-[#12211C] px-8 py-3.5 text-[#F2EDE3]">
+        <p className="mt-4 text-[var(--c-text-2)]">{t({ ko: "죄송합니다 — 다시 시작해 주세요. 2분이면 됩니다.", en: "Sorry — please start again, it only takes two minutes." })}</p>
+        <Link href="/plan" className="mt-8 inline-flex rounded-full bg-[var(--c-text)] px-8 py-3.5 text-[var(--c-bg)]">
           {t({ ko: "다시 시작하기", en: "Start over" })}
         </Link>
       </div>
@@ -58,24 +58,24 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div
-      className={`${display.variable} flex-1 bg-[#F2EDE3] text-[#1B211E] font-[family-name:var(--font-geist-sans)] selection:bg-[#D8503C] selection:text-[#F2EDE3]`}
+      className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
     >
       <header className="mx-auto flex max-w-3xl items-center justify-between px-6 py-6">
         {/* py/-my: 보이는 크기는 그대로 두고 손가락으로 누를 범위만 44px 로 넓힌다 */}
         <Link
           href="/"
-          className="-my-2 py-2 font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3E6FB0]"
+          className="-my-2 py-2 font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
         >
           mohallae
         </Link>
-        <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[#4A5D54]">
+        <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[var(--c-text-3)]">
           {t({ ko: "무료 초안", en: "Free draft" })}
         </span>
       </header>
 
       <main className="mx-auto max-w-3xl px-6 pb-24">
         {/* ── 제목 ─────────────────────────────────────── */}
-        <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[#4A5D54]">
+        <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
           {dateRange(plan.start_date, plan.duration_days)} · {plan.travelers}{" "}
           {t({ ko: "명", en: plan.travelers === 1 ? "traveler" : "travelers" })}
           {plan.destinations.length > 0 && ` · ${plan.destinations.join(", ")}`}
@@ -83,28 +83,28 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         <h1 className="mt-4 font-[family-name:var(--font-display)] text-[clamp(2.25rem,6vw,3.5rem)] leading-[1.02] tracking-tight">
           {trip.tripTitle}
         </h1>
-        <p className="mt-5 text-lg leading-relaxed text-[#3D4A44]">{trip.summary}</p>
+        <p className="mt-5 text-lg leading-relaxed text-[var(--c-text-2)]">{trip.summary}</p>
 
         {/* ── 일자별 ───────────────────────────────────── */}
         <ol className="mt-14 space-y-12">
           {trip.days.map((day) => (
             <li key={day.dayNumber}>
               <div className="flex items-baseline gap-4">
-                <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[#D8503C]">
+                <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-accent)]">
                   {String(day.dayNumber).padStart(2, "0")}
                 </span>
                 <h2 className="font-[family-name:var(--font-display)] text-2xl leading-tight">
                   {day.theme}
                 </h2>
               </div>
-              <ul className="mt-5 space-y-5 border-l border-[#DDD5C6] pl-6">
+              <ul className="mt-5 space-y-5 border-l border-[var(--c-line-2)] pl-6">
                 {day.activities.map((a, i) => (
                   <li key={i}>
-                    <p className="font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.15em] text-[#4A5D54]">
+                    <p className="font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.15em] text-[var(--c-text-3)]">
                       {a.time}
                     </p>
                     <p className="mt-1 text-lg">{a.name}</p>
-                    <p className="mt-1 leading-relaxed text-[#3D4A44]">{a.note}</p>
+                    <p className="mt-1 leading-relaxed text-[var(--c-text-2)]">{a.note}</p>
                   </li>
                 ))}
               </ul>
@@ -113,23 +113,23 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         </ol>
 
         {/* ── 맛보기 팁 하나. 이 화면에서 제일 중요한 부분이다 ── */}
-        <figure className="mt-16 rounded-2xl bg-[#12211C] p-7 text-[#E8E2D6] shadow-[0_24px_60px_-24px_rgba(18,33,28,0.55)] sm:p-9">
-          <figcaption className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[#A8C3B4]">
+        <figure className="mt-16 rounded-2xl bg-[var(--c-deep)] p-7 text-[var(--c-text-on-deep)] shadow-[0_24px_60px_-24px_rgba(18,33,28,0.55)] sm:p-9">
+          <figcaption className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-accent-dim)]">
             {t({ ko: "컨시어지 팁 하나", en: "One concierge tip" })} · {trip.sampleTip.activityName}
           </figcaption>
           <p className="mt-4 font-[family-name:var(--font-display)] text-2xl leading-snug">
             {trip.sampleTip.highlight}
           </p>
 
-          <div className="mt-7 border-t border-[#2A3D35] pt-5">
-            <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[#D8503C]">
+          <div className="mt-7 border-t border-[var(--c-line)] pt-5">
+            <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-accent)]">
               {t({ ko: "피하실 것", en: "What to avoid" })}
             </p>
-            <p className="mt-2 leading-relaxed text-[#C9CFC6]">{trip.sampleTip.pitfall}</p>
+            <p className="mt-2 leading-relaxed text-[var(--c-text-on-deep)]">{trip.sampleTip.pitfall}</p>
           </div>
 
-          <div className="mt-6 border-t border-[#2A3D35] pt-5">
-            <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[#7FA8DC]">
+          <div className="mt-6 border-t border-[var(--c-line)] pt-5">
+            <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-focus)]">
               {t({ ko: "여기 사는 사람이라면 이렇게 말합니다", en: "What someone here would tell you" })}
             </p>
             <p className="mt-2 leading-relaxed">{trip.sampleTip.insiderSecret}</p>
@@ -137,21 +137,21 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         </figure>
 
         {/* ── 숙소·식당·예산 ───────────────────────────── */}
-        <dl className="mt-14 grid gap-8 border-t border-[#DDD5C6] pt-10 sm:grid-cols-3">
+        <dl className="mt-14 grid gap-8 border-t border-[var(--c-line-2)] pt-10 sm:grid-cols-3">
           <div>
-            <dt className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]">
+            <dt className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
               {t({ ko: "묵을 곳", en: "Where to stay" })}
             </dt>
             <dd className="mt-2 text-lg">{trip.picks.stay}</dd>
           </div>
           <div>
-            <dt className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]">
+            <dt className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
               {t({ ko: "먹을 곳", en: "Where to eat" })}
             </dt>
             <dd className="mt-2 text-lg">{trip.picks.dining}</dd>
           </div>
           <div>
-            <dt className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[#4A5D54]">
+            <dt className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
               {t({ ko: "예상 총액", en: "Estimated total" })}
             </dt>
             <dd className="mt-2 text-lg">{trip.totalEstimate}</dd>
@@ -159,11 +159,11 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         </dl>
 
         {/* ── 여기서부터가 유료 ────────────────────────── */}
-        <section className="mt-16 rounded-2xl bg-[#EDE7DB] p-7 sm:p-9">
+        <section className="mt-16 rounded-2xl bg-[var(--c-surface)] p-7 sm:p-9">
           <h2 className="font-[family-name:var(--font-display)] text-3xl leading-tight">
             {t({ ko: "팁 하나를 보셨습니다. 모든 정거장에 하나씩 있습니다.", en: "That\u2019s one tip. Every stop has one." })}
           </h2>
-          <p className="mt-4 max-w-xl leading-relaxed text-[#3D4A44]">
+          <p className="mt-4 max-w-xl leading-relaxed text-[var(--c-text-2)]">
             {t({
               ko: "위 초안은 여행의 뼈대입니다. 전체 일정이 그 안을 채웁니다 — 모든 정거장의 팁, 예산에 맞춘 숙소 다섯 곳과 식당 다섯 곳, 비용 분해, 그리고 무엇을 언제 예약하면 되는지. 한국 전화로만 받는 곳까지 알려드립니다.",
               en: "The draft above is the shape of your trip. The full plan fills it in — a tip at every stop, five stays and five restaurants chosen for your budget, costs broken down, and exactly what to book and when, including the places that only take Korean phone reservations.",
@@ -171,7 +171,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
           </p>
           <Link
             href={`/plan/${plan.id}/consult`}
-            className="mt-8 inline-flex items-center rounded-full bg-[#12211C] px-8 py-3.5 text-base text-[#F2EDE3] transition-colors hover:bg-[#D8503C] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#3E6FB0]"
+            className="mt-8 inline-flex items-center rounded-full bg-[var(--c-accent)] px-8 py-3.5 text-base text-white transition-colors hover:bg-[var(--c-text)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
           >
             {t({ ko: "전체 일정 받기", en: "Get the full plan" })}
           </Link>
