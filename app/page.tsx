@@ -267,7 +267,7 @@ export default async function Home() {
 
       {/* ── 역명판 + 하늘 ─────────────────────────────── */}
       <section>
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12">
+        <div className="ktc-deck mx-auto max-w-6xl px-6 pt-8 md:grid md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12">
           {/* PC 에서는 글도 카드와 같이 머문다. 글만 흘러가면 카드가 허공에 뜬 것처럼 보인다 */}
           <div className="md:sticky md:top-0 md:flex md:min-h-screen md:flex-col md:justify-center">
             {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
@@ -327,20 +327,13 @@ export default async function Home() {
 
             2:3 — 원본 비율 그대로다. 잘리는 데 없이 세로가 길어진다.
           */}
-          <div className="ktc-deck w-full min-w-0 md:justify-self-end">
             {/*
               붙는 칸과 비율 칸을 **나눠 둔다.** 한 칸에 "화면 높이"와 "2:3 비율"을
               같이 주면 비율이 폭을 역산해서 밀어내고, 좁은 화면에서 가로로 넘친다.
               (실제로 375px 화면에서 496px 로 삐져나왔다)
             */}
-            <div className="ktc-deck-sticky w-full min-w-0">
-              {/*
-                폰에서는 **화면을 거의 채운다.** 2:3 을 그대로 두면 폭이 좁아
-                카드가 484px 밖에 안 되고 위아래로 300px 넘게 비어 보인다.
-                대신 사진 위아래가 조금 잘린다 — 빈 어둠보다 잘린 사진이 낫다.
-                svh: 폰 주소창이 접혔다 펴져도 높이가 안 튄다.
-              */}
-              <div className="relative mx-auto h-[calc(100svh-4rem)] w-full max-w-[31rem] md:h-auto md:aspect-[2/3]">
+            <div className="ktc-deck-sticky mt-10 w-full min-w-0 md:mt-0 md:justify-self-end">
+              <div className="relative mx-auto aspect-[2/3] w-full max-w-[31rem]">
             {HERO_CARDS.map((card, i) => (
               <figure
                 key={card.src}
@@ -404,10 +397,8 @@ export default async function Home() {
               ))}
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="ktc-route mt-14">
+        <div className="ktc-route mt-14 md:col-span-2">
           {/* 안내 표지의 머리줄. 노선 이름과 **지금 서울 상태**가 여기 한 줄에 온다 */}
           <div className="mx-auto max-w-6xl px-6">
             <p className="whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.9rem] uppercase tracking-[0.08em] text-[var(--c-text-3)] sm:text-[0.72rem] sm:tracking-[0.3em]">
@@ -531,6 +522,7 @@ export default async function Home() {
               </figure>
             ))}
           </div>
+        </div>
         </div>
       </section>
 

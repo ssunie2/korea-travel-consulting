@@ -234,21 +234,26 @@ body {
   @media (prefers-reduced-motion: no-preference) {
     .ktc-deck {
       /*
-        **붙어 있는 길이와 넘기는 길이를 정확히 같게 맞춘다.**
-        붙는 칸을 화면 높이로 두면 (덱높이 − 화면높이) 가 둘 다에 똑같이 쓰인다.
-        그래서 마지막 장이 놓이는 순간 붙는 게 풀리고 **곧바로 다음 내용이 올라온다.**
-        빈 스크롤이 생길 수가 없다.
+        높이를 억지로 늘리지 않는다. **안에 든 것(글·카드·노선도)의 자연스러운 길이**가
+        그대로 넘기는 데 쓸 스크롤이 된다. 억지로 늘린 만큼이 곧 빈 어둠이다.
       */
-      height: 260vh;
       view-timeline-name: --ktc-deck;
       view-timeline-axis: block;
     }
+    /*
+      붙는 건 사진 칸 하나뿐이고, **카드 크기는 건드리지 않는다.**
+      카드가 붙어 있는 동안 그 아래로 노선도가 올라와 빈 자리를 채운다 —
+      그래서 화면 높이로 채우거나 카드를 늘릴 필요가 없다.
+    */
     .ktc-deck-sticky {
       position: sticky;
-      top: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
+      top: 4rem;
+      /* 노선도가 올라올 때 카드 **뒤로** 지나가게 한다. 안 그러면 카드를 덮는다 */
+      z-index: 2;
+    }
+    .ktc-deck .ktc-route {
+      position: relative;
+      z-index: 1;
     }
     .ktc-deck-card {
       transform-origin: 50% 85%;
