@@ -266,8 +266,8 @@ export default async function Home() {
 
 
       {/* ── 역명판 + 하늘 ─────────────────────────────── */}
-      <section className="ktc-route">
-        <div className="mx-auto max-w-6xl px-6 pt-8 md:pt-12">
+      <section>
+        <div className="mx-auto max-w-6xl px-6 pt-8 md:grid md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12">
           {/* PC 에서는 글도 카드와 같이 머문다. 글만 흘러가면 카드가 허공에 뜬 것처럼 보인다 */}
           <div className="md:sticky md:top-0 md:flex md:min-h-screen md:flex-col md:justify-center">
             {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
@@ -337,14 +337,9 @@ export default async function Home() {
             그래서 뒤에 오는 노선도가 카드 뒤로 숨을 일이 없다 — 상자 다음에 오니까.
             상자 맨 위가 곧 카드 자리라, 카드가 제자리에 붙은 뒤부터 넘어가기 시작한다.
           */}
-          <div className="ktc-deck w-full min-w-0">
-            <div className="ktc-deck-sticky mt-10 w-full min-w-0">
-              {/*
-                  폰은 폭에 맞추고, PC 는 **높이에 맞춘다.**
-                  PC 에서 폭 기준으로 두면 카드가 744px 이 되어 카드+노선도가
-                  화면(900)을 넘고 역 이름이 잘린다. 둘이 한 화면에 같이 있어야 한다.
-                */}
-                <div className="relative mx-auto aspect-[2/3] w-full max-w-[31rem] md:h-[calc(100vh-22rem)] md:w-auto">
+          <div className="ktc-deck w-full min-w-0 md:justify-self-end">
+            <div className="ktc-deck-sticky mt-10 w-full min-w-0 md:mt-0">
+              <div className="relative mx-auto aspect-[2/3] w-full max-w-[31rem]">
             {HERO_CARDS.map((card, i) => (
               <figure
                 key={card.src}
@@ -406,92 +401,90 @@ export default async function Home() {
                 </figure>
               ))}
               </div>
-                <div className="mt-8">
-            {/* 안내 표지의 머리줄. 노선 이름과 **지금 서울 상태**가 여기 한 줄에 온다 */}
-            <div className="mx-auto max-w-6xl px-6">
-              <p className="whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.9rem] uppercase tracking-[0.08em] text-[var(--c-text-3)] sm:text-[0.72rem] sm:tracking-[0.3em]">
-                {t({ ko: "서울 지하철 · 4일", en: "Seoul Metro · 4 Days" })}
-                {weather.tempC !== null && (
-                  <>
-                    <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
-                    {weather.tempC}°
-                  </>
-                )}
-                <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
-                {weather.sky === "clear"
-                  ? t({ ko: "맑음", en: "Clear" })
-                  : weather.sky === "cloud"
-                    ? t({ ko: "흐림", en: "Cloudy" })
-                    : weather.sky === "rain"
-                      ? t({ ko: "비", en: "Rain" })
-                      : t({ ko: "눈", en: "Snow" })}
-              </p>
             </div>
-            <div aria-hidden className="mt-3 h-px w-full bg-[var(--c-line-2)]" />
+          </div>
 
-            {/* 누르는 자리를 그림 위에 겹쳐야 해서 relative 가 필요하다 */}
-            <div className="relative">
-              <MetroScene scene={NARROW} className="block h-auto w-full md:hidden" />
-              <MetroScene scene={WIDE} className="hidden h-auto w-full md:block" />
+        <div className="ktc-route mt-14 md:col-span-2">
+          {/* 안내 표지의 머리줄. 노선 이름과 **지금 서울 상태**가 여기 한 줄에 온다 */}
+          <div className="mx-auto max-w-6xl px-6">
+            <p className="whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.9rem] uppercase tracking-[0.08em] text-[var(--c-text-3)] sm:text-[0.72rem] sm:tracking-[0.3em]">
+              {t({ ko: "서울 지하철 · 4일", en: "Seoul Metro · 4 Days" })}
+              {weather.tempC !== null && (
+                <>
+                  <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
+                  {weather.tempC}°
+                </>
+              )}
+              <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
+              {weather.sky === "clear"
+                ? t({ ko: "맑음", en: "Clear" })
+                : weather.sky === "cloud"
+                  ? t({ ko: "흐림", en: "Cloudy" })
+                  : weather.sky === "rain"
+                    ? t({ ko: "비", en: "Rain" })
+                    : t({ ko: "눈", en: "Snow" })}
+            </p>
+          </div>
+          <div aria-hidden className="mt-3 h-px w-full bg-[var(--c-line-2)]" />
 
-              <fieldset className="absolute inset-0 m-0 border-0 p-0">
-                <legend className="sr-only">{t({ ko: "날짜를 골라 그 날의 컨시어지 팁을 보세요", en: "Choose a day to preview its concierge tip" })}</legend>
-                {STATIONS.map((station) => (
-                  <label
-                    key={station.day}
-                    style={{ left: `${station.x / 10}%` }}
-                    className="group absolute top-[54.5%] h-[92px] w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:h-[112px] sm:w-28 md:h-[160px] md:w-44"
+          {/* 누르는 자리를 그림 위에 겹쳐야 해서 relative 가 필요하다 */}
+          <div className="relative">
+            <MetroScene scene={NARROW} className="block h-auto w-full md:hidden" />
+            <MetroScene scene={WIDE} className="hidden h-auto w-full md:block" />
+
+            <fieldset className="absolute inset-0 m-0 border-0 p-0">
+              <legend className="sr-only">{t({ ko: "날짜를 골라 그 날의 컨시어지 팁을 보세요", en: "Choose a day to preview its concierge tip" })}</legend>
+              {STATIONS.map((station) => (
+                <label
+                  key={station.day}
+                  style={{ left: `${station.x / 10}%` }}
+                  className="group absolute top-[54.5%] h-[92px] w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:h-[112px] sm:w-28 md:h-[160px] md:w-44"
+                >
+                  {/*
+                    전통 문양 — DAY 글자 위. 원래 전동차가 지나가던 자리다.
+                    크기는 그 전동차(주황 타원)의 좁은 폭에서 출발했고, PC 가 답답해 보여 1.5배로 키웠다.
+                    폰도 16px 로 올렸다 — 문양이 세 겹이라 11px 에서는 뭉개진다.
+                    `opacity` 로만 켜고 끈다. `hidden` 으로 하면 켜질 때 줄이 밀린다.
+                  */}
+                  <span
+                    aria-hidden
+                    className="ktc-mark absolute bottom-[calc(50%+28.9px)] left-1/2 h-[24px] w-[24px] -translate-x-1/2 text-[var(--c-accent-soft)] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+36.8px)] sm:h-[30px] sm:w-[30px] md:bottom-[calc(50%+52.2px)] md:h-[39px] md:w-[39px]"
                   >
-                    {/*
-                      전통 문양 — DAY 글자 위. 원래 전동차가 지나가던 자리다.
-                      크기는 그 전동차(주황 타원)의 좁은 폭에서 출발했고, PC 가 답답해 보여 1.5배로 키웠다.
-                      폰도 16px 로 올렸다 — 문양이 세 겹이라 11px 에서는 뭉개진다.
-                      `opacity` 로만 켜고 끈다. `hidden` 으로 하면 켜질 때 줄이 밀린다.
-                    */}
-                    <span
-                      aria-hidden
-                      className="ktc-mark absolute bottom-[calc(50%+28.9px)] left-1/2 h-[24px] w-[24px] -translate-x-1/2 text-[var(--c-accent-soft)] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+36.8px)] sm:h-[30px] sm:w-[30px] md:bottom-[calc(50%+52.2px)] md:h-[39px] md:w-[39px]"
-                    >
-                      <DayPattern day={station.day} />
-                    </span>
+                    <DayPattern day={station.day} />
+                  </span>
 
-                    {/* 날짜 — 점 위 */}
-                    <span className="absolute bottom-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-none tracking-[0.16em] text-[var(--c-text)] group-has-[:checked]:text-[var(--c-accent)] sm:bottom-[calc(50%+15px)] sm:text-[0.8rem] sm:tracking-[0.2em] md:bottom-[calc(50%+21px)] md:text-[1.2rem]">
-                      DAY {station.day}
-                    </span>
+                  {/* 날짜 — 점 위 */}
+                  <span className="absolute bottom-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-none tracking-[0.16em] text-[var(--c-text)] group-has-[:checked]:text-[var(--c-accent)] sm:bottom-[calc(50%+15px)] sm:text-[0.8rem] sm:tracking-[0.2em] md:bottom-[calc(50%+21px)] md:text-[1.2rem]">
+                    DAY {station.day}
+                  </span>
 
-                    <input
-                      id={`ktc-day-${station.day}`}
-                      type="radio"
-                      name="ktc-day"
-                      value={station.day}
-                      defaultChecked={station.day === 2}
-                      aria-controls={`ktc-tip-${station.day}`}
-                      className="peer sr-only"
-                    />
+                  <input
+                    id={`ktc-day-${station.day}`}
+                    type="radio"
+                    name="ktc-day"
+                    value={station.day}
+                    defaultChecked={station.day === 2}
+                    aria-controls={`ktc-tip-${station.day}`}
+                    className="peer sr-only"
+                  />
 
-                    {/* 역 — 작고 정확한 점. 고른 역에만 가는 테두리가 하나 더 */}
-                    <span
-                      aria-hidden
-                      className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--c-text)] peer-checked:bg-[var(--c-accent)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[var(--c-focus)] sm:h-3 sm:w-3 md:h-[18px] md:w-[18px]"
-                    />
+                  {/* 역 — 작고 정확한 점. 고른 역에만 가는 테두리가 하나 더 */}
+                  <span
+                    aria-hidden
+                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--c-text)] peer-checked:bg-[var(--c-accent)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[var(--c-focus)] sm:h-3 sm:w-3 md:h-[18px] md:w-[18px]"
+                  />
 
-                    {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
-                    <span className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.75rem] leading-none tracking-[0.02em] text-[var(--c-text-3)] sm:top-[calc(50%+15px)] sm:text-[0.65rem] sm:tracking-[0.14em] sm:tracking-[0.14em] md:top-[calc(50%+21px)] md:text-[0.98rem]">
-                      {station.en}
-                    </span>
-                    <span className="absolute top-[calc(50%+27px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.75rem] leading-none text-[var(--c-text-4)] sm:top-[calc(50%+34.4px)] sm:text-[0.6rem] md:top-[calc(50%+48.7px)] md:text-[0.9rem]">
-                      {station.ko}
-                    </span>
-                  </label>
-                ))}
-              </fieldset>
-            </div>
-            </div>
+                  {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
+                  <span className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.75rem] leading-none tracking-[0.02em] text-[var(--c-text-3)] sm:top-[calc(50%+15px)] sm:text-[0.65rem] sm:tracking-[0.14em] sm:tracking-[0.14em] md:top-[calc(50%+21px)] md:text-[0.98rem]">
+                    {station.en}
+                  </span>
+                  <span className="absolute top-[calc(50%+27px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.75rem] leading-none text-[var(--c-text-4)] sm:top-[calc(50%+34.4px)] sm:text-[0.6rem] md:top-[calc(50%+48.7px)] md:text-[0.9rem]">
+                    {station.ko}
+                  </span>
+                </label>
+              ))}
+            </fieldset>
           </div>
-            </div>
-          </div>
-
 
           {/* 선택한 역 아래에 그 DAY의 컨시어지 팁을 보여준다. */}
           <div className="mx-auto max-w-5xl px-6 pb-16 pt-8">
@@ -535,6 +528,8 @@ export default async function Home() {
               </figure>
             ))}
           </div>
+        </div>
+        </div>
       </section>
 
       {/* ── how it works ────────────────────────────────── */}
