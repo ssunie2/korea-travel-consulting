@@ -489,6 +489,8 @@ export default async function Home() {
             </div>
             </div>
           </div>
+            </div>
+          </div>
 
 
           {/* 선택한 역 아래에 그 DAY의 컨시어지 팁을 보여준다. */}
@@ -533,8 +535,6 @@ export default async function Home() {
               </figure>
             ))}
           </div>
-        </div>
-        </div>
       </section>
 
       {/* ── how it works ────────────────────────────────── */}
