@@ -267,12 +267,7 @@ export default async function Home() {
 
       {/* ── 역명판 + 하늘 ─────────────────────────────── */}
       <section>
-        <div className="mx-auto max-w-6xl px-6 pt-8 md:grid md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12">
-          {/* PC 에서는 글도 카드와 같이 머문다. 글만 흘러가면 카드가 허공에 뜬 것처럼 보인다 */}
-          {/*
-            **글은 붙이지 않는다.** 붙여두면 카드가 다 넘어간 뒤에도 제자리에 남아,
-            뒤따라 올라오는 노선도·팁 위에 겹쳐 보인다. 그냥 같이 올라가게 둔다.
-          */}
+        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12">
           <div>
             {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
             <div>
@@ -331,27 +326,17 @@ export default async function Home() {
 
             2:3 — 원본 비율 그대로다. 잘리는 데 없이 세로가 길어진다.
           */}
-            {/*
-              붙는 칸과 비율 칸을 **나눠 둔다.** 한 칸에 "화면 높이"와 "2:3 비율"을
-              같이 주면 비율이 폭을 역산해서 밀어내고, 좁은 화면에서 가로로 넘친다.
-              (실제로 375px 화면에서 496px 로 삐져나왔다)
-            */}
-            {/*
-            **붙는 상자.** 이 상자 안에서만 카드가 붙어 있고, 상자가 끝나면 풀린다.
-            그래서 뒤에 오는 노선도가 카드 뒤로 숨을 일이 없다 — 상자 다음에 오니까.
-            상자 맨 위가 곧 카드 자리라, 카드가 제자리에 붙은 뒤부터 넘어가기 시작한다.
-          */}
-          <div className="ktc-deck w-full min-w-0 md:justify-self-end">
-            <div className="ktc-deck-sticky mt-10 w-full min-w-0 md:mt-0">
-              <div className="relative mx-auto aspect-[2/3] w-[calc(100%+1.5rem)] max-w-[31rem] sm:w-full">
+          <div className="ktc-deck w-full md:justify-self-end">
+            <div className="ktc-deck-sticky relative mx-auto aspect-[2/3] w-full max-w-[31rem]">
             {HERO_CARDS.map((card, i) => (
               <figure
                 key={card.src}
                 style={{
                   zIndex: HERO_CARDS.length - i,
-                  /* 몇 번째 장인지. 실제 구간 계산은 CSS 가 한다 —
-                     "카드가 제자리에 붙는 시점"이 화면 크기마다 달라서, 그 값을 CSS 에 둔다 */
-                  ["--ktc-i" as string]: String(i),
+                  /* 마지막 장은 안 걷히므로 나누는 수는 (장수 - 1) 이다.
+                     장수로 나누면 마지막 구간이 통째로 빈 스크롤이 된다 */
+                  ["--ktc-from" as string]: `${(i / (HERO_CARDS.length - 1)) * 100}%`,
+                  ["--ktc-to" as string]: `${((i + 1) / (HERO_CARDS.length - 1)) * 100}%`,
                 }}
                 className={`absolute inset-0 overflow-hidden rounded-[1.75rem] border border-[var(--c-line-2)] bg-[var(--c-deep)] shadow-[0_28px_70px_-28px_rgba(0,0,0,0.7)] ${
                   /* 마지막 장은 걷히지 않는다. 걷히면 뒤에 아무것도 없어 빈 자리가 남는다 */
@@ -402,13 +387,13 @@ export default async function Home() {
                     />
                   ))}
                 </div>
-                </figure>
-              ))}
-              </div>
+              </figure>
+            ))}
             </div>
           </div>
+        </div>
 
-        <div className="ktc-route mt-14 md:col-span-2">
+        <div className="ktc-route mt-14">
           {/* 안내 표지의 머리줄. 노선 이름과 **지금 서울 상태**가 여기 한 줄에 온다 */}
           <div className="mx-auto max-w-6xl px-6">
             <p className="whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.9rem] uppercase tracking-[0.08em] text-[var(--c-text-3)] sm:text-[0.72rem] sm:tracking-[0.3em]">
@@ -532,7 +517,6 @@ export default async function Home() {
               </figure>
             ))}
           </div>
-        </div>
         </div>
       </section>
 

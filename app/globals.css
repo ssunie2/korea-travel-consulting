@@ -233,53 +233,36 @@ body {
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .ktc-deck {
-      /*
-        높이를 억지로 늘리지 않는다. **안에 든 것(글·카드·노선도)의 자연스러운 길이**가
-        그대로 넘기는 데 쓸 스크롤이 된다. 억지로 늘린 만큼이 곧 빈 어둠이다.
-      */
+      /* 다섯 장을 넘기는 데 쓸 세로 길이. 짧으면 휙 지나가고 길면 스크롤이 지루하다 */
+      height: 170vh;
       view-timeline-name: --ktc-deck;
       view-timeline-axis: block;
     }
     /*
-      붙는 건 사진 칸 하나뿐이고, **카드 크기는 건드리지 않는다.**
-      카드가 붙어 있는 동안 그 아래로 노선도가 올라와 빈 자리를 채운다 —
-      그래서 화면 높이로 채우거나 카드를 늘릴 필요가 없다.
-    */
-    /*
-      카드가 붙는 자리. **화면에서 위아래가 같도록 가운데에 둔다.**
-      위로만 붙이면 아래만 258px 비어서 "내용이 없는 것"처럼 보이고,
-      가운데 두면 사진을 보여주려고 비운 자리로 읽힌다.
-
-      화면 크기로 나누지 않고 한 식으로 쓴다 — 카드가 화면을 거의 채우는 PC 에서는
-      가운데 값이 저절로 작아져 `4rem` 이 이기고, 폰에서는 가운데 값이 이긴다.
-      카드 높이 = 폭 × 1.5 (2:3), 폭은 화면에서 여백을 뺀 값이되 31rem 을 넘지 않는다.
+      붙는 건 **사진 칸 하나뿐이다.** 히어로 전체를 붙이면 폰에서 글+사진이
+      화면보다 커서, 카드가 다 넘어가기 전에 히어로가 먼저 위로 떠나간다.
+      붙는 것이 화면보다 작아야 붙어 있는 길이와 애니메이션 길이가 맞는다.
     */
     .ktc-deck-sticky {
-      top: max(4rem, (100svh - min(100vw - 1.5rem, 31rem) * 1.5) / 2);
       position: sticky;
-      /* 노선도가 올라올 때 카드 **뒤로** 지나가게 한다. 안 그러면 카드를 덮는다 */
-      z-index: 2;
-    }
-    .ktc-deck .ktc-route {
-      position: relative;
-      z-index: 1;
+      top: 3.5rem;
     }
     /*
-      **붙는 상자의 길이 = 카드 + 넘기는 데 쓸 스크롤.**
-      상자가 끝나면 카드가 풀리고 노선도가 그 뒤로 이어진다 — 겹치거나 숨을 수 없다.
-      상자 맨 위가 카드 자리라, 카드가 온전히 자리잡은 뒤부터 넘어간다.
+      카드가 붙어 있는 동안 그 아래는 원래 빈 어둠이었다. 스크롤할 게 남았다는 신호가
+      없어서 화면이 끊겨 보인다. **다음 내용을 그 빈 만큼 끌어올려** 카드 밑에 붙인다.
+
+      끌어올리는 양 = 화면 높이 − 카드가 붙는 위치 − 카드 높이.
+      카드는 폭의 1.5배(2:3)이고 폭은 31rem 을 넘지 않으므로 그대로 계산된다.
     */
     .ktc-deck {
       --ktc-card-h: calc(min(100vw - 3rem, 31rem) * 1.5);
-      height: calc(var(--ktc-card-h) + 110vh);
-      view-timeline-name: --ktc-deck;
-      view-timeline-axis: block;
+      margin-bottom: calc(-1 * max(0px, 100vh - 3.5rem - var(--ktc-card-h)));
     }
     .ktc-deck-card {
       transform-origin: 50% 85%;
       animation: ktc-deck-lift linear forwards;
       animation-timeline: --ktc-deck;
-      animation-range: contain calc(var(--ktc-i) * 25%) contain calc((var(--ktc-i) + 1) * 25%);
+      animation-range: contain var(--ktc-from) contain var(--ktc-to);
     }
   }
 }
