@@ -212,69 +212,44 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   첫 화면 사진 카드 — 스크롤하면 맨 위 장이 걷히며 다음 장이 나온다.
+   첫 화면 사진 카드 — 제자리에서 한 장씩 저절로 넘어간다.
 
-   참고한 데모(stacking-cards)는 카드가 **아래에서 올라와 쌓이는** 것인데,
-   우리는 반대로 **위에서 한 장씩 걷어낸다.** 표를 넘기는 동작에 가깝고,
-   왼쪽 글이 제자리에 머무는 동안 오른쪽만 바뀌어서 첫 화면이 길어지지 않는다.
+   **스크롤로 넘기지 않는다.** 스크롤로 넘기려면 카드가 화면에 온전히 담겨 있는
+   동안만 써야 하는데, 카드가 화면을 거의 채우는 PC 에서 그 구간이 156px 뿐이라
+   넉 장이 순식간에 지나간다. 늘리려면 카드를 붙여야 하고, 붙이면 그만큼
+   카드 아래가 빈 어둠이 된다. 셋 다 만족시키는 스크롤 방식은 없다.
 
-   걷히는 장은 **위로 밀리면서 살짝 기울고 작아진다.** 곧게 사라지면
-   그냥 꺼지는 것처럼 보이고, 조금 기울면 손으로 넘긴 것처럼 읽힌다.
+   그래서 **카드는 완전히 제자리에 두고 시간으로 넘긴다.** 스크롤 길이를
+   하나도 쓰지 않으므로 빈 공간이 생길 수가 없고, 손님이 가만히 있어도 다섯 장을 다 본다.
 
-   못 알아듣는 브라우저에서는 **맨 위 한 장만 보인다** — 지금 쓰던 첫 화면 그대로다.
+   걷히는 장은 위로 밀리면서 살짝 기울고 작아진다. 곧게 사라지면 그냥 꺼지는
+   것처럼 보이고, 조금 기울면 손으로 넘긴 것처럼 읽힌다.
+
+   움직임을 싫어하는 설정이면 첫 장만 보인다.
    ══════════════════════════════════════════════════════════════ */
-@keyframes ktc-deck-lift {
-  to {
-    transform: translateY(-9%) rotate(-2.4deg) scale(0.93);
+@keyframes ktc-deck-cycle {
+  0%,
+  17% {
+    opacity: 1;
+    transform: none;
+  }
+  20%,
+  97% {
     opacity: 0;
+    transform: translateY(-9%) rotate(-2.4deg) scale(0.93);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
   }
 }
 
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .ktc-deck {
-      /*
-        높이를 억지로 늘리지 않는다. **안에 든 것(글·카드·노선도)의 자연스러운 길이**가
-        그대로 넘기는 데 쓸 스크롤이 된다. 억지로 늘린 만큼이 곧 빈 어둠이다.
-      */
-      view-timeline-name: --ktc-deck;
-      view-timeline-axis: block;
-    }
-    /*
-      붙는 건 사진 칸 하나뿐이고, **카드 크기는 건드리지 않는다.**
-      카드가 붙어 있는 동안 그 아래로 노선도가 올라와 빈 자리를 채운다 —
-      그래서 화면 높이로 채우거나 카드를 늘릴 필요가 없다.
-    */
-    .ktc-deck-sticky {
-      position: sticky;
-      top: 4rem;
-      /* 노선도가 올라올 때 카드 **뒤로** 지나가게 한다. 안 그러면 카드를 덮는다 */
-      z-index: 2;
-    }
-    .ktc-deck .ktc-route {
-      position: relative;
-      z-index: 1;
-    }
-    /*
-      **붙는 상자의 길이 = 카드 + 넘기는 데 쓸 스크롤.**
-      상자가 끝나면 카드가 풀리고 노선도가 그 뒤로 이어진다 — 겹치거나 숨을 수 없다.
-      상자 맨 위가 카드 자리라, 카드가 온전히 자리잡은 뒤부터 넘어간다.
-    */
-    .ktc-deck {
-      --ktc-card-h: calc(min(100vw - 3rem, 31rem) * 1.5);
-      height: calc(var(--ktc-card-h) + 110vh);
-      view-timeline-name: --ktc-deck;
-      view-timeline-axis: block;
-    }
-    .ktc-deck-sticky {
-      position: sticky;
-      top: 4rem;
-    }
-    .ktc-deck-card {
-      transform-origin: 50% 85%;
-      animation: ktc-deck-lift linear forwards;
-      animation-timeline: --ktc-deck;
-      animation-range: contain calc(var(--ktc-i) * 25%) contain calc((var(--ktc-i) + 1) * 25%);
-    }
+@media (prefers-reduced-motion: no-preference) {
+  .ktc-deck-card {
+    transform-origin: 50% 85%;
+    /* 다섯 장 × 한 장당 3초. 음수 지연으로 한 장씩 어긋나게 출발시킨다 */
+    animation: ktc-deck-cycle 15s linear infinite;
+    /* 1→2→3→4→5 순서로 나오게. 음수 지연을 그냥 곱하면 거꾸로 돈다 */
+    animation-delay: calc(var(--ktc-i) * 3s - 15s);
   }
 }
