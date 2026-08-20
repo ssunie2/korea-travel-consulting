@@ -120,7 +120,7 @@ export default function PrivacyPolicy() {
         </p>
 
         {/* 1 */}
-        <section className="ktc-rise mt-12 border-t border-[var(--c-line-2)] pt-8">
+        <section className="mt-12 border-t border-[var(--c-line-2)] pt-8">
           <h2 className="font-[family-name:var(--font-display)] text-2xl leading-snug">
             {t({ ko: "1. 무엇을 받는지", en: "1. What we collect" })}
           </h2>
@@ -152,7 +152,7 @@ export default function PrivacyPolicy() {
         </section>
 
         {/* 2 — 민감정보 */}
-        <section className="ktc-rise mt-12 border-t border-[var(--c-line-2)] pt-8">
+        <section className="mt-12 border-t border-[var(--c-line-2)] pt-8">
           <h2 className="font-[family-name:var(--font-display)] text-2xl leading-snug">
             {t({ ko: "2. 식이·접근성 메모", en: "2. Dietary and accessibility notes" })}
           </h2>
@@ -192,7 +192,7 @@ export default function PrivacyPolicy() {
         </section>
 
         {/* 3 */}
-        <section className="ktc-rise mt-12 border-t border-[var(--c-line-2)] pt-8">
+        <section className="mt-12 border-t border-[var(--c-line-2)] pt-8">
           <h2 className="font-[family-name:var(--font-display)] text-2xl leading-snug">
             {t({ ko: "3. 또 누가 보는지", en: "3. Who else sees it" })}
           </h2>
@@ -229,7 +229,7 @@ export default function PrivacyPolicy() {
         </section>
 
         {/* 4 */}
-        <section className="ktc-rise mt-12 border-t border-[var(--c-line-2)] pt-8">
+        <section className="mt-12 border-t border-[var(--c-line-2)] pt-8">
           <h2 className="font-[family-name:var(--font-display)] text-2xl leading-snug">
             {t({ ko: "4. 얼마나 보관하는지", en: "4. How long we keep it" })}
           </h2>
@@ -263,7 +263,7 @@ export default function PrivacyPolicy() {
         </section>
 
         {/* 5 */}
-        <section className="ktc-rise mt-12 border-t border-[var(--c-line-2)] pt-8">
+        <section className="mt-12 border-t border-[var(--c-line-2)] pt-8">
           <h2 className="font-[family-name:var(--font-display)] text-2xl leading-snug">
             {t({ ko: "5. 요청하실 수 있는 것", en: "5. What you can ask us to do" })}
           </h2>
@@ -307,7 +307,7 @@ export default function PrivacyPolicy() {
         </section>
 
         {/* 6 */}
-        <section className="ktc-rise mt-12 border-t border-[var(--c-line-2)] pt-8">
+        <section className="mt-12 border-t border-[var(--c-line-2)] pt-8">
           <h2 className="font-[family-name:var(--font-display)] text-2xl leading-snug">
             {t({ ko: "6. 안전하게 지키는 법", en: "6. Keeping it safe" })}
           </h2>
@@ -316,7 +316,7 @@ export default function PrivacyPolicy() {
         </section>
 
         {/* 7 */}
-        <section className="ktc-rise mt-12 border-t border-[var(--c-line-2)] pt-8">
+        <section className="mt-12 border-t border-[var(--c-line-2)] pt-8">
           <h2 className="font-[family-name:var(--font-display)] text-2xl leading-snug">
             {t({ ko: "7. 아동", en: "7. Children" })}
           </h2>
@@ -325,7 +325,7 @@ export default function PrivacyPolicy() {
         </section>
 
         {/* 8 */}
-        <section className="ktc-rise mt-12 border-t border-[var(--c-line-2)] pt-8">
+        <section className="mt-12 border-t border-[var(--c-line-2)] pt-8">
           <h2 className="font-[family-name:var(--font-display)] text-2xl leading-snug">
             {t({ ko: "8. 연락처", en: "8. Who to contact" })}
           </h2>
@@ -343,7 +343,7 @@ export default function PrivacyPolicy() {
             {t({ ko: "저희가 문제를 해결해 드리지 못하면 한국인터넷진흥원 개인정보 침해신고센터(privacy.go.kr, 118)에, 유럽이나 영국에 계시면 해당 국가의 개인정보 감독기구에 신고하실 수 있습니다.", en: "If we do not resolve your concern, you can complain to the Korea Internet & Security Agency Privacy Center (privacy.go.kr, 118) or, if you are in Europe or the UK, to your national data protection authority." })}</p>
         </section>
 
-        <section className="ktc-rise mt-12 border-t border-[var(--c-line-2)] pt-8">
+        <section className="mt-12 border-t border-[var(--c-line-2)] pt-8">
           <h2 className="font-[family-name:var(--font-display)] text-2xl leading-snug">
             {t({ ko: "9. 변경", en: "9. Changes" })}
           </h2>

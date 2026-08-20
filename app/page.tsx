@@ -121,46 +121,6 @@ const paid = t({
  * 누르는 자리. `x` 는 화면 폭의 몇 %인지다 — 넓은 화면과 폰 장면이
  * 같은 비율로 정거장을 놓기 때문에 이 한 벌로 둘 다 덮는다.
  */
-/**
- * 첫 화면에서 넘어가는 사진 카드. **스크롤하면 한 장씩 걷히며 다음 장이 나온다.**
- *
- * 첫 장은 지금 쓰던 사진 그대로다. 나머지는 흰 바탕 임시 이미지다.
- * TODO(출시 전): `public/placeholder-seoul-*.svg` 를 같은 이름의 진짜 사진으로 바꾼다.
- * 첫 장(`seoul-blue-hour.jpg`)도 AI 가 만든 그림이라 같이 갈아야 한다.
- */
-const HERO_CARDS = [
-  {
-    src: "/seoul-blue-hour.jpg",
-    alt: "A hanok-lined street in Seoul at blue hour, with Namsan Tower in the distance",
-    badge: t({ ko: "서울", en: "Seoul" }),
-    line: t({ ko: "오래된 지붕, 새로운 서울.", en: "Old roofs. New Seoul." }),
-  },
-  {
-    src: "/placeholder-seoul-1.svg",
-    alt: "",
-    badge: t({ ko: "경복", en: "Palace" }),
-    line: t({ ko: "화요일만 피하면 됩니다.", en: "Just don\u2019t come on a Tuesday." }),
-  },
-  {
-    src: "/placeholder-seoul-2.svg",
-    alt: "",
-    badge: t({ ko: "북촌", en: "Bukchon" }),
-    line: t({ ko: "누군가의 대문 앞입니다.", en: "This is someone\u2019s front door." }),
-  },
-  {
-    src: "/placeholder-seoul-3.svg",
-    alt: "",
-    badge: t({ ko: "시장", en: "Market" }),
-    line: t({ ko: "좋은 자리는 현금만 받습니다.", en: "The best stalls take cash only." }),
-  },
-  {
-    src: "/placeholder-seoul-4.svg",
-    alt: "",
-    badge: t({ ko: "남산", en: "Namsan" }),
-    line: t({ ko: "차로는 못 올라갑니다.", en: "You can\u2019t drive up." }),
-  },
-];
-
 const STATIONS = [
   // 양끝 여백 125, 정거장 사이 250. 끝을 좁혀 선이 화면 밖으로 이어지는 느낌을 남긴다
   { day: 1, x: 125, en: "INCHEON", ko: "인천공항", enSub: "인천공항", koSub: "INCHEON" },
@@ -315,82 +275,50 @@ export default async function Home() {
             </p>
           </div>
 
-          {/*
-            첫 화면 사진. **한 장이 아니라 넘어가는 카드 묶음이다.**
-            스크롤하면 맨 위 장이 위로 걷히면서 다음 장이 드러난다 — 표를 한 장씩 넘기듯이.
+          {/* 한옥의 결은 사진으로, 노선의 그래픽은 아래 SVG로 이어 붙인다. */}
+          <figure className="relative mx-auto w-full max-w-[31rem] overflow-hidden rounded-[1.75rem] border border-[var(--c-line-2)] bg-[var(--c-deep)] shadow-[0_28px_70px_-28px_rgba(0,0,0,0.7)] md:justify-self-end">
+            {/*
+              TODO(출시 전): 이 이미지는 **AI 가 만든 그림이지 실제 사진이 아니다.**
+              1024×1536(AI 표준 출력 크기), 카메라 정보 전무, 확대하면 사람 형체와
+              기와가 뭉개져 있다. 북촌로11길에서 남산을 본 구도를 흉내낸 것이다.
 
-            TODO(출시 전): 첫 장은 **AI 가 만든 그림이지 실제 사진이 아니다.**
-            1024×1536(AI 표준 출력 크기), 카메라 정보 전무, 확대하면 사람 형체와
-            기와가 뭉개져 있다. 북촌로11길에서 남산을 본 구도를 흉내낸 것이다.
-            나머지 넉 장은 흰 바탕 임시 이미지다. **손님을 받기 전에 전부 진짜 사진으로 바꾼다.**
-
-            2:3 — 원본 비율 그대로다. 잘리는 데 없이 세로가 길어진다.
-          */}
-          <div className="ktc-deck w-full md:justify-self-end">
-            <div className="ktc-deck-sticky relative mx-auto aspect-[2/3] w-full max-w-[31rem]">
-            {HERO_CARDS.map((card, i) => (
-              <figure
-                key={card.src}
-                style={{
-                  zIndex: HERO_CARDS.length - i,
-                  /* 마지막 장은 안 걷히므로 나누는 수는 (장수 - 1) 이다.
-                     장수로 나누면 마지막 구간이 통째로 빈 스크롤이 된다 */
-                  ["--ktc-from" as string]: `${(i / (HERO_CARDS.length - 1)) * 100}%`,
-                  ["--ktc-to" as string]: `${((i + 1) / (HERO_CARDS.length - 1)) * 100}%`,
-                }}
-                className={`absolute inset-0 overflow-hidden rounded-[1.75rem] border border-[var(--c-line-2)] bg-[var(--c-deep)] shadow-[0_28px_70px_-28px_rgba(0,0,0,0.7)] ${
-                  /* 마지막 장은 걷히지 않는다. 걷히면 뒤에 아무것도 없어 빈 자리가 남는다 */
-                  i < HERO_CARDS.length - 1 ? "ktc-deck-card" : ""
-                }`}
-              >
-                <Image
-                  src={card.src}
-                  alt={card.alt}
-                  fill
-                  sizes="(min-width: 768px) 42vw, 100vw"
-                  className="object-cover"
-                  unoptimized
-                  priority={i === 0}
-                />
-                {/* 아래를 어둡게 까는 건 글을 읽히게 하려는 것이다. 글이 없는 장은 사진을 가릴 뿐이다 */}
-                {i === 0 && (
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,22,32,.12)_35%,rgba(8,22,32,.82)_100%)]"
-                  />
-                )}
-                {/*
-                  글은 **첫 장에만** 둔다. 다섯 장에 다 얹으면 넘길 때마다 문장이 바뀌어
-                  읽으려다 말고, 사진도 글에 가린다. 뒤 장은 사진이 하게 둔다.
-                */}
-                {i === 0 && (
-                  <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-7">
-                    {/* 사진 위에 얹히는 글이다. 바탕 토큰을 따라가면 안 된다 — 어두운 사진 위에서 안 보인다 */}
-                    <p className="max-w-[12ch] font-[family-name:var(--font-display)] text-3xl leading-none text-[var(--c-text)] sm:text-4xl">
-                      {card.line}
-                    </p>
-                    <span className="grid h-16 w-16 flex-none place-items-center rounded-full border-2 border-[var(--c-bg)] bg-[var(--c-accent)] text-lg font-bold tracking-[0.12em] text-[var(--c-bg)] shadow-lg">
-                      {card.badge}
-                    </span>
-                  </figcaption>
-                )}
-                <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-[var(--c-bg)]/90 px-3 py-2 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-[0.15em] text-[var(--c-text)] backdrop-blur-sm sm:left-7 sm:top-7">
-                  <span aria-hidden className="h-2 w-2 rounded-full bg-[var(--c-accent)]" />
-                  {t({ ko: "현지의 시선", en: "Local view" })}
+              우리가 파는 게 "실제로 가보면 이렇다"는 정보라서, 첫 화면에 존재하지 않는
+              골목을 걸어두면 들키는 순간 무너지는 게 사진 한 장이 아니다.
+              **손님을 받기 전에 직접 찍은 사진이나 라이선스가 분명한 실사진으로 바꾼다.**
+              선경이 알고 있고, 지금은 자리를 채워두는 용도로만 둔다.
+            */}
+            {/* 2:3 — 원본 비율 그대로다. 잘리는 데 없이 세로가 길어진다 */}
+            <div className="relative aspect-[2/3]">
+              <Image
+                src="/seoul-blue-hour.jpg"
+                alt="A hanok-lined street in Seoul at blue hour, with Namsan Tower in the distance"
+                fill
+                sizes="(min-width: 768px) 42vw, 100vw"
+                className="object-cover"
+                preload
+                unoptimized
+              />
+              <div
+                aria-hidden
+                className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,22,32,.12)_35%,rgba(8,22,32,.82)_100%)]"
+              />
+              <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-[var(--c-bg)] sm:p-7">
+                <div>
+                  {/* 사진 위에 얹히는 글이다. 바탕 토큰을 따라가면 안 된다 — 어두운 사진 위에서 안 보인다 */}
+                  <p className="max-w-[12ch] font-[family-name:var(--font-display)] text-3xl leading-none text-[var(--c-text)] sm:text-4xl">
+                    {t({ ko: "오래된 지붕, 새로운 서울.", en: "Old roofs. New Seoul." })}
+                  </p>
                 </div>
-                {/* 몇 장 중 몇 번째인지. 넘어가는 중이라는 걸 알려주지 않으면 그냥 사진으로 보인다 */}
-                <div aria-hidden className="absolute right-5 top-5 flex gap-1.5 sm:right-7 sm:top-7">
-                  {HERO_CARDS.map((_, k) => (
-                    <span
-                      key={k}
-                      className={`h-1 w-4 rounded-full ${k === i ? "bg-[var(--c-accent)]" : "bg-[var(--c-text)]/35"}`}
-                    />
-                  ))}
-                </div>
-              </figure>
-            ))}
+                <span className="grid h-16 w-16 flex-none place-items-center rounded-full border-2 border-[var(--c-bg)] bg-[var(--c-accent)] text-lg font-bold tracking-[0.12em] shadow-lg">
+                  서울
+                </span>
+              </figcaption>
+              <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full bg-[var(--c-bg)]/90 px-3 py-2 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-[0.15em] text-[var(--c-text)] backdrop-blur-sm sm:left-7 sm:top-7">
+                <span aria-hidden className="h-2 w-2 rounded-full bg-[var(--c-accent)]" />
+                {t({ ko: "현지의 시선", en: "Local view" })}
+              </div>
             </div>
-          </div>
+          </figure>
         </div>
 
         <div className="ktc-route mt-14">
@@ -521,12 +449,12 @@ export default async function Home() {
       </section>
 
       {/* ── how it works ────────────────────────────────── */}
-      <section className="ktc-rise border-t border-[var(--c-line-2)]">
+      <section className="border-t border-[var(--c-line-2)]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
             {t({ ko: "진행 방식", en: "How it works" })}
           </h2>
-          <ol className="ktc-rise mt-10 grid gap-10 md:grid-cols-3 md:gap-12">
+          <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-12">
             {steps.map((step, i) => (
               <li key={step.title}>
                 <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-accent)]">
@@ -543,7 +471,7 @@ export default async function Home() {
       </section>
 
       {/* ── free vs paid ────────────────────────────────── */}
-      <section className="ktc-rise border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
+      <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <h2 className="font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
             {t({ ko: "무엇이 무료이고, 무엇에 값을 치르는지", en: "What's free, and what you're paying for" })}
@@ -591,7 +519,7 @@ export default async function Home() {
       </section>
 
       {/* ── pricing + contact ───────────────────────────── */}
-      <section id="pricing" className="ktc-rise scroll-mt-20 border-t border-[var(--c-line-2)]">
+      <section id="pricing" className="scroll-mt-20 border-t border-[var(--c-line-2)]">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
           <div>
             <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">

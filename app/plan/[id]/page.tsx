@@ -86,7 +86,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         <p className="mt-5 text-lg leading-relaxed text-[var(--c-text-2)]">{trip.summary}</p>
 
         {/* ── 일자별 ───────────────────────────────────── */}
-        <ol className="ktc-rise mt-14 space-y-12">
+        <ol className="mt-14 space-y-12">
           {trip.days.map((day) => (
             <li key={day.dayNumber}>
               <div className="flex items-baseline gap-4">
@@ -113,7 +113,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         </ol>
 
         {/* ── 맛보기 팁 하나. 이 화면에서 제일 중요한 부분이다 ── */}
-        <figure className="ktc-rise mt-16 rounded-2xl bg-[var(--c-deep)] p-7 text-[var(--c-text-on-deep)] shadow-[0_24px_60px_-24px_rgba(18,33,28,0.55)] sm:p-9">
+        <figure className="mt-16 rounded-2xl bg-[var(--c-deep)] p-7 text-[var(--c-text-on-deep)] shadow-[0_24px_60px_-24px_rgba(18,33,28,0.55)] sm:p-9">
           <figcaption className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-accent-dim)]">
             {t({ ko: "컨시어지 팁 하나", en: "One concierge tip" })} · {trip.sampleTip.activityName}
           </figcaption>
@@ -137,7 +137,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         </figure>
 
         {/* ── 숙소·식당·예산 ───────────────────────────── */}
-        <dl className="ktc-rise mt-14 grid gap-8 border-t border-[var(--c-line-2)] pt-10 sm:grid-cols-3">
+        <dl className="mt-14 grid gap-8 border-t border-[var(--c-line-2)] pt-10 sm:grid-cols-3">
           <div>
             <dt className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
               {t({ ko: "묵을 곳", en: "Where to stay" })}
@@ -159,7 +159,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         </dl>
 
         {/* ── 여기서부터가 유료 ────────────────────────── */}
-        <section className="ktc-rise mt-16 rounded-2xl bg-[var(--c-surface)] p-7 sm:p-9">
+        <section className="mt-16 rounded-2xl bg-[var(--c-surface)] p-7 sm:p-9">
           <h2 className="font-[family-name:var(--font-display)] text-3xl leading-tight">
             {t({ ko: "팁 하나를 보셨습니다. 모든 정거장에 하나씩 있습니다.", en: "That\u2019s one tip. Every stop has one." })}
           </h2>
