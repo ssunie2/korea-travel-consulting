@@ -256,19 +256,22 @@ body {
       z-index: 1;
     }
     /*
-      **붙는 상자의 길이 = 카드 + 넘기는 데 쓸 스크롤.**
-      상자가 끝나면 카드가 풀리고 노선도가 그 뒤로 이어진다 — 겹치거나 숨을 수 없다.
-      상자 맨 위가 카드 자리라, 카드가 온전히 자리잡은 뒤부터 넘어간다.
+      **붙는 자리에 카드와 노선도가 같이 들어간다.**
+      그래서 카드가 넘어가는 내내 노선도가 이미 그 아래에 자리잡고 있다 —
+      빈 어둠도, 나중에 올라오는 것도 없다.
+
+      상자 길이 = 붙어 있을 것들 + 넘기는 데 쓸 스크롤.
+      상자가 끝나면 둘이 같이 풀리고 컨시어지 팁이 이어진다.
     */
     .ktc-deck {
       --ktc-card-h: calc(min(100vw - 3rem, 31rem) * 1.5);
-      height: calc(var(--ktc-card-h) + 110vh);
+      height: calc(var(--ktc-card-h) + 210vh);
       view-timeline-name: --ktc-deck;
       view-timeline-axis: block;
     }
     .ktc-deck-sticky {
       position: sticky;
-      top: 4rem;
+      top: 1.5rem;
     }
     .ktc-deck-card {
       transform-origin: 50% 85%;
