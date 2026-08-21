@@ -309,9 +309,14 @@ export default async function Home() {
               </p>
             </div>
 
+            {/*
+              제목만 조금 굵게. **굵은 서체로 바꾸지 않고 획을 두껍게 한다** —
+              쓰는 명조 계열은 굵은 획이 따로 없어서, 굵게 지정하면 브라우저가
+              억지로 늘려 뭉개진 글자가 된다. 획을 0.6px 키우면 서체 모양은 그대로다.
+            */}
             <h1
               className="mt-12 font-[family-name:var(--font-display)] text-[clamp(2.25rem,5.2vw,3.75rem)] leading-[1.24] tracking-tight"
-              style={{ wordSpacing: ".16em" }}
+              style={{ wordSpacing: ".16em", WebkitTextStroke: "0.6px currentColor" }}
             >
               <span className="whitespace-nowrap">
                 {t({ ko: "한국에 ", en: "Plan Korea like you know " })}
