@@ -58,21 +58,15 @@ const MOTION = `
   하나, **속도를 고르지 않게.** 22% 지점에서 회전은 벌써 갈 길의 27% 를 갔는데 위치는 4% 뿐이다 —
   제자리에서 기울기만 하다가 마지막에 확 빠진다. 고르게 움직이면 부드럽긴 해도 볼 게 없다.
 
-  둘, **카드마다 나가는 쪽을 번갈아.** 홀수는 왼쪽 위, 짝수는 오른쪽 위로 나간다.
-  값을 좌우 대칭으로 맞추지 않은 건 똑같이 뒤집으면 오히려 기계적으로 보여서다.
+  둘, **옆으로 민다.** 네 장 모두 같은 쪽(왼쪽)으로 나간다. 가로로 26% 가는 동안
+  세로로는 3.5% 만 움직여서, 들려서 사라지는 게 아니라 옆으로 넘겨지는 것으로 읽힌다.
+  기울기 5도는 넘길 때 손끝이 한쪽을 미는 느낌을 내려고 남겨둔 것이다.
 */
 @keyframes ktc-deck-lift {
   0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1 }
-  22% { transform: translate(-.2%, -.8%) rotate(-1.6deg) scale(.997); opacity: 1 }
-  55% { transform: translate(-1.4%, -4.2%) rotate(-3.4deg) scale(.986); opacity: 1 }
-  100% { transform: translate(-5%, -18%) rotate(-6deg) scale(.95); opacity: 0 }
-}
-/* 짝수 번째 카드는 반대쪽으로 나간다. 좌우가 번갈아야 한 장씩 튕겨내는 것처럼 보인다. */
-@keyframes ktc-deck-lift-alt {
-  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1 }
-  22% { transform: translate(.2%, -.9%) rotate(1.4deg) scale(.997); opacity: 1 }
-  55% { transform: translate(1.5%, -4.4%) rotate(3deg) scale(.986); opacity: 1 }
-  100% { transform: translate(4.6%, -18%) rotate(5.2deg) scale(.95); opacity: 0 }
+  22% { transform: translate(-1.2%, -.2%) rotate(-.8deg) scale(.997); opacity: 1 }
+  55% { transform: translate(-6%, -1%) rotate(-2.4deg) scale(.986); opacity: 1 }
+  100% { transform: translate(-26%, -3.5%) rotate(-5deg) scale(.95); opacity: 0 }
 }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
@@ -88,7 +82,6 @@ const MOTION = `
       animation-timeline: --ktc-deck;
       animation-range: contain var(--ktc-from) contain var(--ktc-to);
     }
-    .ktc-deck-card:nth-child(even) { animation-name: ktc-deck-lift-alt }
   }
 }
 /*
@@ -231,7 +224,24 @@ const STATIONS = [
 const TIPS = [
   {
     day: 1,
-    headline: t({ ko: "첫 한 시간이 남은 나흘을 정합니다.", en: "The first hour decides the next four days." }),
+    // 줄 위치를 직접 잡은 하나. 낱말 단위로 끊어도 "첫 한 시간이 남은 / 나흘을" 이 되는데,
+    // "첫 한 시간이" 와 "남은 나흘" 이 서로 대비되는 문장이라 거기서 끊어야 뜻이 산다.
+    headline: t({
+      ko: (
+        <>
+          첫 한 시간이
+          <br />
+          남은 나흘을 정합니다.
+        </>
+      ),
+      en: (
+        <>
+          The first hour
+          <br />
+          decides the next four days.
+        </>
+      ),
+    }),
     place: t({ ko: "인천공항", en: "Incheon Airport" }),
     dont: t({ ko: "공항 환전소에서 현금을 다 바꾼다.", en: "Change all your cash at the airport counter." }),
     do: t({
@@ -535,7 +545,11 @@ export default async function Home() {
                     <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-accent-soft)]">
                       {t({ ko: `DAY ${tip.day} · 환승역`, en: `Day ${tip.day} · Transfer here` })}
                     </p>
-                    <p className="mt-4 font-[family-name:var(--font-display)] text-3xl leading-tight sm:text-4xl">
+                    {/*
+                      break-keep: 한국어는 기본값이 **글자 아무 데서나 끊는 것**이라
+                      "나흘을" 이 "나흘 / 을" 로 갈라진다. 낱말(띄어쓰기) 단위로만 끊게 한다.
+                    */}
+                    <p className="mt-4 break-keep font-[family-name:var(--font-display)] text-3xl leading-tight sm:text-4xl">
                       {tip.headline}
                     </p>
                   </div>
