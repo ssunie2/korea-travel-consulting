@@ -849,15 +849,15 @@ export default async function Home() {
                 ko: (
                   <>
                     <span className="block md:inline">저희는 계획을 세우고, 예약은 손님이 하십니다.</span>{" "}
-                    <span className="block md:inline">숙소·식당·입장권을 대신 예약해 드리거나</span>{" "}
-                    <span className="block md:inline">그 대금을 받지 않습니다.</span>
+                    <span className="block mt-1.5 md:mt-0 md:inline">숙소·식당·입장권을 대신 예약해 드리거나</span>{" "}
+                    <span className="block mt-1.5 md:mt-0 md:inline">그 대금을 받지 않습니다.</span>
                   </>
                 ),
                 en: (
                   <>
                     <span className="block md:inline">We plan; you book.</span>{" "}
-                    <span className="block md:inline">We don&rsquo;t make reservations for you or take payment</span>{" "}
-                    <span className="block md:inline">for hotels, restaurants or tickets.</span>
+                    <span className="block mt-1.5 md:mt-0 md:inline">We don&rsquo;t make reservations for you or take payment</span>{" "}
+                    <span className="block mt-1.5 md:mt-0 md:inline">for hotels, restaurants or tickets.</span>
                   </>
                 ),
               })}
@@ -912,21 +912,28 @@ export default async function Home() {
                 ),
               })}
             </p>
-            <div className="mt-4 max-w-md space-y-1.5 leading-relaxed text-[var(--c-text-2)]">
-              {t({
-                ko: [
-                  "여행이 며칠이든 값은 하나입니다.",
-                  "처음부터 끝까지 만들어져 나오니",
-                  "예약할 통화도, 기다릴 사람도 없습니다.",
-                ],
-                en: [
-                  "One price, however long your trip is.",
-                  "It's put together for you start to finish —",
-                  "no call to book, nobody to wait on.",
-                ],
-              }).map((line, i) => (
-                <p key={i}>{line}</p>
-              ))}
+            {/*
+              값 이야기는 늘 제 줄에 두고, 뒤의 두 도막만 PC 에서 이어 붙인다.
+              폰은 셋 다 나뉜 채로 둔다. max-w 를 PC 에서 넓히지 않으면 이어 붙여도 다시 접힌다.
+            */}
+            <div className="mt-4 max-w-md space-y-1.5 leading-relaxed text-[var(--c-text-2)] md:max-w-none">
+              <p>{t({ ko: "여행이 며칠이든 값은 하나입니다.", en: "One price, however long your trip is." })}</p>
+              <p>
+                {t({
+                  ko: (
+                    <>
+                      <span className="block md:inline">처음부터 끝까지 만들어져 나오니</span>{" "}
+                      <span className="block mt-1.5 md:mt-0 md:inline">예약할 통화도, 기다릴 사람도 없습니다.</span>
+                    </>
+                  ),
+                  en: (
+                    <>
+                      <span className="block md:inline">It&rsquo;s put together for you start to finish —</span>{" "}
+                      <span className="block mt-1.5 md:mt-0 md:inline">no call to book, nobody to wait on.</span>
+                    </>
+                  ),
+                })}
+              </p>
             </div>
           </div>
           <div id="contact" className="scroll-mt-20 md:justify-self-end">
@@ -959,11 +966,22 @@ export default async function Home() {
           <span className="font-[family-name:var(--font-geist-sans)] font-semibold tracking-[-0.02em]">
             mohallae
           </span>
+          {/*
+            자리는 **대한민국 서울 → 개인정보 처리방침** 순이다.
+
+            처리방침 링크는 **평소에도 밑줄을 그어 둔다.** 개인정보 보호법 시행령 제31조와
+            KISA 안내가 처리방침을 다른 고지사항과 **구분되게** 표시하라고 한다.
+            전에는 마우스를 올려야만 밑줄이 나와서 평소에는 옆의 '대한민국 서울' 과
+            똑같아 보였다. 글자색도 한 단계 밝게 둬서 누를 수 있는 곳임을 알린다.
+          */}
           <div className="flex gap-5">
-            <Link href="/privacy" className="underline-offset-4 hover:underline">
+            <span>{t({ ko: "대한민국 서울", en: "Seoul, Korea" })}</span>
+            <Link
+              href="/privacy"
+              className="text-[var(--c-text)] underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+            >
               {t({ ko: "개인정보 처리방침", en: "Privacy" })}
             </Link>
-            <span>{t({ ko: "대한민국 서울", en: "Seoul, Korea" })}</span>
           </div>
         </div>
       </footer>
