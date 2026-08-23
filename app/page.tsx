@@ -813,16 +813,19 @@ export default async function Home() {
             >
               {t({ ko: "무료 초안부터 받아보기", en: "Start with the free draft" })}
             </Link>
-            <p className="mt-5 leading-relaxed text-[var(--c-text-2)]">
-              {t({ ko: "먼저 물어보고 싶으신가요?", en: "Rather just ask a question first?" })}{" "}
-              <Link
-                href="/contact"
-                className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
-              >
-                {t({ ko: "무엇이든 물어보세요", en: "Ask us anything" })}
-              </Link>
-              .
-            </p>
+            {/* 묻는 말과 누를 곳을 갈라 놓는다. 한 줄에 붙어 있으면 밑줄이 문장 끝에 묻힌다. */}
+            <div className="mt-5 space-y-1.5 leading-relaxed text-[var(--c-text-2)]">
+              <p>{t({ ko: "먼저 물어보고 싶으신가요?", en: "Rather just ask a question first?" })}</p>
+              <p>
+                <Link
+                  href="/contact"
+                  className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+                >
+                  {t({ ko: "무엇이든 물어보세요", en: "Ask us anything" })}
+                </Link>
+                .
+              </p>
+            </div>
           </div>
         </div>
       </section>
