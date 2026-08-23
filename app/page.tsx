@@ -48,21 +48,31 @@ const MOTION = `
   .ktc-route:has(#ktc-day-4:checked) .ktc-tip-4 { display: grid }
 }
 /*
-  카드가 한 방향으로만 미끄러져 나간다.
+  카드가 넘어가는 모양. **꺾지 않되 밋밋하지도 않게.**
 
-  전에는 튕기는 맛을 주려고 55% 에서 아래로 눌렀다가(+1.2%) 올리고,
-  88% 에서 -8% 까지 갔다가 -6.2% 로 되돌아왔다. **방향이 꺾이는 지점마다 눈에 걸린다** —
-  스크롤로 도는 애니메이션이라 손가락은 계속 한 쪽으로 가는데 그림만 반대로 가서 어긋난다.
+  처음엔 튕기는 맛을 주려고 55% 에서 아래로 눌렀다가 올리고, 88% 에서 되돌아오게 했다.
+  **방향이 꺾이는 지점마다 눈에 걸린다** — 스크롤로 도는 애니메이션이라 손가락은 계속
+  한 쪽으로 가는데 그림만 반대로 가서 어긋난다. 그래서 다섯 값 전부 한 방향으로만 두되,
+  꺾는 대신 **두 가지로 성격을 낸다.**
 
-  그래서 x·y·회전·크기·투명도 **다섯 값이 전부 한 방향으로만** 움직이게 뒀다.
-  꺾이는 데가 없으면 걸리는 데도 없다. 중간 두 지점은 곡선을 만들기 위한 것이지
-  방향을 바꾸지 않는다.
+  하나, **속도를 고르지 않게.** 22% 지점에서 회전은 벌써 갈 길의 27% 를 갔는데 위치는 4% 뿐이다 —
+  제자리에서 기울기만 하다가 마지막에 확 빠진다. 고르게 움직이면 부드럽긴 해도 볼 게 없다.
+
+  둘, **카드마다 나가는 쪽을 번갈아.** 홀수는 왼쪽 위, 짝수는 오른쪽 위로 나간다.
+  값을 좌우 대칭으로 맞추지 않은 건 똑같이 뒤집으면 오히려 기계적으로 보여서다.
 */
 @keyframes ktc-deck-lift {
   0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1 }
-  35% { transform: translate(-.8%, -3.2%) rotate(-1.8deg) scale(.988); opacity: 1 }
-  70% { transform: translate(-2.6%, -9.4%) rotate(-3.8deg) scale(.971); opacity: .85 }
+  22% { transform: translate(-.2%, -.8%) rotate(-1.6deg) scale(.997); opacity: 1 }
+  55% { transform: translate(-1.4%, -4.2%) rotate(-3.4deg) scale(.986); opacity: 1 }
   100% { transform: translate(-5%, -18%) rotate(-6deg) scale(.95); opacity: 0 }
+}
+/* 짝수 번째 카드는 반대쪽으로 나간다. 좌우가 번갈아야 한 장씩 튕겨내는 것처럼 보인다. */
+@keyframes ktc-deck-lift-alt {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1 }
+  22% { transform: translate(.2%, -.9%) rotate(1.4deg) scale(.997); opacity: 1 }
+  55% { transform: translate(1.5%, -4.4%) rotate(3deg) scale(.986); opacity: 1 }
+  100% { transform: translate(4.6%, -18%) rotate(5.2deg) scale(.95); opacity: 0 }
 }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
@@ -78,6 +88,7 @@ const MOTION = `
       animation-timeline: --ktc-deck;
       animation-range: contain var(--ktc-from) contain var(--ktc-to);
     }
+    .ktc-deck-card:nth-child(even) { animation-name: ktc-deck-lift-alt }
   }
 }
 /*
