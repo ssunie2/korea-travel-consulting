@@ -47,14 +47,27 @@ const MOTION = `
   .ktc-route:has(#ktc-day-3:checked) .ktc-tip-3,
   .ktc-route:has(#ktc-day-4:checked) .ktc-tip-4 { display: grid }
 }
-/* 사진 카드는 브라우저가 스크롤 위치를 읽어 한 장씩 천천히 걷는다. */
+/*
+  카드가 한 방향으로만 미끄러져 나간다.
+
+  전에는 튕기는 맛을 주려고 55% 에서 아래로 눌렀다가(+1.2%) 올리고,
+  88% 에서 -8% 까지 갔다가 -6.2% 로 되돌아왔다. **방향이 꺾이는 지점마다 눈에 걸린다** —
+  스크롤로 도는 애니메이션이라 손가락은 계속 한 쪽으로 가는데 그림만 반대로 가서 어긋난다.
+
+  그래서 x·y·회전·크기·투명도 **다섯 값이 전부 한 방향으로만** 움직이게 뒀다.
+  꺾이는 데가 없으면 걸리는 데도 없다. 중간 두 지점은 곡선을 만들기 위한 것이지
+  방향을 바꾸지 않는다.
+*/
 @keyframes ktc-deck-lift {
-  to { transform: translateY(-6%) rotate(-3.2deg) scale(.955); opacity: 0 }
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1 }
+  35% { transform: translate(-.8%, -3.2%) rotate(-1.8deg) scale(.988); opacity: 1 }
+  70% { transform: translate(-2.6%, -9.4%) rotate(-3.8deg) scale(.971); opacity: .85 }
+  100% { transform: translate(-5%, -18%) rotate(-6deg) scale(.95); opacity: 0 }
 }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .ktc-deck {
-      height: calc(100vh + 260vh);
+      height: calc(100vh + 310vh);
       view-timeline-name: --ktc-deck;
       view-timeline-axis: block;
     }
@@ -312,11 +325,11 @@ export default async function Home() {
             {/*
               제목만 조금 굵게. **굵은 서체로 바꾸지 않고 획을 두껍게 한다** —
               쓰는 명조 계열은 굵은 획이 따로 없어서, 굵게 지정하면 브라우저가
-              억지로 늘려 뭉개진 글자가 된다. 획을 0.6px 키우면 서체 모양은 그대로다.
+              억지로 늘려 뭉개진 글자가 된다. 획을 0.8px 키우면 서체 모양은 그대로다.
             */}
             <h1
-              className="mt-12 font-[family-name:var(--font-display)] text-[clamp(2.25rem,5.2vw,3.75rem)] leading-[1.24] tracking-tight"
-              style={{ wordSpacing: ".16em", WebkitTextStroke: "0.6px currentColor" }}
+              className="mt-12 font-[family-name:var(--font-display)] text-[clamp(2.25rem,5.4vw,3.875rem)] leading-[1.24] tracking-tight"
+              style={{ wordSpacing: ".16em", WebkitTextStroke: "0.8px currentColor" }}
             >
               <span className="whitespace-nowrap">
                 {t({ ko: "한국에 ", en: "Plan Korea like you know " })}
@@ -388,7 +401,12 @@ export default async function Home() {
 
           {/* 밝은 사진부터 시작해 스크롤할 때 한 장씩 걷히는 서울 카드 묶음. */}
           <div className="ktc-deck mt-14 w-full md:justify-self-end">
-            <div className="ktc-deck-sticky relative mx-auto aspect-[4/5] w-full max-w-[31rem]">
+            {/*
+              그림자 크기를 화면마다 달리 준다. **카드가 커지면 그림자도 같이 커져야 한다** —
+              PC 카드는 폰보다 37% 넓은데 그림자를 14px 로 두면 상대적으로 얇아져
+              폰에서 보이던 두께가 PC 에서는 사라진 것처럼 보인다. 카드 폭에 맞춰 같은 비율로 키웠다.
+            */}
+            <div className="ktc-deck-sticky relative mx-auto aspect-[4/5] w-full max-w-[31rem] shadow-[14px_16px_0_rgba(5,19,16,.58)] md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
               {HERO_CARDS.map((card, index) => (
                 <figure
                   key={card.number}
@@ -397,7 +415,7 @@ export default async function Home() {
                     ["--ktc-from" as string]: `${6 + index * 20}%`,
                     ["--ktc-to" as string]: `${26 + index * 20}%`,
                   }}
-                  className={`absolute inset-0 overflow-hidden border border-[var(--c-line-2)] bg-[var(--c-deep)] shadow-[0_28px_70px_-28px_rgba(0,0,0,.72)] ${
+                  className={`absolute inset-0 overflow-hidden border border-[var(--c-line-2)] bg-[var(--c-deep)] ${
                     index < HERO_CARDS.length - 1 ? "ktc-deck-card" : ""
                   }`}
                 >
