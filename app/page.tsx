@@ -609,12 +609,13 @@ export default async function Home() {
                     DAY {station.day}
                   </span>
 
+                  {/* 새로고침하면 늘 DAY 1 이 눌린 채로 시작한다 */}
                   <input
                     id={`ktc-day-${station.day}`}
                     type="radio"
                     name="ktc-day"
                     value={station.day}
-                    defaultChecked={station.day === 2}
+                    defaultChecked={station.day === 1}
                     aria-controls={`ktc-tip-${station.day}`}
                     className="peer sr-only"
                   />
