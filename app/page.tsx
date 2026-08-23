@@ -113,18 +113,34 @@ const MOTION = `
 }
 `;
 
+/**
+ * 진행 방식 세 단계.
+ *
+ * 설명글을 **두 도막으로 나눠 들고 있다.** 앞은 무엇을 주는지, 뒤는 그래서 어떻다는 것이다.
+ * 한 줄로 이어두면 브라우저가 자리 나는 대로 끊어서 "판단하실" 이 "판 / 단하실" 로 갈라졌다.
+ * 마침표 자리에서 우리가 끊어주면 그런 일이 없고, 읽는 사람도 두 가지를 따로 받는다.
+ */
 const steps = [
   {
     title: t({ ko: "여행 정보를 알려주세요", en: "Tell us about your trip" }),
-    body: t({ ko: "날짜, 기간, 동행, 관심사. 2분이면 되고 가입도 필요 없습니다.", en: "Dates, how long, who's coming, what you're into. Two minutes, no account." }),
+    body: t({
+      ko: ["날짜, 기간, 동행, 관심사.", "2분이면 되고 가입도 필요 없습니다."],
+      en: ["Dates, how long, who's coming, what you're into.", "Two minutes, no account."],
+    }),
   },
   {
     title: t({ ko: "무료 초안을 받으세요", en: "Get a free draft" }),
-    body: t({ ko: "일자별 개요와 컨시어지 팁 하나. 나머지가 어떨지 판단하실 수 있습니다.", en: "A day-by-day outline, plus one concierge tip so you can judge the rest." }),
+    body: t({
+      ko: ["일자별 개요와 컨시어지 팁 하나.", "나머지가 어떨지 판단하실 수 있습니다."],
+      en: ["A day-by-day outline, plus one concierge tip", "so you can judge the rest."],
+    }),
   },
   {
     title: t({ ko: "전체 일정을 받으세요", en: "Get the full plan" }),
-    body: t({ ko: "₩150,000. 모든 정거장에 팁이 붙고, 시간을 가장 덜 버리는 동선으로 짜드립니다.", en: "₩150,000. A tip at every stop, and the route that wastes the least of your time." }),
+    body: t({
+      ko: ["₩150,000.", "모든 정거장에 팁이 붙고, 시간을 가장 덜 버리는 동선으로 짜드립니다."],
+      en: ["₩150,000.", "A tip at every stop, and the route that wastes the least of your time."],
+    }),
   },
 ];
 
@@ -643,7 +659,15 @@ export default async function Home() {
                 <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl leading-tight">
                   {step.title}
                 </h3>
-                <p className="mt-2 leading-relaxed text-[var(--c-text-2)]">{step.body}</p>
+                {/* break-keep: 한국어가 낱말 가운데서 끊기지 않게. 큰제목과 같은 처리다. */}
+                {step.body.map((line, li) => (
+                  <p
+                    key={li}
+                    className={`break-keep leading-relaxed text-[var(--c-text-2)] ${li === 0 ? "mt-2" : "mt-1.5"}`}
+                  >
+                    {line}
+                  </p>
+                ))}
               </li>
             ))}
           </ol>
