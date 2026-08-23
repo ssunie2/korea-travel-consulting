@@ -726,12 +726,29 @@ export default async function Home() {
             </div>
           </div>
           {/* 우리는 여행사가 아니다. 이 선을 손님에게도 분명히 해둔다 (규칙 6번) */}
-          <p className="mt-10 max-w-2xl leading-relaxed text-[var(--c-text-3)]">
+          {/*
+            네 도막으로 끊어 읽힌다. **여기가 규칙 6번을 손님에게 밝히는 자리라**
+            한 덩어리로 뭉쳐 있으면 "안 한다"는 말이 문단에 묻힌다.
+            무엇을 하는지 / 무엇을 안 하는지 / 대금은 안 받는지 / 대신 무엇을 하는지, 넷을 갈랐다.
+          */}
+          <div className="mt-10 max-w-2xl space-y-1.5 leading-relaxed text-[var(--c-text-3)]">
             {t({
-              ko: "저희는 계획을 세우고, 예약은 손님이 하십니다. 숙소·식당·입장권을 대신 예약해 드리거나 그 대금을 받지 않습니다 — 무엇을 어떻게 예약하면 되는지 알려드립니다.",
-              en: "We plan; you book. We don't make reservations for you or take payment for hotels, restaurants or tickets — we tell you exactly what to book and how.",
-            })}
-          </p>
+              ko: [
+                "저희는 계획을 세우고, 예약은 손님이 하십니다.",
+                "숙소·식당·입장권을 대신 예약해 드리거나",
+                "그 대금을 받지 않습니다.",
+                "— 무엇을 어떻게 예약하면 되는지 알려드립니다.",
+              ],
+              en: [
+                "We plan; you book.",
+                "We don't make reservations for you or take payment",
+                "for hotels, restaurants or tickets.",
+                "— We tell you exactly what to book and how.",
+              ],
+            }).map((line, i) => (
+              <p key={i}>{line}</p>
+            ))}
+          </div>
         </div>
       </section>
 
