@@ -187,18 +187,28 @@ const free = t({
 });
 
 /* 규칙 6번(#28): 예약 대행·통역은 쓰지 않는다. 우리는 알려주고, 예약은 손님이 한다. */
-const paid = t({
+/**
+ * 유료 항목. **글자 하나면 한 줄, 둘이면 아랫줄에 작게 붙는다.**
+ *
+ * 전에는 `팁 — 건너뛸 것` 처럼 한 줄로 이어 붙였는데, 줄이 넘치면 줄표 뒤가
+ * 아무 데나 걸쳐서 두 도막이 한 덩어리로 뭉개졌다. 줄을 나누고 **줄표는 아랫줄 맨 앞으로**
+ * 옮긴다 — 그 자리가 윗줄 첫 글자와 같은 왼쪽 끝이라 두 줄이 나란히 선다.
+ * 뒷도막은 앞도막을 풀어 주는 말이라 한 단계 작게 둔다.
+ *
+ * 줄표는 글자에 넣지 않고 그리는 쪽에서 붙인다 — 자료에 두면 언어마다 빠뜨리기 쉽다.
+ */
+const paid = t<(string | [string, string])[]>({
   ko: [
-    "모든 정거장에 팁 — 건너뛸 것, 현지인은 어떻게 하는지",
+    ["모든 정거장에 팁", "건너뛸 것, 현지인은 어떻게 하는지"],
     "숙소 다섯 곳과 식당 다섯 곳, 고른 이유까지",
     "비용 항목별 분해, 동선과 시간 계산",
-    "무엇을 언제 예약하면 되는지 — 한국 전화로만 받는 곳까지",
+    ["무엇을 언제 예약하면 되는지", "한국 전화로만 받는 곳까지"],
   ],
   en: [
-    "A tip on every stop — what to skip, what locals do",
+    ["A tip on every stop", "what to skip, what locals do"],
     "Five stays and five restaurants, with reasons",
     "Costs broken down, routes and timing worked out",
-    "Exactly what to book and when — including the places that only take Korean phone reservations",
+    ["Exactly what to book and when", "including the places that only take Korean phone reservations"],
   ],
 });
 
@@ -421,7 +431,13 @@ export default async function Home() {
       <div className="relative z-[1]">
       {/* ── 역명판 + 하늘 ─────────────────────────────── */}
       <section>
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12 md:[&>div:first-child]:sticky md:[&>div:first-child]:top-[12vh]">
+        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12 md:[&>div:first-child]:sticky md:[&>div:first-child]:top-12 md:[&>div:first-child]:min-h-[40rem]">
+          {/*
+            왼쪽 글 칸을 카드와 같은 높이(top-12 = 48px)에 고정한다.
+            전에는 12vh(900px 화면에서 108px)였다 — 카드 윗선보다 60px 아래라
+            둘이 어긋나 보였다. **카드의 .ktc-deck-sticky 도 top: 3rem(48px)이므로
+            둘 중 하나를 고치면 다른 쪽도 같이 맞춰야 한다.**
+          */}
           <div>
             {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
             <div>
@@ -524,7 +540,18 @@ export default async function Home() {
               PC 카드는 폰보다 37% 넓은데 그림자를 14px 로 두면 상대적으로 얇아져
               폰에서 보이던 두께가 PC 에서는 사라진 것처럼 보인다. 카드 폭에 맞춰 같은 비율로 키웠다.
             */}
-            <div className="ktc-deck-sticky relative mx-auto aspect-[4/5] w-full max-w-[31rem] shadow-[14px_16px_0_rgba(5,19,16,.58)] md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
+            {/*
+              **붙는 칸(바깥)과 카드 상자(안)를 나눠 둔다.** 둘을 한 요소에 두면
+              aspect-[4/5] 와 min-h 가 서로 싸워서 폭이 튄다(전에 겪었다).
+
+              바깥에 md:min-h-[40rem] 을 주는 이유는 **왼쪽 글 칸과 같이 떨어지게** 하기 위해서다 —
+              스티키는 제 높이만큼 늦게 풀리므로, 짧은 쪽이 나중에 풀려 카드만 먼저 올라갔다.
+              양쪽을 같은 값으로 묶으면 둘이 같은 지점에서 함께 풀린다.
+              40rem 은 카드가 제일 클 때(31rem × 5/4 = 38.75rem)보다 크게 잡은 값이다.
+              **왼쪽 글 칸에도 같은 값이 걸려 있다. 한쪽만 바꾸면 다시 어긋난다.**
+            */}
+            <div className="ktc-deck-sticky mx-auto w-full max-w-[31rem] md:min-h-[40rem]">
+              <div className="relative aspect-[4/5] w-full shadow-[14px_16px_0_rgba(5,19,16,.58)] md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
               {HERO_CARDS.map((card, index) => (
                 <figure
                   key={card.number}
@@ -567,6 +594,7 @@ export default async function Home() {
                   </figcaption>
                 </figure>
               ))}
+              </div>
             </div>
           </div>
         </div>
@@ -603,12 +631,13 @@ export default async function Home() {
                     DAY {station.day}
                   </span>
 
+                  {/* 새로고침하면 늘 DAY 1 이 눌린 채로 시작한다 */}
                   <input
                     id={`ktc-day-${station.day}`}
                     type="radio"
                     name="ktc-day"
                     value={station.day}
-                    defaultChecked={station.day === 2}
+                    defaultChecked={station.day === 1}
                     aria-controls={`ktc-tip-${station.day}`}
                     className="peer sr-only"
                   />
@@ -725,16 +754,18 @@ export default async function Home() {
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
             {t({
+              // block md:inline — 폰에서는 줄을 나누고 PC 에서는 이어 붙인다.
+              // PC 는 칸이 넓어 두 줄로 끊으면 오른쪽이 비어 왼쪽으로 쏠려 보인다.
               ko: (
                 <>
-                  <span className="block">무엇이 무료이고,</span>
-                  <span className="block">무엇에 값을 치르는지</span>
+                  <span className="block md:inline">무엇이 무료이고,</span>{" "}
+                  <span className="block md:inline">무엇에 값을 치르는지</span>
                 </>
               ),
               en: (
                 <>
-                  <span className="block">What&rsquo;s free,</span>
-                  <span className="block">and what you&rsquo;re paying for</span>
+                  <span className="block md:inline">What&rsquo;s free,</span>{" "}
+                  <span className="block md:inline">and what you&rsquo;re paying for</span>
                 </>
               ),
             })}
@@ -774,14 +805,30 @@ export default async function Home() {
                 })}
               </p>
               <ul className="mt-4 space-y-3">
-                {paid.map((item) => (
-                  <li key={item} className="flex gap-3 leading-relaxed">
-                    <span aria-hidden className="select-none text-lg leading-relaxed text-[var(--c-accent)]">
-                      •
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
+                {paid.map((item) => {
+                  const [head, note] = Array.isArray(item) ? item : [item, null];
+                  return (
+                    <li key={head} className="flex gap-3 leading-relaxed">
+                      <span aria-hidden className="select-none text-lg leading-relaxed text-[var(--c-accent)]">
+                        •
+                      </span>
+                      <span>
+                        {head}
+                        {/*
+                          풀어 주는 말. 아랫줄에 한 단계 작게, **줄표를 맨 앞에 둔다.**
+                          이 span 은 block 이라 왼쪽 끝이 윗줄 첫 글자와 같은 자리다 —
+                          그래서 줄표가 윗 항목과 나란히 선다. 들여쓰기를 더 주면 안 된다.
+                        */}
+                        {note && (
+                          <span className="block text-sm">
+                            <span aria-hidden className="select-none">— </span>
+                            {note}
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>
@@ -791,23 +838,36 @@ export default async function Home() {
             한 덩어리로 뭉쳐 있으면 "안 한다"는 말이 문단에 묻힌다.
             무엇을 하는지 / 무엇을 안 하는지 / 대금은 안 받는지 / 대신 무엇을 하는지, 넷을 갈랐다.
           */}
-          <div className="mt-10 max-w-2xl space-y-1.5 leading-relaxed text-[var(--c-text-3)]">
-            {t({
-              ko: [
-                "저희는 계획을 세우고, 예약은 손님이 하십니다.",
-                "숙소·식당·입장권을 대신 예약해 드리거나",
-                "그 대금을 받지 않습니다.",
-                "— 무엇을 어떻게 예약하면 되는지 알려드립니다.",
-              ],
-              en: [
-                "We plan; you book.",
-                "We don't make reservations for you or take payment",
-                "for hotels, restaurants or tickets.",
-                "— We tell you exactly what to book and how.",
-              ],
-            }).map((line, i) => (
-              <p key={i}>{line}</p>
-            ))}
+          {/*
+            앞 세 도막은 **폰에서만 줄을 나눈다.** PC 에서는 이어 붙어 한 문단이 된다 —
+            칸이 넓은데 짧게 끊으면 오른쪽이 비어 글이 왼쪽으로 쏠려 보인다.
+            줄표로 시작하는 마지막 도막은 어디서나 제 줄에 남는다. 그게 이 문단의 결론이다.
+          */}
+          <div className="mt-10 max-w-4xl space-y-1.5 leading-relaxed text-[var(--c-text-3)]">
+            <p>
+              {t({
+                ko: (
+                  <>
+                    <span className="block md:inline">저희는 계획을 세우고, 예약은 손님이 하십니다.</span>{" "}
+                    <span className="block mt-1.5 md:mt-0 md:inline">숙소·식당·입장권을 대신 예약해 드리거나</span>{" "}
+                    <span className="block mt-1.5 md:mt-0 md:inline">그 대금을 받지 않습니다.</span>
+                  </>
+                ),
+                en: (
+                  <>
+                    <span className="block md:inline">We plan; you book.</span>{" "}
+                    <span className="block mt-1.5 md:mt-0 md:inline">We don&rsquo;t make reservations for you or take payment</span>{" "}
+                    <span className="block mt-1.5 md:mt-0 md:inline">for hotels, restaurants or tickets.</span>
+                  </>
+                ),
+              })}
+            </p>
+            <p>
+              {t({
+                ko: "— 무엇을 어떻게 예약하면 되는지 알려드립니다.",
+                en: "— We tell you exactly what to book and how.",
+              })}
+            </p>
           </div>
         </div>
       </section>
@@ -852,21 +912,28 @@ export default async function Home() {
                 ),
               })}
             </p>
-            <div className="mt-4 max-w-md space-y-1.5 leading-relaxed text-[var(--c-text-2)]">
-              {t({
-                ko: [
-                  "여행이 며칠이든 값은 하나입니다.",
-                  "처음부터 끝까지 만들어져 나오니",
-                  "예약할 통화도, 기다릴 사람도 없습니다.",
-                ],
-                en: [
-                  "One price, however long your trip is.",
-                  "It's put together for you start to finish —",
-                  "no call to book, nobody to wait on.",
-                ],
-              }).map((line, i) => (
-                <p key={i}>{line}</p>
-              ))}
+            {/*
+              값 이야기는 늘 제 줄에 두고, 뒤의 두 도막만 PC 에서 이어 붙인다.
+              폰은 셋 다 나뉜 채로 둔다. max-w 를 PC 에서 넓히지 않으면 이어 붙여도 다시 접힌다.
+            */}
+            <div className="mt-4 max-w-md space-y-1.5 leading-relaxed text-[var(--c-text-2)] md:max-w-none">
+              <p>{t({ ko: "여행이 며칠이든 값은 하나입니다.", en: "One price, however long your trip is." })}</p>
+              <p>
+                {t({
+                  ko: (
+                    <>
+                      <span className="block md:inline">처음부터 끝까지 만들어져 나오니</span>{" "}
+                      <span className="block mt-1.5 md:mt-0 md:inline">예약할 통화도, 기다릴 사람도 없습니다.</span>
+                    </>
+                  ),
+                  en: (
+                    <>
+                      <span className="block md:inline">It&rsquo;s put together for you start to finish —</span>{" "}
+                      <span className="block mt-1.5 md:mt-0 md:inline">no call to book, nobody to wait on.</span>
+                    </>
+                  ),
+                })}
+              </p>
             </div>
           </div>
           <div id="contact" className="scroll-mt-20 md:justify-self-end">
@@ -899,11 +966,22 @@ export default async function Home() {
           <span className="font-[family-name:var(--font-geist-sans)] font-semibold tracking-[-0.02em]">
             mohallae
           </span>
+          {/*
+            자리는 **대한민국 서울 → 개인정보 처리방침** 순이다.
+
+            처리방침 링크는 **평소에도 밑줄을 그어 둔다.** 개인정보 보호법 시행령 제31조와
+            KISA 안내가 처리방침을 다른 고지사항과 **구분되게** 표시하라고 한다.
+            전에는 마우스를 올려야만 밑줄이 나와서 평소에는 옆의 '대한민국 서울' 과
+            똑같아 보였다. 글자색도 한 단계 밝게 둬서 누를 수 있는 곳임을 알린다.
+          */}
           <div className="flex gap-5">
-            <Link href="/privacy" className="underline-offset-4 hover:underline">
+            <span>{t({ ko: "대한민국 서울", en: "Seoul, Korea" })}</span>
+            <Link
+              href="/privacy"
+              className="text-[var(--c-text)] underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+            >
               {t({ ko: "개인정보 처리방침", en: "Privacy" })}
             </Link>
-            <span>{t({ ko: "대한민국 서울", en: "Seoul, Korea" })}</span>
           </div>
         </div>
       </footer>
