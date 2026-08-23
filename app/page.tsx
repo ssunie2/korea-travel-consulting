@@ -120,6 +120,26 @@ const MOTION = `
  * 한 줄로 이어두면 브라우저가 자리 나는 대로 끊어서 "판단하실" 이 "판 / 단하실" 로 갈라졌다.
  * 마침표 자리에서 우리가 끊어주면 그런 일이 없고, 읽는 사람도 두 가지를 따로 받는다.
  */
+/**
+ * 원화 기호 하나. **쓰는 서체에 ₩(U+20A9)가 없어서** 브라우저가 다른 서체로 대신 그린다.
+ * 그 대신 그리는 서체의 ₩ 는 옆에 오는 숫자와 키가 안 맞는다 — 브라우저에서 재보니
+ * Geist Mono 옆에서는 **20% 크고**, Instrument Serif 옆에서는 **24% 작다.**
+ * (₩ 는 늘 같은 서체에서 오는데 숫자 쪽 서체가 달라서 방향이 반대로 나온다)
+ *
+ * 그래서 자리마다 잰 값을 넣어 키를 맞춘다. ₩ 는 베이스라인에 앉는 글자라
+ * 크기만 줄이고 늘리면 밑선은 그대로 맞는다.
+ *
+ * 숫자는 안 감싼다 — 감싸면 서체에 있는 글자까지 건드리게 되고, 고칠 이유가 없다.
+ */
+function Won({ scale }: { scale: number }) {
+  return <span style={{ fontSize: `${scale}em` }}>₩</span>;
+}
+
+/** 모노 서체 옆에서 쓰는 값. 12px 기준으로 ₩ 잉크 12px, 숫자 10px 이었다 */
+const WON_MONO = 0.833;
+/** 명조 서체 옆. 28px 기준으로 ₩ 16px, 숫자 21px 이었다 */
+const WON_SERIF = 1.313;
+
 const steps = [
   {
     title: t({ ko: "여행 정보를 알려주세요", en: "Tell us about your trip" }),
@@ -137,9 +157,16 @@ const steps = [
   },
   {
     title: t({ ko: "전체 일정을 받으세요", en: "Get the full plan" }),
+    // 값은 제목 옆에 붙는다. 셋 중 이 단계에만 있다.
+    price: (
+      <>
+        <Won scale={WON_MONO} />
+        150,000
+      </>
+    ),
     body: t({
-      ko: ["₩150,000.", "모든 정거장에 팁이 붙고,", "시간을 효율적으로 쓸 수 있게 동선을 짜드립니다."],
-      en: ["₩150,000.", "A tip at every stop,", "and a route that makes good use of your time."],
+      ko: ["모든 정거장에 팁이 붙고,", "시간을 효율적으로 쓸 수 있게 동선을 짜드립니다."],
+      en: ["A tip at every stop,", "and a route that makes good use of your time."],
     }),
   },
 ];
@@ -656,8 +683,18 @@ export default async function Home() {
                 <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-accent)]">
                   {String(i + 1).padStart(2, "0")}
                 </span>
+                {/*
+                  값은 **제목 옆에, 제목 절반 크기로.** 제목이 24px 이니 12px 다.
+                  baseline 이 아니라 가운데(align-middle)에 맞춘다 — 크기 차이가 두 배라
+                  밑줄을 맞추면 값이 바닥에 가라앉아 딸려 붙은 것처럼 보인다.
+                */}
                 <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl leading-tight">
                   {step.title}
+                  {"price" in step && (
+                    <span className="ml-2 align-middle font-[family-name:var(--font-geist-mono)] text-xs tracking-tight text-[var(--c-text-3)]">
+                      {step.price}
+                    </span>
+                  )}
                 </h3>
                 {/* break-keep: 한국어가 낱말 가운데서 끊기지 않게. 큰제목과 같은 처리다. */}
                 {step.body.map((line, li) => (
@@ -712,7 +749,20 @@ export default async function Home() {
             </div>
             <div>
               <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent)]">
-                {t({ ko: "전체 일정 · ₩150,000", en: "Full plan · ₩150,000" })}
+                {t({
+                  ko: (
+                    <>
+                      전체 일정 · <Won scale={WON_MONO} />
+                      150,000
+                    </>
+                  ),
+                  en: (
+                    <>
+                      Full plan · <Won scale={WON_MONO} />
+                      150,000
+                    </>
+                  ),
+                })}
               </p>
               <ul className="mt-4 space-y-3">
                 {paid.map((item) => (
@@ -779,7 +829,10 @@ export default async function Home() {
                 ko: (
                   <>
                     <span className="block">초안은 무료입니다.</span>
-                    <span className="block">전체 일정은 ₩150,000 입니다.</span>
+                    <span className="block">
+                      전체 일정은 <Won scale={WON_SERIF} />
+                      150,000 입니다.
+                    </span>
                   </>
                 ),
                 en: (
