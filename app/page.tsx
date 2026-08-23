@@ -789,12 +789,22 @@ export default async function Home() {
                 ),
               })}
             </p>
-            <p className="mt-4 max-w-md leading-relaxed text-[var(--c-text-2)]">
+            <div className="mt-4 max-w-md space-y-1.5 leading-relaxed text-[var(--c-text-2)]">
               {t({
-                ko: "여행이 며칠이든 값은 하나입니다. 처음부터 끝까지 만들어져 나오니 예약할 통화도, 기다릴 사람도 없습니다.",
-                en: "One price, however long your trip is. It's put together for you start to finish — so there's no call to book and nobody to wait on.",
-              })}
-            </p>
+                ko: [
+                  "여행이 며칠이든 값은 하나입니다.",
+                  "처음부터 끝까지 만들어져 나오니",
+                  "예약할 통화도, 기다릴 사람도 없습니다.",
+                ],
+                en: [
+                  "One price, however long your trip is.",
+                  "It's put together for you start to finish —",
+                  "no call to book, nobody to wait on.",
+                ],
+              }).map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </div>
           </div>
           <div id="contact" className="scroll-mt-20 md:justify-self-end">
             <Link
