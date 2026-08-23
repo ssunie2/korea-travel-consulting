@@ -632,8 +632,35 @@ export default async function Home() {
             <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
               {t({ ko: "가격", en: "Pricing" })}
             </p>
-            <p className="mt-4 font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
-              {t({ ko: "초안은 무료입니다. 전체 일정은 ₩150,000 입니다.", en: "The draft is free. The full plan is ₩150,000." })}
+            {/*
+              두 문장을 각각 한 줄에 놓는다. **줄이 넘치면 줄바꿈 대신 글자가 작아진다.**
+
+              그냥 30px 로 두면 375px 폰에서 제일 긴 줄("전체 일정은 ₩150,000 입니다.")이
+              334px 라 327px 인 자리를 6px 넘겨, "전체 일 / 정은" 처럼 낱말 가운데서 잘렸다.
+
+              그 줄의 폭을 재보니 글자 크기의 11.12배다. 그래서 **자리 너비를 11.6 으로 나눈 값**을
+              글자 크기로 준다(11.12 대신 11.6 은 서체가 늦게 뜰 때를 위한 여유다).
+              이러면 화면이 좁아지는 만큼 글자도 같이 줄어 항상 한 줄에 들어간다.
+
+              폰과 PC 는 자리 너비를 구하는 식이 다르다 — PC 는 2단이라 화면의 절반에서
+              여백(24px)과 단 사이(40px)를 뺀다. clamp 의 양 끝은 원래 크기(30px / 36px)를
+              넘지 않게, 그리고 너무 작아지지 않게 잡은 것이다.
+            */}
+            <p className="mt-4 font-[family-name:var(--font-display)] leading-tight text-[clamp(1.25rem,calc((100vw_-_3rem)/11.6),1.875rem)] md:text-[clamp(1.5rem,calc((50vw_-_44px)/11.6),2.25rem)]">
+              {t({
+                ko: (
+                  <>
+                    <span className="block">초안은 무료입니다.</span>
+                    <span className="block">전체 일정은 ₩150,000 입니다.</span>
+                  </>
+                ),
+                en: (
+                  <>
+                    <span className="block">The draft is free.</span>
+                    <span className="block">The full plan is ₩150,000.</span>
+                  </>
+                ),
+              })}
             </p>
             <p className="mt-4 max-w-md leading-relaxed text-[var(--c-text-2)]">
               {t({
