@@ -421,7 +421,13 @@ export default async function Home() {
       <div className="relative z-[1]">
       {/* ── 역명판 + 하늘 ─────────────────────────────── */}
       <section>
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12 md:[&>div:first-child]:sticky md:[&>div:first-child]:top-[12vh]">
+        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12 md:[&>div:first-child]:sticky md:[&>div:first-child]:top-12">
+          {/*
+            왼쪽 글 칸을 카드와 같은 높이(top-12 = 48px)에 고정한다.
+            전에는 12vh(900px 화면에서 108px)였다 — 카드 윗선보다 60px 아래라
+            둘이 어긋나 보였다. **카드의 .ktc-deck-sticky 도 top: 3rem(48px)이므로
+            둘 중 하나를 고치면 다른 쪽도 같이 맞춰야 한다.**
+          */}
           <div>
             {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
             <div>
