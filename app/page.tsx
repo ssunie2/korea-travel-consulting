@@ -187,18 +187,25 @@ const free = t({
 });
 
 /* 규칙 6번(#28): 예약 대행·통역은 쓰지 않는다. 우리는 알려주고, 예약은 손님이 한다. */
-const paid = t({
+/**
+ * 유료 항목. **글자 하나면 한 줄, 둘이면 아랫줄에 작게 붙는다.**
+ *
+ * 전에는 `팁 — 건너뛸 것` 처럼 줄표로 이어 붙였는데, 줄이 넘치면 줄표 뒤가
+ * 아무 데나 걸쳐서 두 도막이 한 덩어리로 뭉개졌다. 줄표를 빼고 아예 줄을 나눈다.
+ * 뒷도막은 앞도막을 풀어 주는 말이라 한 단계 작게 둔다.
+ */
+const paid = t<(string | [string, string])[]>({
   ko: [
-    "모든 정거장에 팁 — 건너뛸 것, 현지인은 어떻게 하는지",
+    ["모든 정거장에 팁", "건너뛸 것, 현지인은 어떻게 하는지"],
     "숙소 다섯 곳과 식당 다섯 곳, 고른 이유까지",
     "비용 항목별 분해, 동선과 시간 계산",
-    "무엇을 언제 예약하면 되는지 — 한국 전화로만 받는 곳까지",
+    ["무엇을 언제 예약하면 되는지", "한국 전화로만 받는 곳까지"],
   ],
   en: [
-    "A tip on every stop — what to skip, what locals do",
+    ["A tip on every stop", "what to skip, what locals do"],
     "Five stays and five restaurants, with reasons",
     "Costs broken down, routes and timing worked out",
-    "Exactly what to book and when — including the places that only take Korean phone reservations",
+    ["Exactly what to book and when", "including the places that only take Korean phone reservations"],
   ],
 });
 
@@ -781,14 +788,21 @@ export default async function Home() {
                 })}
               </p>
               <ul className="mt-4 space-y-3">
-                {paid.map((item) => (
-                  <li key={item} className="flex gap-3 leading-relaxed">
-                    <span aria-hidden className="select-none text-lg leading-relaxed text-[var(--c-accent)]">
-                      •
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
+                {paid.map((item) => {
+                  const [head, note] = Array.isArray(item) ? item : [item, null];
+                  return (
+                    <li key={head} className="flex gap-3 leading-relaxed">
+                      <span aria-hidden className="select-none text-lg leading-relaxed text-[var(--c-accent)]">
+                        •
+                      </span>
+                      <span>
+                        {head}
+                        {/* 풀어 주는 말. 아랫줄에 한 단계 작게 */}
+                        {note && <span className="block text-sm">{note}</span>}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>
