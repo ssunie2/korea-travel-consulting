@@ -287,7 +287,23 @@ const TIPS = [
   },
   {
     day: 4,
-    headline: t({ ko: "마지막 정거장에서 제일 많이 헤맵니다.", en: "The last stop is the one people get wrong." }),
+    // 장소("마지막 정거장에서")와 그 장소에서 벌어지는 일("제일 많이 헤맵니다")을 갈라 놓는다.
+    headline: t({
+      ko: (
+        <>
+          마지막 정거장에서
+          <br />
+          제일 많이 헤맵니다.
+        </>
+      ),
+      en: (
+        <>
+          The last stop
+          <br />
+          is the one people get wrong.
+        </>
+      ),
+    }),
     place: t({ ko: "남산 · N서울타워", en: "Namsan & N Seoul Tower" }),
     dont: t({ ko: "타워 입구까지 택시를 탄다.", en: "Take a taxi to the tower entrance." }),
     do: t({
