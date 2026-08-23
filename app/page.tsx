@@ -277,7 +277,23 @@ const TIPS = [
   },
   {
     day: 3,
-    headline: t({ ko: "어떤 골목은 누군가의 대문 앞입니다.", en: "Some streets are someone's front door." }),
+    // "누군가의 대문" 은 한 덩어리라 갈라지면 안 된다. 앞마디에서 끊는다.
+    headline: t({
+      ko: (
+        <>
+          어떤 골목은
+          <br />
+          누군가의 대문 앞입니다.
+        </>
+      ),
+      en: (
+        <>
+          Some streets
+          <br />
+          are someone&rsquo;s front door.
+        </>
+      ),
+    }),
     place: t({ ko: "북촌한옥마을", en: "Bukchon Hanok Village" }),
     dont: t({ ko: "사람 없는 사진을 찍으려고 아침 8시에 간다.", en: "Arrive at 8am for empty photos." }),
     do: t({
