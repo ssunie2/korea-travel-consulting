@@ -512,7 +512,13 @@ export default async function Home() {
           </div>
 
           {/* 밝은 사진부터 시작해 스크롤할 때 한 장씩 걷히는 서울 카드 묶음. */}
-          <div className="ktc-deck mt-14 w-full md:justify-self-end">
+          {/*
+            md:mt-0 — **PC 에서는 위 여백을 없앤다.** mt-14(56px)가 카드를 처음에
+            아래로 밀어놔서, 스크롤을 조금 하면 카드가 스티키 자리(48px)로 올라앉는
+            한 번의 움직임이 생겼다. 그 56px 이 화면에 보이던 단차다.
+            폰은 카드가 글 아래에 오므로 이 여백이 그대로 필요하다.
+          */}
+          <div className="ktc-deck mt-14 w-full md:mt-0 md:justify-self-end">
             {/*
               그림자 크기를 화면마다 달리 준다. **카드가 커지면 그림자도 같이 커져야 한다** —
               PC 카드는 폰보다 37% 넓은데 그림자를 14px 로 두면 상대적으로 얇아져
@@ -524,8 +530,11 @@ export default async function Home() {
                   key={card.number}
                   style={{
                     zIndex: HERO_CARDS.length - index,
-                    ["--ktc-from" as string]: `${6 + index * 20}%`,
-                    ["--ktc-to" as string]: `${26 + index * 20}%`,
+                    // 0% 부터 시작한다. 전에는 6% 부터라 카드가 제자리에 앉고도
+                    // 한참(228px) 스크롤해야 첫 장이 넘어갔다. 네 장이 23% 씩 나눠 갖고
+                    // 마지막 8% 는 남은 한 장을 보는 자리로 둔다.
+                    ["--ktc-from" as string]: `${index * 23}%`,
+                    ["--ktc-to" as string]: `${(index + 1) * 23}%`,
                   }}
                   className={`absolute inset-0 overflow-hidden border border-[var(--c-line-2)] bg-[var(--c-deep)] ${
                     index < HERO_CARDS.length - 1 ? "ktc-deck-card" : ""
