@@ -431,7 +431,7 @@ export default async function Home() {
       <div className="relative z-[1]">
       {/* ── 역명판 + 하늘 ─────────────────────────────── */}
       <section>
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12 md:[&>div:first-child]:sticky md:[&>div:first-child]:top-12">
+        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12 md:[&>div:first-child]:sticky md:[&>div:first-child]:top-12 md:[&>div:first-child]:min-h-[40rem]">
           {/*
             왼쪽 글 칸을 카드와 같은 높이(top-12 = 48px)에 고정한다.
             전에는 12vh(900px 화면에서 108px)였다 — 카드 윗선보다 60px 아래라
@@ -540,7 +540,18 @@ export default async function Home() {
               PC 카드는 폰보다 37% 넓은데 그림자를 14px 로 두면 상대적으로 얇아져
               폰에서 보이던 두께가 PC 에서는 사라진 것처럼 보인다. 카드 폭에 맞춰 같은 비율로 키웠다.
             */}
-            <div className="ktc-deck-sticky relative mx-auto aspect-[4/5] w-full max-w-[31rem] shadow-[14px_16px_0_rgba(5,19,16,.58)] md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
+            {/*
+              **붙는 칸(바깥)과 카드 상자(안)를 나눠 둔다.** 둘을 한 요소에 두면
+              aspect-[4/5] 와 min-h 가 서로 싸워서 폭이 튄다(전에 겪었다).
+
+              바깥에 md:min-h-[40rem] 을 주는 이유는 **왼쪽 글 칸과 같이 떨어지게** 하기 위해서다 —
+              스티키는 제 높이만큼 늦게 풀리므로, 짧은 쪽이 나중에 풀려 카드만 먼저 올라갔다.
+              양쪽을 같은 값으로 묶으면 둘이 같은 지점에서 함께 풀린다.
+              40rem 은 카드가 제일 클 때(31rem × 5/4 = 38.75rem)보다 크게 잡은 값이다.
+              **왼쪽 글 칸에도 같은 값이 걸려 있다. 한쪽만 바꾸면 다시 어긋난다.**
+            */}
+            <div className="ktc-deck-sticky mx-auto w-full max-w-[31rem] md:min-h-[40rem]">
+              <div className="relative aspect-[4/5] w-full shadow-[14px_16px_0_rgba(5,19,16,.58)] md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
               {HERO_CARDS.map((card, index) => (
                 <figure
                   key={card.number}
@@ -583,6 +594,7 @@ export default async function Home() {
                   </figcaption>
                 </figure>
               ))}
+              </div>
             </div>
           </div>
         </div>
