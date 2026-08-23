@@ -677,8 +677,21 @@ export default async function Home() {
       {/* ── free vs paid ────────────────────────────────── */}
       <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <h2 className="font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
-            {t({ ko: "무엇이 무료이고, 무엇에 값을 치르는지", en: "What's free, and what you're paying for" })}
+          <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
+            {t({
+              ko: (
+                <>
+                  <span className="block">무엇이 무료이고,</span>
+                  <span className="block">무엇에 값을 치르는지</span>
+                </>
+              ),
+              en: (
+                <>
+                  <span className="block">What&rsquo;s free,</span>
+                  <span className="block">and what you&rsquo;re paying for</span>
+                </>
+              ),
+            })}
           </h2>
           <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-16">
             <div>
