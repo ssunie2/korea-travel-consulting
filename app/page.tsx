@@ -701,8 +701,9 @@ export default async function Home() {
               <ul className="mt-4 space-y-3">
                 {free.map((item) => (
                   <li key={item} className="flex gap-3 leading-relaxed">
-                    <span aria-hidden className="text-[var(--c-text-3)]">
-                      —
+                    {/* 목록 기호. aria-hidden 은 화면 낭독기가 ul/li 로 이미 목록임을 알리기 때문이다 */}
+                    <span aria-hidden className="select-none text-lg leading-relaxed text-[var(--c-text-3)]">
+                      •
                     </span>
                     <span className="text-[var(--c-text-2)]">{item}</span>
                   </li>
@@ -716,8 +717,8 @@ export default async function Home() {
               <ul className="mt-4 space-y-3">
                 {paid.map((item) => (
                   <li key={item} className="flex gap-3 leading-relaxed">
-                    <span aria-hidden className="text-[var(--c-accent)]">
-                      —
+                    <span aria-hidden className="select-none text-lg leading-relaxed text-[var(--c-accent)]">
+                      •
                     </span>
                     <span>{item}</span>
                   </li>
