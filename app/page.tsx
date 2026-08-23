@@ -138,8 +138,8 @@ const steps = [
   {
     title: t({ ko: "전체 일정을 받으세요", en: "Get the full plan" }),
     body: t({
-      ko: ["₩150,000.", "모든 정거장에 팁이 붙고, 시간을 가장 덜 버리는 동선으로 짜드립니다."],
-      en: ["₩150,000.", "A tip at every stop, and the route that wastes the least of your time."],
+      ko: ["₩150,000.", "모든 정거장에 팁이 붙고,", "시간을 효율적으로 쓸 수 있게 동선을 짜드립니다."],
+      en: ["₩150,000.", "A tip at every stop,", "and a route that makes good use of your time."],
     }),
   },
 ];
