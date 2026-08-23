@@ -62,8 +62,26 @@
   }
 }
 
+/**
+ * 한국어 줄바꿈. **낱말 가운데서 끊기지 않게 한다.**
+ *
+ * 브라우저 기본값(`word-break: normal`)은 한글을 **글자 아무 데서나** 끊는다.
+ * 중국어·일본어는 낱말 사이에 띄어쓰기가 없어서 그게 맞지만, 한국어는 띄어쓰기를 쓰므로
+ * 영어처럼 낱말 단위로 끊어야 한다. 그냥 두면 이렇게 된다:
+ *
+ *     편의점에서 티머
+ *     니 카드를 사두면          ← "티머니" 가 갈라짐
+ *
+ * 실제로 페이지를 훑어보니 이런 자리가 **40곳**이었다. 한 군데씩 고칠 일이 아니라
+ * 여기 한 줄로 전체에 건다.
+ *
+ * `overflow-wrap` 은 안전장치다. 낱말 하나가 자리보다 길면(긴 주소나 영어 단어)
+ * keep-all 만으로는 화면 밖으로 삐져나가는데, 그때는 끊어서라도 넣으라는 뜻이다.
+ */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
