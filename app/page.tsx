@@ -251,7 +251,23 @@ const TIPS = [
   },
   {
     day: 2,
-    headline: t({ ko: "하나만 어긋나도 하루가 통째로 바뀝니다.", en: "One detail can reroute a whole day." }),
+    // "하나만 어긋나도" 가 조건, "하루가 통째로" 가 결과다. 그 사이에서 끊는다.
+    headline: t({
+      ko: (
+        <>
+          하나만 어긋나도
+          <br />
+          하루가 통째로 바뀝니다.
+        </>
+      ),
+      en: (
+        <>
+          One detail
+          <br />
+          can reroute a whole day.
+        </>
+      ),
+    }),
     place: t({ ko: "경복궁", en: "Gyeongbokgung Palace" }),
     dont: t({ ko: "화요일 오전 10시, 여기서 시작.", en: "Tuesday morning, 10:00 — start here." }),
     do: t({
