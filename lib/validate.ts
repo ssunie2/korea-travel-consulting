@@ -76,6 +76,7 @@ export function validatePlanInput(raw: unknown): { ok: true; value: PlanInput } 
       durationDays,
       travelers,
       budgetPerPerson,
+      budgetRange: text(d.budgetRange, 60),
       budgetCurrency,
       styles,
       audience: text(d.audience, 40),

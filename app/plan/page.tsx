@@ -93,6 +93,21 @@ const AVOIDS = [
   { v: "Spicy food", ko: "매운 음식" }, { v: "Late nights", ko: "늦은 밤 일정" },
   { v: "Long travel legs", ko: "긴 이동" }, { v: "Drinking", ko: "술자리" },
 ];
+/**
+ * 1인 예산 구간. **숫자를 직접 적게 하면 손님이 멈춘다** — 한국 물가를 모르니
+ * 얼마를 적어야 할지 감이 없다. 보기에서 고르면 그 자리에서 넘어간다.
+ *
+ * 원화 옆에 달러를 같이 적는다. 손님은 해외 여행객이라 원화 감각이 없고,
+ * 달러만 적으면 우리가 실제로 짤 예산과 어긋난다. (1달러 ≈ 1,350원으로 어림한 값)
+ * 보기에 없으면 '기타' 로 직접 적는다.
+ */
+const BUDGETS = [
+  { v: "Under 100,000 KRW (about $75)", ko: "10만원 미만 (약 $75)" },
+  { v: "100,000–150,000 KRW (about $75–110)", ko: "10–15만원 (약 $75–110)" },
+  { v: "150,000–200,000 KRW (about $110–150)", ko: "15–20만원 (약 $110–150)" },
+  { v: "200,000–300,000 KRW (about $150–220)", ko: "20–30만원 (약 $150–220)" },
+  { v: "Over 300,000 KRW (about $220)", ko: "30만원 이상 (약 $220)" },
+];
 const CURRENCIES = ["KRW", "USD", "EUR", "JPY"];
 const LANGUAGES = [
   { code: "en", label: "English" },
@@ -206,7 +221,7 @@ export default function PlanForm() {
           // 9/13 에 와서 9/15 에 간다면 이틀 밤, 사흘치 일정이다
           durationDays: nightsBetween(dateStart, dateEnd) + 1,
           travelers: Number(f.get("travelers")),
-          budgetPerPerson: f.get("budgetPerPerson") ? Number(f.get("budgetPerPerson")) : undefined,
+          budgetRange: f.get("budgetRange") || undefined,
           budgetCurrency: f.get("budgetCurrency"),
           audience: f.get("audience") || undefined,
           pace: f.get("pace") || undefined,
@@ -361,18 +376,25 @@ export default function PlanForm() {
             </label>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-[2fr_1fr]">
-            <label className="block">
-              <span className={label}>{t({ ko: "1인 예산", en: "Budget per person" })}</span>
-              <input type="number" name="budgetPerPerson" min={0} placeholder="Optional" className={field} />
-            </label>
+          <div className="grid gap-6 sm:grid-cols-2">
             <Select
-                label={t({ ko: "통화", en: "Currency" })}
-                name="budgetCurrency"
-                defaultValue="USD"
-                options={CURRENCIES.map((c) => ({ value: c, label: c }))}
-                placeholder="USD"
-              />
+              label={t({ ko: "1인 예산", en: "Budget per person" })}
+              name="budgetRange"
+              options={BUDGETS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+              placeholder={t({ ko: "고르세요", en: "Choose one" })}
+              allowOther
+            />
+            {/*
+              통화는 이제 '얼마인가' 가 아니라 **'비용을 어느 돈으로 보여드릴까'** 를 묻는다.
+              예산은 위에서 구간으로 받으므로 여기서 금액을 겹쳐 묻지 않는다.
+            */}
+            <Select
+              label={t({ ko: "비용을 어느 통화로 볼까요", en: "Show costs in" })}
+              name="budgetCurrency"
+              defaultValue="USD"
+              options={CURRENCIES.map((c) => ({ value: c, label: c }))}
+              placeholder="USD"
+            />
           </div>
 
           <fieldset>

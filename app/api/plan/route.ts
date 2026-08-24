@@ -54,6 +54,7 @@ export async function POST(req: Request) {
       start_date: input.startDate,
       duration_days: input.durationDays,
       travelers: input.travelers,
+      budget_range: input.budgetRange ?? null,
       budget_per_person: input.budgetPerPerson ?? null,
       budget_currency: input.budgetCurrency,
       styles: input.styles,

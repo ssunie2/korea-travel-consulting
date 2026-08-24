@@ -8,8 +8,15 @@ export type PlanInput = {
   startDate: string // 'YYYY-MM-DD'
   durationDays: number
   travelers: number
+  /**
+   * 1인 예산 **구간**. 숫자가 아니라 '10–15만원 (약 $75–110)' 같은 글자다 —
+   * 손님은 한국 물가를 몰라 숫자를 적기 어렵고, 우리도 정확한 액수보다
+   * 어느 급인지만 알면 일정을 짤 수 있다.
+   */
+  budgetRange?: string
+  /** 옛 숫자 칸. 구간으로 바뀌기 전 초안들에 값이 남아 있다 */
   budgetPerPerson?: number
-  /** 손님은 해외 여행객이라 달러·유로로 생각한다 */
+  /** 비용을 어느 돈으로 보여줄지. 손님은 해외 여행객이라 달러·유로로 읽는다 */
   budgetCurrency: string
   styles: string[]
   audience?: string
@@ -144,6 +151,7 @@ export type Plan = {
   start_date: string
   duration_days: number
   travelers: number
+  budget_range: string | null
   budget_per_person: number | null
   budget_currency: string
   styles: string[]

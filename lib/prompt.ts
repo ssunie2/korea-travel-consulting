@@ -87,9 +87,12 @@ function shape(input: PlanInput): string {
 }
 
 export function buildFreeDraftPrompt(input: PlanInput): string {
-  const budget = input.budgetPerPerson
-    ? `about ${input.budgetPerPerson.toLocaleString()} ${input.budgetCurrency} per person`
-    : 'not specified'
+  // 구간(새 방식)이 있으면 그것을 쓴다. 숫자(옛 방식)는 예전 초안에만 남아 있다.
+  const budget = input.budgetRange
+    ? `${input.budgetRange} per person`
+    : input.budgetPerPerson
+      ? `about ${input.budgetPerPerson.toLocaleString()} ${input.budgetCurrency} per person`
+      : 'not specified'
 
   return `You are a Korean travel consultant writing a FREE TEASER itinerary for a foreign visitor.
 
@@ -99,6 +102,7 @@ Trip:
 - Length: ${input.durationDays} days
 - Travelers: ${input.travelers} (${input.audience ?? 'unspecified group'})
 - Budget: ${budget}
+- Show every cost in ${input.budgetCurrency}.
 - Styles: ${input.styles.length ? input.styles.join(', ') : 'no preference'}
 ${shape(input)}${input.dietary?.length ? `- MUST WORK AROUND: ${input.dietary.join(', ')}\n  Every food recommendation has to respect this. Do not suggest anything they cannot eat or reach.` : ''}
 - Stay inside the places listed above. Do not add cities they did not ask for.
@@ -234,9 +238,11 @@ export const fullItinerarySchema = {
  * 그래서 지시문의 절반이 동선과 예산에 대한 것이다.
  */
 export function buildFullPlanPrompt(input: PlanInput): string {
-  const budget = input.budgetPerPerson
-    ? `${input.budgetPerPerson.toLocaleString()} ${input.budgetCurrency} per person for the whole trip`
-    : 'not specified — assume mid-range'
+  const budget = input.budgetRange
+    ? `${input.budgetRange} per person`
+    : input.budgetPerPerson
+      ? `${input.budgetPerPerson.toLocaleString()} ${input.budgetCurrency} per person for the whole trip`
+      : 'not specified — assume mid-range'
 
   return `You are a Korean travel planner. This traveler has PAID for a full plan.
 They are not paying for more words. They are paying for two things:
@@ -252,6 +258,7 @@ Trip:
 - Length: ${input.durationDays} days
 - Travelers: ${input.travelers} (${input.audience ?? 'unspecified group'})
 - Budget: ${budget}
+- Show every cost in ${input.budgetCurrency}.
 - Styles: ${input.styles.length ? input.styles.join(', ') : 'no preference'}
 ${shape(input)}${input.dietary?.length ? `- MUST WORK AROUND: ${input.dietary.join(', ')}\n  Every food recommendation must respect this. Do not suggest anything they cannot eat or reach.` : ''}
 

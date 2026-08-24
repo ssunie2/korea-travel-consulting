@@ -57,6 +57,7 @@ async function generateFullPlan(formData: FormData) {
       startDate: plan.start_date,
       durationDays: plan.duration_days,
       travelers: plan.travelers,
+      budgetRange: plan.budget_range ?? undefined,
       budgetPerPerson: plan.budget_per_person ?? undefined,
       budgetCurrency: plan.budget_currency,
       styles: plan.styles,
