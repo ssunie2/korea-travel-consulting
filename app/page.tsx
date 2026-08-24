@@ -165,15 +165,15 @@ function Won({ scale }: { scale: number }) {
 
 /** 모노 서체 옆에서 쓰는 값. 12px 기준으로 ₩ 잉크 12px, 숫자 10px 이었다 */
 const WON_MONO = 0.833;
-/** 명조 서체 옆. 28px 기준으로 ₩ 16px, 숫자 21px 이었다 */
-const WON_SERIF = 1.313;
 
 const steps = [
   {
     title: t({ ko: "여행 정보를 알려주세요", en: "Tell us about your trip" }),
     body: t({
-      ko: ["날짜, 기간, 동행, 관심사.", "2분이면 되고 가입도 필요 없습니다."],
-      en: ["Dates, how long, who's coming, what you're into.", "Two minutes, no account."],
+      // '등' 으로 열어 둔다. 폼에서 묻는 것이 넷보다 많아졌고(속도·이동 수단·숙소·예산…),
+      // 마침표로 닫으면 딱 넷만 묻는 것처럼 읽힌다.
+      ko: ["날짜, 기간, 동행, 관심사 등", "2분이면 되고 가입도 필요 없습니다."],
+      en: ["Dates, how long, who's coming, what you're into, and more", "Two minutes, no account."],
     }),
   },
   {
@@ -909,37 +909,39 @@ export default async function Home() {
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
           <div>
             <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
-              {t({ ko: "가격", en: "Pricing" })}
+              {/*
+                전에는 '가격' 이었다. 값을 뺀 자리라 그 이름은 더 이상 맞지 않는다 —
+                가격이라 적어 두고 값이 없으면 손님이 값을 찾다가 못 찾는다.
+              */}
+              {t({ ko: "시작하기", en: "Get started" })}
             </p>
             {/*
               두 문장을 각각 한 줄에 놓는다. **줄이 넘치면 줄바꿈 대신 글자가 작아진다.**
 
-              그냥 30px 로 두면 375px 폰에서 제일 긴 줄("전체 일정은 ₩150,000 입니다.")이
-              334px 라 327px 인 자리를 6px 넘겨, "전체 일 / 정은" 처럼 낱말 가운데서 잘렸다.
+              고정 크기로 두면 375px 폰에서 제일 긴 줄이 자리를 넘겨 낱말 가운데서 잘린다.
+              (전에 "전체 일정은 ₩150,000 입니다." 가 334px 라 327px 자리를 6px 넘겼다)
 
-              그 줄의 폭을 재보니 글자 크기의 11.12배다. 그래서 **자리 너비를 11.6 으로 나눈 값**을
-              글자 크기로 준다(11.12 대신 11.6 은 서체가 늦게 뜰 때를 위한 여유다).
+              제일 긴 줄("지금 바로 여행 일정 받아보세요.")의 폭이 글자 크기의 12.14배다.
+              그래서 **자리 너비를 12.6 으로 나눈 값**을
+              글자 크기로 준다(12.14 대신 12.6 은 서체가 늦게 뜰 때를 위한 여유다).
               이러면 화면이 좁아지는 만큼 글자도 같이 줄어 항상 한 줄에 들어간다.
 
               폰과 PC 는 자리 너비를 구하는 식이 다르다 — PC 는 2단이라 화면의 절반에서
               여백(24px)과 단 사이(40px)를 뺀다. clamp 의 양 끝은 원래 크기(30px / 36px)를
               넘지 않게, 그리고 너무 작아지지 않게 잡은 것이다.
             */}
-            <p className="mt-4 font-[family-name:var(--font-display)] leading-tight text-[clamp(1.25rem,calc((100vw_-_3rem)/11.6),1.875rem)] md:text-[clamp(1.5rem,calc((50vw_-_44px)/11.6),2.25rem)]">
+            <p className="mt-4 font-[family-name:var(--font-display)] leading-tight text-[clamp(1.25rem,calc((100vw_-_3rem)/12.6),1.875rem)] md:text-[clamp(1.5rem,calc((50vw_-_44px)/12.6),2.25rem)]">
               {t({
                 ko: (
                   <>
                     <span className="block">초안은 무료입니다.</span>
-                    <span className="block">
-                      전체 일정은 <Won scale={WON_SERIF} />
-                      150,000 입니다.
-                    </span>
+                    <span className="block">지금 바로 여행 일정 받아보세요.</span>
                   </>
                 ),
                 en: (
                   <>
                     <span className="block">The draft is free.</span>
-                    <span className="block">The full plan is ₩150,000.</span>
+                    <span className="block">Get your itinerary now.</span>
                   </>
                 ),
               })}
