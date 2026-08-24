@@ -55,6 +55,12 @@ export default function Select({
   // 키보드로 훑고 있는 자리. 고른 것(value)과 다르다 — 아직 정하지 않았을 뿐이다.
   const [cursor, setCursor] = useState(0);
   const boxRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  /**
+   * 목록을 위로 열지 아래로 열지. **화면 아래쪽 칸은 아래로 열면 목록이 화면 밖으로 나간다.**
+   * 열 때 한 번만 재서 정한다 — 열려 있는 동안 계속 재면 스크롤할 때마다 방향이 뒤집힌다.
+   */
+  const [dropUp, setDropUp] = useState(false);
   const listId = useId();
   const labelId = useId();
 
@@ -86,6 +92,16 @@ export default function Select({
     return () => document.removeEventListener("mousedown", away);
   }, [open]);
 
+  /** 열기 전에 아래에 자리가 있는지 본다. 모자라고 위가 더 넓으면 위로 연다. */
+  function decideDirection() {
+    const box = btnRef.current?.getBoundingClientRect();
+    if (!box) return;
+    // 한 줄 44px + 안쪽 여백. 실제로 그려 보기 전에는 이 어림이 가장 가깝다.
+    const needed = Math.min(all.length * 44 + 12, window.innerHeight * 0.7);
+    const below = window.innerHeight - box.bottom - 12;
+    setDropUp(below < needed && box.top > below);
+  }
+
   function choose(v: string) {
     setValue(v);
     setOpen(false);
@@ -97,6 +113,7 @@ export default function Select({
       if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         setCursor(Math.max(0, all.findIndex((o) => o.value === value)));
+        decideDirection();
         setOpen(true);
       }
       return;
@@ -136,6 +153,7 @@ export default function Select({
       <input type="hidden" name={name} value={submitted} />
 
       <button
+        ref={btnRef}
         type="button"
         role="combobox"
         aria-labelledby={label ? `${labelId} ${listId}-value` : undefined}
@@ -144,6 +162,7 @@ export default function Select({
         aria-haspopup="listbox"
         onClick={() => {
           setCursor(Math.max(0, all.findIndex((o) => o.value === value)));
+          if (!open) decideDirection();
           setOpen((v) => !v);
         }}
         onKeyDown={onKey}
@@ -182,7 +201,14 @@ export default function Select({
           role="listbox"
           aria-label={placeholder}
           tabIndex={-1}
-          className="absolute z-20 mt-2 max-h-72 w-full overflow-auto rounded-2xl border border-[var(--c-line)] bg-[var(--c-surface-2)] p-1.5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.7)]"
+          /*
+            max-h-[70vh]: 전에는 288px 이라 보기가 일곱만 돼도 마지막 줄(기타)이 잘려
+            스크롤해야 보였다. 화면 높이의 70% 까지 늘려 웬만한 목록은 한눈에 들어온다.
+            그보다 긴 목록만 스크롤이 생긴다.
+          */
+          className={`absolute z-20 max-h-[70vh] w-full overflow-auto rounded-2xl border border-[var(--c-line)] bg-[var(--c-surface-2)] p-1.5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.7)] ${
+            dropUp ? "bottom-full mb-2" : "top-full mt-2"
+          }`}
         >
           {all.map((o, i) => {
             const picked = o.value === value;
