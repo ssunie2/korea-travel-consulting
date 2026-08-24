@@ -9,6 +9,7 @@ import bukchon from "@/public/landing/bukchon.webp";
 import gwangjangMarket from "@/public/landing/gwangjang-market.webp";
 import hanRiver from "@/public/landing/han-river.webp";
 import gyeongbokgung from "@/public/landing/gyeongbokgung.webp";
+import RouteScrollDays from "@/components/RouteScrollDays";
 
 // 표제용 서체. layout.tsx 를 건드리지 않으려고 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -68,6 +69,25 @@ const MOTION = `
   55% { transform: translate(-6%, -1%) rotate(-2.4deg) scale(.986); opacity: 1 }
   100% { transform: translate(-26%, -3.5%) rotate(-5deg) scale(.95); opacity: 0 }
 }
+/*
+  노선도를 스크롤로 넘기기 위한 자리.
+
+  **PC 에서만 붙여 둔다.** 폰에서는 노선 그림과 팁을 합친 높이(861px)가
+  화면(812px)보다 커서, 붙여 두면 아래가 잘린다. 폰은 붙이지 않고 지나가면서 넘어간다.
+
+  높이 200vh 는 날짜 넷이 나눠 갖는 스크롤 길이다 — 한 날에 50vh 씩.
+  글을 읽을 틈은 주되 지루하지 않을 만큼으로 잡았다.
+  실제로 날짜를 옮기는 것은 components/RouteScrollDays.tsx 다.
+*/
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .ktc-route { min-height: calc(100vh + 200vh) }
+  .ktc-route-pin { position: sticky; top: 3rem }
+}
+/*
+  폰에서는 붙이지 않는다. 노선 그림만 붙여 봤더니 아래 팁이 그 밑으로 들어가면서
+  팁 제목이 잘렸다. 대신 **노선 그림이 화면에 있는 동안** 날짜가 다 넘어가게 했다 —
+  components/RouteScrollDays.tsx 가 폰에서는 노선 그림을 기준으로 잰다.
+*/
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .ktc-deck {
@@ -607,8 +627,11 @@ export default async function Home() {
         </div>
 
         <div className="ktc-route mt-14">
+          <RouteScrollDays days={STATIONS.length} />
+          {/* PC 에서 이 칸이 화면에 붙어 있는 동안 날짜가 넘어간다 */}
+          <div className="ktc-route-pin">
           {/* 누르는 자리를 그림 위에 겹쳐야 해서 relative 가 필요하다 */}
-          <div className="relative">
+          <div className="ktc-route-scene relative">
             <MetroScene scene={NARROW} className="block h-auto w-full md:hidden" />
             <MetroScene scene={WIDE} className="hidden h-auto w-full md:block" />
 
@@ -712,6 +735,7 @@ export default async function Home() {
                 </div>
               </figure>
             ))}
+          </div>
           </div>
         </div>
       </section>
