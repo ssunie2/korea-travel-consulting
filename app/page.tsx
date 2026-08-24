@@ -828,20 +828,13 @@ export default async function Home() {
             </div>
             <div>
               <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent)]">
-                {t({
-                  ko: (
-                    <>
-                      전체 일정 · <Won scale={WON_MONO} />
-                      150,000
-                    </>
-                  ),
-                  en: (
-                    <>
-                      Full plan · <Won scale={WON_MONO} />
-                      150,000
-                    </>
-                  ),
-                })}
+                {/*
+                  값은 여기서 빼 두었다 (선경·뮤조 판단, 2026-08-24).
+                  이 칸은 **무엇을 받는지** 를 보여주는 자리다. 목록 머리에 값부터 나오면
+                  아래 내용을 읽기 전에 값으로 먼저 판단하게 된다.
+                  값은 아래 '가격' 칸과 진행 방식 03 에 그대로 있다.
+                */}
+                {t({ ko: "전체 일정", en: "Full plan" })}
               </p>
               <ul className="mt-4 space-y-3">
                 {paid.map((item) => {
