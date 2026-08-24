@@ -917,7 +917,12 @@ export default async function Home() {
               폰은 셋 다 나뉜 채로 둔다. max-w 를 PC 에서 넓히지 않으면 이어 붙여도 다시 접힌다.
             */}
             <div className="mt-4 max-w-md space-y-1.5 leading-relaxed text-[var(--c-text-2)] md:max-w-none">
-              <p>{t({ ko: "여행이 며칠이든 값은 하나입니다.", en: "One price, however long your trip is." })}</p>
+              {/*
+                '여행이 며칠이든 값은 하나입니다.' 였다. 랜딩에서 값을 안 보여주기로 하면서
+                그 문장만 남으니 손님이 그 하나가 얼만지 알 수 없어 애매해졌다.
+                무게를 **얼마인지** 에서 **길이와 상관없다** 는 쪽으로 옮겼다.
+              */}
+              <p>{t({ ko: "며칠을 가시든 값은 같습니다.", en: "The price is the same however long you stay." })}</p>
               <p>
                 {t({
                   ko: (
