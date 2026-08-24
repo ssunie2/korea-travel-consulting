@@ -113,7 +113,9 @@ THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
   first-time visitor would get wrong. Make it specific and concrete, not generic advice.
   This one tip is what convinces them we know Korea. Make it count.
 - Name only ONE place to stay and ONE place to eat, names only, no explanation.
-- Give a total cost estimate only. No breakdown.
+- Give a cost estimate only, no breakdown. **Write BOTH per person AND the group total**,
+  in that order, in ${input.budgetCurrency}. The traveller told us their budget per person,
+  so a group-only number leaves them doing the division themselves.
 - Do NOT include: per-activity tips, alternative options, photo spots, what to wear,
   packing lists, booking instructions, or transport details. Those belong to the paid consultation.
 
@@ -127,7 +129,8 @@ Field notes:
 - sampleTip.highlight: the must-do, max 12 words
 - sampleTip.pitfall: a specific mistake first-timers make here
 - sampleTip.insiderSecret: something only a local would know
-- totalEstimate: one line, whole trip`
+- totalEstimate: one line, per person first then the group total
+  (e.g. "450,000 KRW per person · 900,000 KRW for 2")`
 }
 
 const place = {

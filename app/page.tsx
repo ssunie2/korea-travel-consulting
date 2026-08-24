@@ -148,32 +148,17 @@ const MOTION = `
  * 한 줄로 이어두면 브라우저가 자리 나는 대로 끊어서 "판단하실" 이 "판 / 단하실" 로 갈라졌다.
  * 마침표 자리에서 우리가 끊어주면 그런 일이 없고, 읽는 사람도 두 가지를 따로 받는다.
  */
-/**
- * 원화 기호 하나. **쓰는 서체에 ₩(U+20A9)가 없어서** 브라우저가 다른 서체로 대신 그린다.
- * 그 대신 그리는 서체의 ₩ 는 옆에 오는 숫자와 키가 안 맞는다 — 브라우저에서 재보니
- * Geist Mono 옆에서는 **20% 크고**, Instrument Serif 옆에서는 **24% 작다.**
- * (₩ 는 늘 같은 서체에서 오는데 숫자 쪽 서체가 달라서 방향이 반대로 나온다)
- *
- * 그래서 자리마다 잰 값을 넣어 키를 맞춘다. ₩ 는 베이스라인에 앉는 글자라
- * 크기만 줄이고 늘리면 밑선은 그대로 맞는다.
- *
- * 숫자는 안 감싼다 — 감싸면 서체에 있는 글자까지 건드리게 되고, 고칠 이유가 없다.
- */
-function Won({ scale }: { scale: number }) {
-  return <span style={{ fontSize: `${scale}em` }}>₩</span>;
-}
-
-/** 모노 서체 옆에서 쓰는 값. 12px 기준으로 ₩ 잉크 12px, 숫자 10px 이었다 */
-const WON_MONO = 0.833;
-/** 명조 서체 옆. 28px 기준으로 ₩ 16px, 숫자 21px 이었다 */
-const WON_SERIF = 1.313;
 
 const steps = [
   {
     title: t({ ko: "여행 정보를 알려주세요", en: "Tell us about your trip" }),
     body: t({
-      ko: ["날짜, 기간, 동행, 관심사.", "2분이면 되고 가입도 필요 없습니다."],
-      en: ["Dates, how long, who's coming, what you're into.", "Two minutes, no account."],
+      // '등' 으로 열어 둔다. 폼에서 묻는 것이 넷보다 많아졌고(속도·이동 수단·숙소·예산…),
+      // 마침표로 닫으면 딱 넷만 묻는 것처럼 읽힌다.
+      // '가입도 필요 없습니다' 를 뺐다 — 첫 화면 버튼 옆에 '가입 없음' 이 이미 있다.
+      // '적는' 이 아니라 '선택하는' 이다. 폼이 거의 다 눌러서 고르는 방식으로 바뀌었다.
+      ko: ["날짜, 기간, 동행, 관심사 등", "선택하는 데 2분이면 충분합니다."],
+      en: ["Dates, how long, who's coming, what you're into, and more", "Two minutes to pick your answers."],
     }),
   },
   {
@@ -185,13 +170,6 @@ const steps = [
   },
   {
     title: t({ ko: "전체 일정을 받으세요", en: "Get the full plan" }),
-    // 값은 제목 옆에 붙는다. 셋 중 이 단계에만 있다.
-    price: (
-      <>
-        <Won scale={WON_MONO} />
-        150,000
-      </>
-    ),
     body: t({
       ko: ["모든 정거장에 팁이 붙고,", "시간을 효율적으로 쓸 수 있게 동선을 짜드립니다."],
       en: ["A tip at every stop,", "and a route that makes good use of your time."],
@@ -760,18 +738,8 @@ export default async function Home() {
                 <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-accent)]">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                {/*
-                  값은 **제목 옆에, 제목 절반 크기로.** 제목이 24px 이니 12px 다.
-                  baseline 이 아니라 가운데(align-middle)에 맞춘다 — 크기 차이가 두 배라
-                  밑줄을 맞추면 값이 바닥에 가라앉아 딸려 붙은 것처럼 보인다.
-                */}
                 <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl leading-tight">
                   {step.title}
-                  {"price" in step && (
-                    <span className="ml-2 align-middle font-[family-name:var(--font-geist-mono)] text-xs tracking-tight text-[var(--c-text-3)]">
-                      {step.price}
-                    </span>
-                  )}
                 </h3>
                 {/* break-keep: 한국어가 낱말 가운데서 끊기지 않게. 큰제목과 같은 처리다. */}
                 {step.body.map((line, li) => (
@@ -828,20 +796,13 @@ export default async function Home() {
             </div>
             <div>
               <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent)]">
-                {t({
-                  ko: (
-                    <>
-                      전체 일정 · <Won scale={WON_MONO} />
-                      150,000
-                    </>
-                  ),
-                  en: (
-                    <>
-                      Full plan · <Won scale={WON_MONO} />
-                      150,000
-                    </>
-                  ),
-                })}
+                {/*
+                  값은 여기서 빼 두었다 (선경·뮤조 판단, 2026-08-24).
+                  이 칸은 **무엇을 받는지** 를 보여주는 자리다. 목록 머리에 값부터 나오면
+                  아래 내용을 읽기 전에 값으로 먼저 판단하게 된다.
+                  값은 아래 '가격' 칸과 진행 방식 03 에 그대로 있다.
+                */}
+                {t({ ko: "전체 일정", en: "Full plan" })}
               </p>
               <ul className="mt-4 space-y-3">
                 {paid.map((item) => {
@@ -916,37 +877,39 @@ export default async function Home() {
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
           <div>
             <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
-              {t({ ko: "가격", en: "Pricing" })}
+              {/*
+                전에는 '가격' 이었다. 값을 뺀 자리라 그 이름은 더 이상 맞지 않는다 —
+                가격이라 적어 두고 값이 없으면 손님이 값을 찾다가 못 찾는다.
+              */}
+              {t({ ko: "시작하기", en: "Get started" })}
             </p>
             {/*
               두 문장을 각각 한 줄에 놓는다. **줄이 넘치면 줄바꿈 대신 글자가 작아진다.**
 
-              그냥 30px 로 두면 375px 폰에서 제일 긴 줄("전체 일정은 ₩150,000 입니다.")이
-              334px 라 327px 인 자리를 6px 넘겨, "전체 일 / 정은" 처럼 낱말 가운데서 잘렸다.
+              고정 크기로 두면 375px 폰에서 제일 긴 줄이 자리를 넘겨 낱말 가운데서 잘린다.
+              (전에 "전체 일정은 ₩150,000 입니다." 가 334px 라 327px 자리를 6px 넘겼다)
 
-              그 줄의 폭을 재보니 글자 크기의 11.12배다. 그래서 **자리 너비를 11.6 으로 나눈 값**을
-              글자 크기로 준다(11.12 대신 11.6 은 서체가 늦게 뜰 때를 위한 여유다).
+              제일 긴 줄("지금 바로 여행 일정 받아보세요.")의 폭이 글자 크기의 12.14배다.
+              그래서 **자리 너비를 12.6 으로 나눈 값**을
+              글자 크기로 준다(12.14 대신 12.6 은 서체가 늦게 뜰 때를 위한 여유다).
               이러면 화면이 좁아지는 만큼 글자도 같이 줄어 항상 한 줄에 들어간다.
 
               폰과 PC 는 자리 너비를 구하는 식이 다르다 — PC 는 2단이라 화면의 절반에서
               여백(24px)과 단 사이(40px)를 뺀다. clamp 의 양 끝은 원래 크기(30px / 36px)를
               넘지 않게, 그리고 너무 작아지지 않게 잡은 것이다.
             */}
-            <p className="mt-4 font-[family-name:var(--font-display)] leading-tight text-[clamp(1.25rem,calc((100vw_-_3rem)/11.6),1.875rem)] md:text-[clamp(1.5rem,calc((50vw_-_44px)/11.6),2.25rem)]">
+            <p className="mt-4 font-[family-name:var(--font-display)] leading-tight text-[clamp(1.25rem,calc((100vw_-_3rem)/12.6),1.875rem)] md:text-[clamp(1.5rem,calc((50vw_-_44px)/12.6),2.25rem)]">
               {t({
                 ko: (
                   <>
                     <span className="block">초안은 무료입니다.</span>
-                    <span className="block">
-                      전체 일정은 <Won scale={WON_SERIF} />
-                      150,000 입니다.
-                    </span>
+                    <span className="block">지금 바로 여행 일정 받아보세요.</span>
                   </>
                 ),
                 en: (
                   <>
                     <span className="block">The draft is free.</span>
-                    <span className="block">The full plan is ₩150,000.</span>
+                    <span className="block">Get your itinerary now.</span>
                   </>
                 ),
               })}
@@ -956,7 +919,12 @@ export default async function Home() {
               폰은 셋 다 나뉜 채로 둔다. max-w 를 PC 에서 넓히지 않으면 이어 붙여도 다시 접힌다.
             */}
             <div className="mt-4 max-w-md space-y-1.5 leading-relaxed text-[var(--c-text-2)] md:max-w-none">
-              <p>{t({ ko: "여행이 며칠이든 값은 하나입니다.", en: "One price, however long your trip is." })}</p>
+              {/*
+                '여행이 며칠이든 값은 하나입니다.' 였다. 랜딩에서 값을 안 보여주기로 하면서
+                그 문장만 남으니 손님이 그 하나가 얼만지 알 수 없어 애매해졌다.
+                무게를 **얼마인지** 에서 **길이와 상관없다** 는 쪽으로 옮겼다.
+              */}
+              <p>{t({ ko: "며칠을 가시든 값은 같습니다.", en: "The price is the same however long you stay." })}</p>
               <p>
                 {t({
                   ko: (
