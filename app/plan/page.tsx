@@ -94,19 +94,22 @@ const AVOIDS = [
   { v: "Long travel legs", ko: "긴 이동" }, { v: "Drinking", ko: "술자리" },
 ];
 /**
- * 1인 예산 구간. **숫자를 직접 적게 하면 손님이 멈춘다** — 한국 물가를 모르니
- * 얼마를 적어야 할지 감이 없다. 보기에서 고르면 그 자리에서 넘어간다.
+ * 1인 예산 구간. **여행 전체 기준이다** — 하루치가 아니다.
+ * 처음에는 하루치처럼 낮게 잡았는데, 최소 2박은 하는 여행이라 액수가 턱없이 적었다.
+ *
+ * **숫자를 직접 적게 하면 손님이 멈춘다** — 한국 물가를 모르니 얼마를 적어야 할지
+ * 감이 없다. 보기에서 고르면 그 자리에서 넘어간다.
  *
  * 원화 옆에 달러를 같이 적는다. 손님은 해외 여행객이라 원화 감각이 없고,
  * 달러만 적으면 우리가 실제로 짤 예산과 어긋난다. (1달러 ≈ 1,350원으로 어림한 값)
  * 보기에 없으면 '기타' 로 직접 적는다.
  */
 const BUDGETS = [
-  { v: "Under 100,000 KRW (about $75)", ko: "10만원 미만 (약 $75)" },
-  { v: "100,000–150,000 KRW (about $75–110)", ko: "10–15만원 (약 $75–110)" },
-  { v: "150,000–200,000 KRW (about $110–150)", ko: "15–20만원 (약 $110–150)" },
-  { v: "200,000–300,000 KRW (about $150–220)", ko: "20–30만원 (약 $150–220)" },
-  { v: "Over 300,000 KRW (about $220)", ko: "30만원 이상 (약 $220)" },
+  { v: "Under 150,000 KRW (about $110) for the whole trip", ko: "15만원 미만 (약 $110)" },
+  { v: "150,000–250,000 KRW (about $110–185) for the whole trip", ko: "15–25만원 (약 $110–185)" },
+  { v: "250,000–350,000 KRW (about $185–260) for the whole trip", ko: "25–35만원 (약 $185–260)" },
+  { v: "350,000–500,000 KRW (about $260–370) for the whole trip", ko: "35–50만원 (약 $260–370)" },
+  { v: "Over 500,000 KRW (about $370) for the whole trip", ko: "50만원 이상 (약 $370)" },
 ];
 const CURRENCIES = ["KRW", "USD", "EUR", "JPY"];
 const LANGUAGES = [
@@ -378,7 +381,7 @@ export default function PlanForm() {
 
           <div className="grid gap-6 sm:grid-cols-2">
             <Select
-              label={t({ ko: "1인 예산", en: "Budget per person" })}
+              label={t({ ko: "1인 예산 (여행 전체)", en: "Budget per person (whole trip)" })}
               name="budgetRange"
               options={BUDGETS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
               placeholder={t({ ko: "고르세요", en: "Choose one" })}
