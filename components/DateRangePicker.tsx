@@ -121,6 +121,12 @@ export default function DateRangePicker({
 }) {
   const todayKey = new Date().toISOString().slice(0, 10);
   const [open, setOpen] = useState(false);
+  /**
+   * 지금 어느 칸을 고르는 중인지. **이게 없으면 눌러도 아무 표시가 없어서**
+   * 손님이 "안 눌렸나" 하고 몇 번씩 누르게 된다 (선경이 실제로 겪었다).
+   * 누른 칸에 테두리를 둘러 지금 이 칸을 고르는 중임을 보여준다.
+   */
+  const [picking, setPicking] = useState<"start" | "end">("start");
   // 왼쪽에 보이는 달. 고른 날이 있으면 그 달부터 연다.
   const [cursor, setCursor] = useState(() => {
     const base = start ? new Date(`${start}T00:00:00Z`) : new Date();
@@ -133,21 +139,24 @@ export default function DateRangePicker({
     // 지나간 날은 못 고른다
     if (dayKey < todayKey) return;
 
-    // 아직 시작이 없거나, 둘 다 골라 놓은 상태면 → 새로 시작한다
-    if (!start || (start && end)) {
-      onChange({ start: dayKey, end: null });
+    // '가는 날' 을 고르는 중 → 가는 날을 놓고 곧바로 '오는 날' 차례로 넘긴다.
+    // 넘겨 주지 않으면 손님이 오는 날 칸을 따로 눌러야 하는데, 그걸 모른다.
+    if (picking === "start") {
+      // 이미 있던 오는 날보다 뒤를 고르면 그 오는 날은 말이 안 되므로 비운다
+      const keepEnd = end && dayKey < end && nightsBetween(dayKey, end) <= maxNights ? end : null;
+      onChange({ start: dayKey, end: keepEnd });
+      setPicking("end");
       return;
     }
-    // 시작보다 앞을 누르면 그게 새 시작이 된다. "잘못 골랐다"고 막는 것보다 자연스럽다.
-    if (dayKey <= start) {
+
+    // '오는 날' 을 고르는 중인데 가는 날보다 앞이면, 그것을 새 가는 날로 본다.
+    // "잘못 골랐다" 고 막는 것보다 자연스럽다.
+    if (!start || dayKey <= start || nightsBetween(start, dayKey) > maxNights) {
       onChange({ start: dayKey, end: null });
+      setPicking("end");
       return;
     }
-    if (nightsBetween(start, dayKey) > maxNights) {
-      // 너무 긴 여행은 여기서 막지 않고 시작만 옮긴다. 오류를 띄우면 왜 안 되는지 알기 어렵다.
-      onChange({ start: dayKey, end: null });
-      return;
-    }
+
     onChange({ start, end: dayKey });
     setOpen(false);
   }
@@ -159,8 +168,22 @@ export default function DateRangePicker({
     });
   }
 
-  const summary =
-    "flex-1 rounded-2xl border px-4 py-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)]";
+  /**
+   * 두 칸의 생김새. **지금 고르는 중인 칸은 주황 테두리를 두 겹으로 둘러 눈에 띄게 한다.**
+   * 값이 들어간 칸은 테두리만 밝게, 아직 빈 칸은 흐리게.
+   */
+  const summary = (mine: "start" | "end", filled: boolean) => {
+    const active = open && picking === mine;
+    return [
+      "flex-1 rounded-2xl border px-4 py-3 text-left transition-colors",
+      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)]",
+      active
+        ? "border-[var(--c-accent)] ring-2 ring-[var(--c-accent)]/35 bg-[var(--c-surface-2)]"
+        : filled
+          ? "border-[var(--c-text-3)] bg-[var(--c-surface)]"
+          : "border-[var(--c-line)] bg-[var(--c-surface)]",
+    ].join(" ");
+  };
 
   return (
     <div>
@@ -168,16 +191,18 @@ export default function DateRangePicker({
       <div className="flex gap-3">
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
-          className={`${summary} ${start ? "border-[var(--c-text-3)]" : "border-[var(--c-line)]"} bg-[var(--c-surface)]`}
+          aria-pressed={open && picking === "start"}
+          onClick={() => { setPicking("start"); setOpen(true); }}
+          className={summary("start", !!start)}
         >
           <span className="block text-[0.7rem] text-[var(--c-text-3)]">{t({ ko: "가는 날", en: "Check-in" })}</span>
           <span className="block text-[var(--c-text)]">{start ?? t({ ko: "날짜 선택", en: "Pick a date" })}</span>
         </button>
         <button
           type="button"
-          onClick={() => setOpen(true)}
-          className={`${summary} ${end ? "border-[var(--c-text-3)]" : "border-[var(--c-line)]"} bg-[var(--c-surface)]`}
+          aria-pressed={open && picking === "end"}
+          onClick={() => { setPicking("end"); setOpen(true); }}
+          className={summary("end", !!end)}
         >
           <span className="block text-[0.7rem] text-[var(--c-text-3)]">{t({ ko: "오는 날", en: "Check-out" })}</span>
           <span className="block text-[var(--c-text)]">{end ?? t({ ko: "날짜 선택", en: "Pick a date" })}</span>
@@ -193,6 +218,12 @@ export default function DateRangePicker({
 
       {open && (
         <div className="mt-3 rounded-2xl border border-[var(--c-line)] bg-[var(--c-surface)] p-4 sm:p-5">
+          {/* 지금 무엇을 고르는 중인지 글로도 알린다. 테두리만으로는 못 보는 사람이 있다 */}
+          <p aria-live="polite" className="mb-1 text-center text-sm text-[var(--c-accent)]">
+            {picking === "start"
+              ? t({ ko: "가는 날을 고르세요", en: "Pick your check-in date" })
+              : t({ ko: "오는 날을 고르세요", en: "Pick your check-out date" })}
+          </p>
           <div className="mb-2 flex items-center justify-between">
             <button
               type="button"
@@ -230,7 +261,7 @@ export default function DateRangePicker({
           <div className="mt-3 flex items-center justify-between border-t border-[var(--c-line-2)] pt-3">
             <button
               type="button"
-              onClick={() => onChange({ start: null, end: null })}
+              onClick={() => { onChange({ start: null, end: null }); setPicking("start"); }}
               className="min-h-11 px-2 text-sm text-[var(--c-text-3)] underline underline-offset-4 hover:text-[var(--c-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)]"
             >
               {t({ ko: "날짜 지우기", en: "Clear dates" })}

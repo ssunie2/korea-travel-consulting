@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Instrument_Serif } from "next/font/google";
 import { t } from "@/lib/copy";
 import DateRangePicker, { nightsBetween } from "@/components/DateRangePicker";
+import Select from "@/components/Select";
 
 // 표제용 서체. 랜딩·결과 화면과 같은 방식으로 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -264,11 +265,21 @@ export default function PlanForm() {
         <h1 className="font-[family-name:var(--font-display)] text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight">
           {t({ ko: "여행에 대해 알려주세요", en: "Tell us about your trip" })}
         </h1>
+        {/*
+          두 도막으로 끊는다. **앞은 얼마나 드는지, 뒤는 무엇을 받는지** 라 성격이 다르다.
+          PC 는 칸이 넓어 한 줄로 이어지는데, 그러면 "받으십니다" 가 문장 끝에 묻힌다.
+          block 이라 폰·PC 어디서나 아랫줄로 내려간다.
+        */}
         <p className="mt-4 leading-relaxed text-[var(--c-text-2)]">
-          {t({
-            ko: "2분이면 됩니다. 가입도 카드도 필요 없습니다. 일자별 개요와 가이드북에 없는 팁 하나를 받으십니다.",
-            en: "Two minutes. No account, no card. You'll get a day-by-day outline and one tip a guidebook won't give you.",
-          })}
+          <span className="block">
+            {t({ ko: "2분이면 됩니다. 가입도 카드도 필요 없습니다.", en: "Two minutes. No account, no card." })}
+          </span>
+          <span className="mt-1 block">
+            {t({
+              ko: "일자별 개요와 가이드북에 없는 팁 하나를 받으십니다.",
+              en: "You'll get a day-by-day outline and one tip a guidebook won't give you.",
+            })}
+          </span>
         </p>
 
         <form onSubmit={onSubmit} className="mt-12 space-y-10">
@@ -355,16 +366,13 @@ export default function PlanForm() {
               <span className={label}>{t({ ko: "1인 예산", en: "Budget per person" })}</span>
               <input type="number" name="budgetPerPerson" min={0} placeholder="Optional" className={field} />
             </label>
-            <label className="block">
-              <span className={label}>{t({ ko: "통화", en: "Currency" })}</span>
-              <select name="budgetCurrency" defaultValue="USD" className={field}>
-                {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <Select
+                label={t({ ko: "통화", en: "Currency" })}
+                name="budgetCurrency"
+                defaultValue="USD"
+                options={CURRENCIES.map((c) => ({ value: c, label: c }))}
+                placeholder="USD"
+              />
           </div>
 
           <fieldset>
@@ -419,17 +427,12 @@ export default function PlanForm() {
             )}
           </fieldset>
 
-          <label className="block">
-            <span className={label}>{t({ ko: "누구와 가시나요", en: "Who\u2019s coming" })}</span>
-            <select name="audience" defaultValue="" className={field}>
-              <option value="">{t({ ko: "상관없음", en: "No preference" })}</option>
-              {AUDIENCES.map((a) => (
-                <option key={a.v} value={a.v}>
-                  {t({ ko: a.ko, en: a.v })}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Select
+              label={t({ ko: "누구와 가시나요", en: "Who\u2019s coming" })}
+              name="audience"
+              options={AUDIENCES.map((a) => ({ value: a.v, label: t({ ko: a.ko, en: a.v }) }))}
+              placeholder={t({ ko: "상관없음", en: "No preference" })}
+            />
 
           {/*
             여기부터는 **일정의 짜임을 정하는 답들**이다. 한 개만 고르는 것은 목록 상자로,
@@ -440,53 +443,47 @@ export default function PlanForm() {
             'not specified' 를 잔뜩 보내면 AI 가 그 빈칸을 지어내 채운다(lib/prompt.ts 의 shape()).
           */}
           <div className="grid gap-6 sm:grid-cols-2">
-            <label className="block">
-              <span className={label}>{t({ ko: "여행 속도", en: "Pace" })}</span>
-              <select name="pace" defaultValue="" className={field}>
-                <option value="">{t({ ko: "상관없음", en: "No preference" })}</option>
-                {PACES.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
-              </select>
-            </label>
+            <Select
+                label={t({ ko: "여행 속도", en: "Pace" })}
+                name="pace"
+                options={PACES.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+                placeholder={t({ ko: "상관없음", en: "No preference" })}
+              />
 
-            <label className="block">
-              <span className={label}>{t({ ko: "한국은 처음이신가요?", en: "First time in Korea?" })}</span>
-              <select name="visitedBefore" defaultValue="" className={field}>
-                <option value="">{t({ ko: "말하지 않을래요", en: "Rather not say" })}</option>
-                {VISITS.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
-              </select>
-            </label>
+            <Select
+                label={t({ ko: "한국은 처음이신가요?", en: "First time in Korea?" })}
+                name="visitedBefore"
+                options={VISITS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+                placeholder={t({ ko: "말하지 않을래요", en: "Rather not say" })}
+              />
 
-            <label className="block">
-              <span className={label}>{t({ ko: "어떻게 다니실 건가요?", en: "How will you get around?" })}</span>
-              <select name="transport" defaultValue="" className={field}>
-                <option value="">{t({ ko: "상관없음", en: "No preference" })}</option>
-                {TRANSPORTS.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
-              </select>
-            </label>
+            <Select
+                label={t({ ko: "어떻게 다니실 건가요?", en: "How will you get around?" })}
+                name="transport"
+                options={TRANSPORTS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+                placeholder={t({ ko: "상관없음", en: "No preference" })}
+              />
 
-            <label className="block">
-              <span className={label}>{t({ ko: "숙소는 어디쯤이 좋으세요?", en: "Where would you rather stay?" })}</span>
-              <select name="stayArea" defaultValue="" className={field}>
-                <option value="">{t({ ko: "상관없음", en: "No preference" })}</option>
-                {STAY_AREAS.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
-              </select>
-            </label>
+            <Select
+                label={t({ ko: "숙소는 어디쯤이 좋으세요?", en: "Where would you rather stay?" })}
+                name="stayArea"
+                options={STAY_AREAS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+                placeholder={t({ ko: "상관없음", en: "No preference" })}
+              />
 
-            <label className="block">
-              <span className={label}>{t({ ko: "하루를 언제 시작하세요?", en: "When do you start your day?" })}</span>
-              <select name="dayRhythm" defaultValue="" className={field}>
-                <option value="">{t({ ko: "상관없음", en: "No preference" })}</option>
-                {RHYTHMS.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
-              </select>
-            </label>
+            <Select
+                label={t({ ko: "하루를 언제 시작하세요?", en: "When do you start your day?" })}
+                name="dayRhythm"
+                options={RHYTHMS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+                placeholder={t({ ko: "상관없음", en: "No preference" })}
+              />
 
-            <label className="block">
-              <span className={label}>{t({ ko: "특별한 날인가요?", en: "Any special occasion?" })}</span>
-              <select name="occasion" defaultValue="" className={field}>
-                <option value="">{t({ ko: "아니요", en: "No" })}</option>
-                {OCCASIONS.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
-              </select>
-            </label>
+            <Select
+                label={t({ ko: "특별한 날인가요?", en: "Any special occasion?" })}
+                name="occasion"
+                options={OCCASIONS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+                placeholder={t({ ko: "아니요", en: "No" })}
+              />
           </div>
 
           {/* 제약사항 — 무슬림·채식 손님에게는 여행의 성패고, 이걸 챙기는 게 우리가 돈 받는 이유에 가깝다 */}
@@ -538,16 +535,13 @@ export default function PlanForm() {
             )}
           </fieldset>
 
-          <label className="block">
-            <span className={label}>{t({ ko: "초안을 받을 언어 *", en: "Language for your draft *" })}</span>
-            <select name="language" defaultValue="en" className={field}>
-              {LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code}>
-                  {l.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Select
+              label={t({ ko: "초안을 받을 언어 *", en: "Language for your draft *" })}
+              name="language"
+              defaultValue="en"
+              options={LANGUAGES.map((l) => ({ value: l.code, label: l.label }))}
+              placeholder="English"
+            />
 
           {error && (
             <p role="alert" className="rounded-lg border border-[var(--c-accent)] bg-[var(--c-error-bg)] px-4 py-3 text-[var(--c-error-text)]">
