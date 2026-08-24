@@ -454,7 +454,8 @@ export default function PlanForm() {
                 label={t({ ko: "한국은 처음이신가요?", en: "First time in Korea?" })}
                 name="visitedBefore"
                 options={VISITS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
-                placeholder={t({ ko: "말하지 않을래요", en: "Rather not say" })}
+                placeholder={t({ ko: "고르세요", en: "Choose one" })}
+                allowOther
               />
 
             <Select

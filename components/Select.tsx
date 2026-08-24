@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { t } from "@/lib/copy";
 
 /**
  * 하나를 고르는 상자.
@@ -17,15 +18,25 @@ import { useEffect, useId, useRef, useState } from "react";
  */
 export type Option = { value: string; label: string };
 
+/** 목록 안에서 '기타' 를 가리키는 값. 화면에만 쓰고 서버로는 안 나간다 */
+const OTHER = "__other__";
+
 export default function Select({
   name,
   label,
+  allowOther = false,
   options,
   defaultValue = "",
   placeholder,
   className = "",
 }: {
   name: string;
+  /**
+   * 보기에 없는 답을 직접 적게 할지. 켜면 목록 맨 아래에 '기타' 가 붙고,
+   * 그것을 고르면 적는 칸이 나온다. 적은 글이 그대로 답이 된다 —
+   * 코드값('__other__')이 서버로 나가면 AI 가 그 말을 이해하지 못한다.
+   */
+  allowOther?: boolean;
   /**
    * 칸 위에 붙는 제목. **부품이 직접 그린다.**
    * 밖에서 `<label>` 로 감싸면 제목 글자를 눌렀을 때 label 이 버튼을 한 번 더 눌러
@@ -39,6 +50,7 @@ export default function Select({
   className?: string;
 }) {
   const [value, setValue] = useState(defaultValue);
+  const [otherText, setOtherText] = useState("");
   const [open, setOpen] = useState(false);
   // 키보드로 훑고 있는 자리. 고른 것(value)과 다르다 — 아직 정하지 않았을 뿐이다.
   const [cursor, setCursor] = useState(0);
@@ -46,8 +58,14 @@ export default function Select({
   const listId = useId();
   const labelId = useId();
 
-  const all: Option[] = [{ value: "", label: placeholder }, ...options];
+  const all: Option[] = [
+    { value: "", label: placeholder },
+    ...options,
+    ...(allowOther ? [{ value: OTHER, label: t({ ko: "기타", en: "Other" }) }] : []),
+  ];
   const current = all.find((o) => o.value === value) ?? all[0];
+  // 서버로 나가는 값. '기타' 를 골랐으면 적은 글이 답이다.
+  const submitted = value === OTHER ? otherText.trim() : value;
 
   // 밖을 누르면 닫는다. 안 하면 목록이 켜진 채로 남아 다른 칸을 가린다.
   useEffect(() => {
@@ -106,7 +124,7 @@ export default function Select({
         </span>
       )}
       {/* 폼이 FormData 로 읽는 값. 화면에는 안 보인다 */}
-      <input type="hidden" name={name} value={value} />
+      <input type="hidden" name={name} value={submitted} />
 
       <button
         type="button"
@@ -133,6 +151,21 @@ export default function Select({
           ⌄
         </span>
       </button>
+
+      {value === OTHER && (
+        <label className="mt-2 block">
+          <span className="sr-only">{label ?? placeholder}</span>
+          <input
+            type="text"
+            value={otherText}
+            onChange={(e) => setOtherText(e.target.value)}
+            maxLength={40}
+            autoFocus
+            placeholder={t({ ko: "직접 적어주세요", en: "Type your answer" })}
+            className="min-h-[3.25rem] w-full rounded-2xl border border-[var(--c-line)] bg-[var(--c-surface)] px-4 py-3 text-[var(--c-text)] placeholder:text-[var(--c-text-3)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)]"
+          />
+        </label>
+      )}
 
       {open && (
         <ul
