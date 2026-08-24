@@ -15,10 +15,19 @@ const display = Instrument_Serif({
 });
 
 /** 값은 영어로 보낸다 — AI 가 읽는 건 이 값이다. 화면에 보이는 이름만 언어를 따른다. */
+/**
+ * 고를 수 있는 여행지. **가까운 곳끼리 붙여 뒀다** — 손님은 지도를 그리며 고르지
+ * 가나다순으로 찾지 않는다. 서울 옆에 인천(공항 도시), 강원끼리, 남해안끼리 묶었다.
+ *
+ * 여기 없는 곳은 아래 "그 외" 를 눌러 직접 적는다.
+ */
 const DESTINATIONS = [
-  { v: "Seoul", ko: "서울" }, { v: "Busan", ko: "부산" }, { v: "Jeju", ko: "제주" },
-  { v: "Gyeongju", ko: "경주" }, { v: "Jeonju", ko: "전주" }, { v: "Gangneung", ko: "강릉" },
-  { v: "Andong", ko: "안동" }, { v: "Sokcho", ko: "속초" },
+  { v: "Seoul", ko: "서울" }, { v: "Incheon", ko: "인천" },
+  { v: "Chuncheon", ko: "춘천" }, { v: "Gangneung", ko: "강릉" }, { v: "Sokcho", ko: "속초" },
+  { v: "Gyeongju", ko: "경주" }, { v: "Andong", ko: "안동" }, { v: "Pohang", ko: "포항" },
+  { v: "Daegu", ko: "대구" }, { v: "Busan", ko: "부산" }, { v: "Tongyeong", ko: "통영" },
+  { v: "Jeonju", ko: "전주" }, { v: "Yeosu", ko: "여수" }, { v: "Mokpo", ko: "목포" },
+  { v: "Jeju", ko: "제주" },
 ];
 const STYLES = [
   { v: "Food", ko: "먹거리" }, { v: "Culture & history", ko: "문화·역사" },
@@ -55,6 +64,9 @@ export default function PlanForm() {
   // 오늘보다 이전 날짜를 못 고르게 막는 값
   const today = new Date().toISOString().slice(0, 10);
   const [destinations, setDestinations] = useState<string[]>([]);
+  // "그 외" — 목록에 없는 곳을 직접 적는 칸. 눌렀을 때만 칸이 나온다.
+  const [otherOn, setOtherOn] = useState(false);
+  const [otherPlace, setOtherPlace] = useState("");
   const [styles, setStyles] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,8 +79,17 @@ export default function PlanForm() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (destinations.length === 0) {
+    // 직접 적은 곳도 고른 것으로 친다. 앞뒤 공백은 떼고 보낸다.
+    const typed = otherOn ? otherPlace.trim() : "";
+    const picked = typed ? [...destinations, typed] : destinations;
+
+    if (picked.length === 0) {
       setError(t({ ko: "가고 싶은 곳을 하나 이상 골라주세요.", en: "Pick at least one place you want to visit." }));
+      return;
+    }
+    // "그 외" 를 눌러 놓고 비워 두면 무엇을 원하는지 알 수 없다
+    if (otherOn && !typed) {
+      setError(t({ ko: "그 외를 고르셨습니다 — 어디인지 적어주세요.", en: "You picked Somewhere else — please type where." }));
       return;
     }
 
@@ -87,7 +108,7 @@ export default function PlanForm() {
         signal: abort.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          destinations,
+          destinations: picked,
           styles,
           startDate: f.get("startDate"),
           durationDays: Number(f.get("durationDays")),
@@ -173,7 +194,40 @@ export default function PlanForm() {
                   </button>
                 );
               })}
+
+              {/* 그 외 — 누르면 아래에 적는 칸이 나온다 */}
+              <button
+                type="button"
+                aria-pressed={otherOn}
+                onClick={() => setOtherOn((v) => !v)}
+                className={`rounded-full border px-4 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)] ${
+                  otherOn
+                    ? "border-[var(--c-deep)] bg-[var(--c-text)] text-[var(--c-bg)]"
+                    : "border-dashed border-[var(--c-line)] bg-[var(--c-surface)] hover:border-[var(--c-text-3)]"
+                }`}
+              >
+                {t({ ko: "그 외", en: "Somewhere else" })}
+              </button>
             </div>
+
+            {otherOn && (
+              <label className="mt-3 block">
+                <span className="sr-only">{t({ ko: "어디인가요?", en: "Where?" })}</span>
+                {/*
+                  maxLength — 길이를 막지 않으면 아주 긴 글이 그대로 AI 로 넘어간다.
+                  지명 하나를 받는 칸이라 40자면 넉넉하다.
+                */}
+                <input
+                  type="text"
+                  value={otherPlace}
+                  onChange={(e) => setOtherPlace(e.target.value)}
+                  maxLength={40}
+                  autoFocus
+                  placeholder={t({ ko: "가고 싶은 지역을 적어주세요 — 예: 남해, 울릉도", en: "Type a place — e.g. Namhae, Ulleungdo" })}
+                  className={field}
+                />
+              </label>
+            )}
           </fieldset>
 
           <div className="grid gap-6 sm:grid-cols-3">
