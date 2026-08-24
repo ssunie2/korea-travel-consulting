@@ -32,8 +32,10 @@ export const freeItinerarySchema = {
                 time: { type: Type.STRING },
                 name: { type: Type.STRING },
                 note: { type: Type.STRING },
+                // 앞 일정에서 여기까지 대략 얼마나 걸리는지. 그날 첫 일정은 빈 값
+                travel: { type: Type.STRING },
               },
-              required: ['time', 'name', 'note'],
+              required: ['time', 'name', 'note', 'travel'],
             },
           },
         },
@@ -43,12 +45,14 @@ export const freeItinerarySchema = {
     sampleTip: {
       type: Type.OBJECT,
       properties: {
+        // 몇 일째 이야기인지 — 그 날 아래에 붙여 보여준다
+        dayNumber: { type: Type.INTEGER },
         activityName: { type: Type.STRING },
         highlight: { type: Type.STRING },
         pitfall: { type: Type.STRING },
         insiderSecret: { type: Type.STRING },
       },
-      required: ['activityName', 'highlight', 'pitfall', 'insiderSecret'],
+      required: ['dayNumber', 'activityName', 'highlight', 'pitfall', 'insiderSecret'],
     },
     picks: {
       type: Type.OBJECT,
@@ -111,6 +115,14 @@ ${shape(input)}${input.dietary?.length ? `- MUST WORK AROUND: ${input.dietary.jo
 
 THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
 - Each day: a short theme + EXACTLY 3 activities (morning, afternoon, evening). One line each.
+- Vary the times across days. A market wakes early, a night view needs dusk, a temple closes at 17:00.
+  Do NOT reuse the same three clock times every day — that reads as a template, not a plan.
+  ${input.dayRhythm ? `Their day rhythm is "${input.dayRhythm}" — set the FIRST activity to match, then let the rest follow what each place needs.` : ''}
+- Every activity except the first of each day needs "travel" — roughly how long it takes to get
+  there from the previous stop, in the form "about 25 min by subway" or "10 min walk".
+  Round to 5 minutes. This shows the route makes sense. The FIRST activity of each day gets "" (empty).
+  Do NOT give step-by-step directions, line numbers or transfers — that belongs to the paid plan.
+- sampleTip needs "dayNumber" — which day the tip belongs to, so we can show it beside that day.
 - Each day also needs a "city" value — the city or area they are in that day (Seoul, Incheon...).
   On a multi-city trip this is how they know which day they change hotels. Never leave it blank.
 - Give EXACTLY ONE insider tip for the whole trip — pick the single most surprising thing a

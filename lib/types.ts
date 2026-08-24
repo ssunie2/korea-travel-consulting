@@ -67,10 +67,26 @@ export type FreeItinerary = {
      */
     city?: string
     /** 아침·오후·저녁 각 1개, 총 3개 */
-    activities: { time: string; name: string; note: string }[]
+    activities: {
+      time: string
+      name: string
+      note: string
+      /**
+       * 앞 일정에서 여기까지 **대략** 얼마나 걸리는지 ("지하철 25분" 정도).
+       * 어떻게 가는지 자세한 길 안내는 유료다 — 여기서는 동선이 말이 되는지만 보여준다.
+       * 그날 첫 일정에는 없다(앞이 없다). 옛 초안에도 없어서 물음표를 붙였다.
+       */
+      travel?: string
+    }[]
   }[]
   /** 전체에서 딱 1개만 보여주는 맛보기 팁 */
   sampleTip: {
+    /**
+     * 이 팁이 몇 일째 이야기인지. **그 날 바로 아래에 붙여 보여주려고** 받는다.
+     * 전에는 맨 끝에 있어서, 나흘치를 다 읽고 나서야 1일차 팁을 봤다.
+     * 옛 초안에는 없어서 물음표 — 없으면 지금처럼 맨 아래에 둔다.
+     */
+    dayNumber?: number
     activityName: string
     highlight: string
     pitfall: string
