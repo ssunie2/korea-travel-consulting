@@ -20,6 +20,8 @@ export const freeItinerarySchema = {
         properties: {
           dayNumber: { type: Type.INTEGER },
           theme: { type: Type.STRING },
+          // 그날 머무는 도시. 여러 도시를 도는 여행에서 짐을 옮기는 날을 알려준다
+          city: { type: Type.STRING },
           activities: {
             type: Type.ARRAY,
             minItems: 3,
@@ -35,7 +37,7 @@ export const freeItinerarySchema = {
             },
           },
         },
-        required: ['dayNumber', 'theme', 'activities'],
+        required: ['dayNumber', 'theme', 'city', 'activities'],
       },
     },
     sampleTip: {
@@ -109,6 +111,8 @@ ${shape(input)}${input.dietary?.length ? `- MUST WORK AROUND: ${input.dietary.jo
 
 THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
 - Each day: a short theme + EXACTLY 3 activities (morning, afternoon, evening). One line each.
+- Each day also needs a "city" value — the city or area they are in that day (Seoul, Incheon...).
+  On a multi-city trip this is how they know which day they change hotels. Never leave it blank.
 - Give EXACTLY ONE insider tip for the whole trip — pick the single most surprising thing a
   first-time visitor would get wrong. Make it specific and concrete, not generic advice.
   This one tip is what convinces them we know Korea. Make it count.

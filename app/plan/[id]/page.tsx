@@ -17,6 +17,25 @@ const display = Instrument_Serif({
 // 주소를 열 때마다 DB에서 최신을 읽는다.
 export const dynamic = "force-dynamic";
 
+/**
+ * 며칠째가 실제로 몇 월 며칠 무슨 요일인지.
+ *
+ * **AI 에게 시키지 않는다.** 출발일과 며칠째만 있으면 정확히 나오는 계산이고,
+ * 맡기면 요일을 틀리게 쓴다. 요일이 중요한 이유는 **일요일에 문 닫는 곳이 많아서**다 —
+ * 요일을 모르면 헛걸음한다.
+ *
+ * 시간대에 따라 하루가 밀리지 않도록 UTC 로만 센다.
+ */
+function dayLabel(startDate: string, dayNumber: number) {
+  const d = new Date(`${startDate}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + dayNumber - 1);
+  const KO = ["일", "월", "화", "수", "목", "금", "토"];
+  return t({
+    ko: `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일 (${KO[d.getUTCDay()]})`,
+    en: d.toLocaleDateString("en-US", { month: "short", day: "numeric", weekday: "short", timeZone: "UTC" }),
+  });
+}
+
 function dateRange(startDate: string, days: number) {
   const start = new Date(`${startDate}T00:00:00Z`);
   const end = new Date(start);
@@ -97,6 +116,21 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
                   {day.theme}
                 </h2>
               </div>
+              {/*
+                날짜·요일과 그날 머무는 도시. 제목 아래 한 줄로 붙인다.
+                도시는 **여러 날에 걸쳐 같으면 굳이 반복하지 않고**, 바뀌는 날에만 눈에 띄면 되지만
+                지금은 매일 적는다 — 빠뜨리는 것보다 낫고, 손님이 하루씩 떼어 봐도 어디인지 안다.
+                city 가 없는 옛 초안도 있어서 있을 때만 그린다.
+              */}
+              <p className="ml-[calc(0.75rem+1rem)] mt-1 font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.14em] text-[var(--c-text-3)]">
+                {dayLabel(plan.start_date, day.dayNumber)}
+                {day.city && (
+                  <>
+                    <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
+                    <span className="text-[var(--c-accent-dim)]">{day.city}</span>
+                  </>
+                )}
+              </p>
               <ul className="mt-5 space-y-5 border-l border-[var(--c-line-2)] pl-6">
                 {day.activities.map((a, i) => (
                   <li key={i}>

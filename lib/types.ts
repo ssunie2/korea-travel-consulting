@@ -61,6 +61,11 @@ export type FreeItinerary = {
   days: {
     dayNumber: number
     theme: string
+    /**
+     * 그날 머무는 도시. 여러 도시를 도는 여행에서 **오늘 짐을 옮기는지**를 알려준다.
+     * 물음표가 붙은 이유 — 이 칸이 생기기 전에 만들어진 초안에는 없다.
+     */
+    city?: string
     /** 아침·오후·저녁 각 1개, 총 3개 */
     activities: { time: string; name: string; note: string }[]
   }[]
@@ -91,6 +96,11 @@ export type FullItinerary = {
   days: {
     dayNumber: number
     theme: string
+    /**
+     * 그날 머무는 도시. 여러 도시를 도는 여행에서 **오늘 짐을 옮기는지**를 알려준다.
+     * 물음표가 붙은 이유 — 이 칸이 생기기 전에 만들어진 초안에는 없다.
+     */
+    city?: string
     /** 지역으로 묶은 결과. "왜 이 순서인지"가 우리가 파는 것이다 */
     area: string
     routeNote: string
