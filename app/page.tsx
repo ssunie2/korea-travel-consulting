@@ -9,6 +9,7 @@ import bukchon from "@/public/landing/bukchon.webp";
 import gwangjangMarket from "@/public/landing/gwangjang-market.webp";
 import hanRiver from "@/public/landing/han-river.webp";
 import gyeongbokgung from "@/public/landing/gyeongbokgung.webp";
+import RouteScrollDays from "@/components/RouteScrollDays";
 
 // 표제용 서체. layout.tsx 를 건드리지 않으려고 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -67,6 +68,33 @@ const MOTION = `
   22% { transform: translate(-1.2%, -.2%) rotate(-.8deg) scale(.997); opacity: 1 }
   55% { transform: translate(-6%, -1%) rotate(-2.4deg) scale(.986); opacity: 1 }
   100% { transform: translate(-26%, -3.5%) rotate(-5deg) scale(.95); opacity: 0 }
+}
+/*
+  노선도를 스크롤로 넘기기 위한 자리.
+
+  **PC 에서만 붙여 둔다.** 폰에서는 노선 그림과 팁을 합친 높이(861px)가
+  화면(812px)보다 커서, 붙여 두면 아래가 잘린다. 폰은 붙이지 않고 지나가면서 넘어간다.
+
+  높이 200vh 는 날짜 넷이 나눠 갖는 스크롤 길이다 — 한 날에 50vh 씩.
+  글을 읽을 틈은 주되 지루하지 않을 만큼으로 잡았다.
+  실제로 날짜를 옮기는 것은 components/RouteScrollDays.tsx 다.
+*/
+/*
+  노선도를 화면에 붙여 두고 그 동안 날짜를 넘긴다. 카드 묶음과 같은 방식이다.
+  붙여 두지 않으면 팁이 화면 밖으로 밀려나 읽을 새가 없다.
+
+  200vh 는 날짜 넷이 나눠 갖는 스크롤 길이다 — 한 날에 50vh 씩.
+  실제로 날짜를 옮기는 것은 components/RouteScrollDays.tsx 다.
+
+  **붙이는 위치가 화면마다 다르다.** 폰은 노선 그림(179px) + 사이(32px) + 팁(586px) = 797px 라
+  812px 화면에 겨우 들어간다. PC 처럼 3rem 을 띄우면 팁 아래가 잘리므로 0.5rem 만 띄운다.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  .ktc-route { min-height: calc(100vh + 200vh) }
+  .ktc-route-pin { position: sticky; top: 0.5rem }
+}
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .ktc-route-pin { top: 3rem }
 }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
@@ -551,7 +579,14 @@ export default async function Home() {
               **왼쪽 글 칸에도 같은 값이 걸려 있다. 한쪽만 바꾸면 다시 어긋난다.**
             */}
             <div className="ktc-deck-sticky mx-auto w-full max-w-[31rem] md:min-h-[40rem]">
-              <div className="relative aspect-[4/5] w-full shadow-[14px_16px_0_rgba(5,19,16,.58)] md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
+              {/*
+                모서리 굴림은 **폰 16px, PC 24px** 로 둔다. 큰 면일수록 더 굴려야
+                같은 정도로 부드러워 보인다 — 작은 화면에서 24px 을 쓰면 과하게 둥글다.
+                그림자가 이 상자에 붙어 있어 모서리를 그대로 따라간다.
+                **안쪽 사진 카드에도 같은 값을 준다.** 바깥에 overflow-hidden 을 걸면
+                넘어가는 카드가 잘려버려서, 각자 제 모서리를 갖게 했다.
+              */}
+              <div className="relative aspect-[4/5] w-full rounded-2xl shadow-[14px_16px_0_rgba(5,19,16,.58)] md:rounded-3xl md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
               {HERO_CARDS.map((card, index) => (
                 <figure
                   key={card.number}
@@ -563,7 +598,7 @@ export default async function Home() {
                     ["--ktc-from" as string]: `${index * 23}%`,
                     ["--ktc-to" as string]: `${(index + 1) * 23}%`,
                   }}
-                  className={`absolute inset-0 overflow-hidden border border-[var(--c-line-2)] bg-[var(--c-deep)] ${
+                  className={`absolute inset-0 overflow-hidden rounded-2xl border border-[var(--c-line-2)] bg-[var(--c-deep)] md:rounded-3xl ${
                     index < HERO_CARDS.length - 1 ? "ktc-deck-card" : ""
                   }`}
                 >
@@ -600,8 +635,11 @@ export default async function Home() {
         </div>
 
         <div className="ktc-route mt-14">
+          <RouteScrollDays days={STATIONS.length} />
+          {/* PC 에서 이 칸이 화면에 붙어 있는 동안 날짜가 넘어간다 */}
+          <div className="ktc-route-pin">
           {/* 누르는 자리를 그림 위에 겹쳐야 해서 relative 가 필요하다 */}
-          <div className="relative">
+          <div className="ktc-route-scene relative">
             <MetroScene scene={NARROW} className="block h-auto w-full md:hidden" />
             <MetroScene scene={WIDE} className="hidden h-auto w-full md:block" />
 
@@ -667,7 +705,7 @@ export default async function Home() {
                 key={tip.day}
                 id={`ktc-tip-${tip.day}`}
                 aria-live="polite"
-                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-[3px] border border-[var(--c-line-2)] bg-[var(--c-surface)] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.6)] md:grid-cols-[.8fr_1.2fr]`}
+                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-2xl border border-[var(--c-line-2)] md:rounded-3xl bg-[var(--c-surface)] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.6)] md:grid-cols-[.8fr_1.2fr]`}
               >
                 <figcaption className="flex flex-col justify-between gap-8 bg-[var(--c-surface-2)] p-6 text-[var(--c-text)] sm:p-8">
                   <div>
@@ -705,6 +743,7 @@ export default async function Home() {
                 </div>
               </figure>
             ))}
+          </div>
           </div>
         </div>
       </section>
