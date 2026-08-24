@@ -48,7 +48,8 @@ export function validatePlanInput(raw: unknown): { ok: true; value: PlanInput } 
   }
 
   const styles = Array.isArray(d.styles) ? d.styles.filter((s): s is string => typeof s === 'string') : []
-  if (styles.length > 6) return { ok: false, error: 'too many styles' }
+  // 고를 수 있는 것이 12개 + 직접 적는 '그 외' 하나다. 6 으로 두면 많이 고른 손님이 거부당한다.
+  if (styles.length > 13) return { ok: false, error: 'too many styles' }
 
   const text = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : undefined)
 

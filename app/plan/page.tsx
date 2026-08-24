@@ -29,9 +29,16 @@ const DESTINATIONS = [
   { v: "Jeonju", ko: "전주" }, { v: "Yeosu", ko: "여수" }, { v: "Mokpo", ko: "목포" },
   { v: "Jeju", ko: "제주" },
 ];
+/**
+ * 관심사. **비슷한 것끼리 붙여 뒀다** — 먹고 보는 것, 한국다운 것, 밖에서 노는 것,
+ * 실내에서 보는 것, 사고 노는 것 순이다. 여기 없는 것은 "그 외" 에 적는다.
+ */
 const STYLES = [
   { v: "Food", ko: "먹거리" }, { v: "Culture & history", ko: "문화·역사" },
-  { v: "Nature & hiking", ko: "자연·등산" }, { v: "Shopping", ko: "쇼핑" },
+  { v: "K-culture", ko: "K-컬처" }, { v: "Hanbok", ko: "한복 체험" },
+  { v: "Nature & hiking", ko: "자연·등산" }, { v: "Beaches", ko: "바다·해변" },
+  { v: "Hot springs & jjimjilbang", ko: "온천·찜질방" }, { v: "Theme parks", ko: "테마파크" },
+  { v: "Art & exhibitions", ko: "미술관·전시" }, { v: "Shopping", ko: "쇼핑" },
   { v: "Nightlife", ko: "밤 문화" }, { v: "Photo spots", ko: "사진 명소" },
 ];
 const AUDIENCES = [
@@ -67,6 +74,9 @@ export default function PlanForm() {
   // "그 외" — 목록에 없는 곳을 직접 적는 칸. 눌렀을 때만 칸이 나온다.
   const [otherOn, setOtherOn] = useState(false);
   const [otherPlace, setOtherPlace] = useState("");
+  // 관심사 쪽 "그 외". 여행지와 같은 방식이다.
+  const [styleOtherOn, setStyleOtherOn] = useState(false);
+  const [otherStyle, setOtherStyle] = useState("");
   const [styles, setStyles] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,6 +103,13 @@ export default function PlanForm() {
       return;
     }
 
+    const typedStyle = styleOtherOn ? otherStyle.trim() : "";
+    const pickedStyles = typedStyle ? [...styles, typedStyle] : styles;
+    if (styleOtherOn && !typedStyle) {
+      setError(t({ ko: "관심사에 그 외를 고르셨습니다 — 무엇인지 적어주세요.", en: "You picked Something else — please type what." }));
+      return;
+    }
+
     setError(null);
     setSubmitting(true);
 
@@ -109,7 +126,7 @@ export default function PlanForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           destinations: picked,
-          styles,
+          styles: pickedStyles,
           startDate: f.get("startDate"),
           durationDays: Number(f.get("durationDays")),
           travelers: Number(f.get("travelers")),
@@ -284,7 +301,35 @@ export default function PlanForm() {
                   </button>
                 );
               })}
+
+              <button
+                type="button"
+                aria-pressed={styleOtherOn}
+                onClick={() => setStyleOtherOn((v) => !v)}
+                className={`rounded-full border px-4 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)] ${
+                  styleOtherOn
+                    ? "border-[var(--c-deep)] bg-[var(--c-text)] text-[var(--c-bg)]"
+                    : "border-dashed border-[var(--c-line)] bg-[var(--c-surface)] hover:border-[var(--c-text-3)]"
+                }`}
+              >
+                {t({ ko: "그 외", en: "Something else" })}
+              </button>
             </div>
+
+            {styleOtherOn && (
+              <label className="mt-3 block">
+                <span className="sr-only">{t({ ko: "무엇에 관심 있으세요?", en: "What else?" })}</span>
+                <input
+                  type="text"
+                  value={otherStyle}
+                  onChange={(e) => setOtherStyle(e.target.value)}
+                  maxLength={40}
+                  autoFocus
+                  placeholder={t({ ko: "관심사를 적어주세요 — 예: 서핑, 도자기 체험", en: "Type an interest — e.g. surfing, pottery" })}
+                  className={field}
+                />
+              </label>
+            )}
           </fieldset>
 
           <label className="block">
