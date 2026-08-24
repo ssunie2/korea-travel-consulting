@@ -9,10 +9,21 @@ export function validatePlanInput(raw: unknown): { ok: true; value: PlanInput } 
   if (typeof raw !== 'object' || raw === null) return { ok: false, error: 'invalid body' }
   const d = raw as Record<string, unknown>
 
+  /**
+   * 객관식 답 목록을 받는다. 보기에서 고른 값이라 짧지만,
+   * '그 외' 칸은 손님이 직접 적는 곳이라 **길이와 개수를 여기서 자른다.**
+   * 폼에서 막아도 서버로 직접 보내는 요청은 폼을 거치지 않는다.
+   */
+  const list = (v: unknown, maxItems: number) =>
+    Array.isArray(v)
+      ? v
+          .filter((x): x is string => typeof x === 'string' && x.trim() !== '')
+          .map((x) => x.trim().slice(0, 40))
+          .slice(0, maxItems)
+      : []
+
   // 목적지가 없으면 AI가 일정을 만들 수 없다
-  const destinations = Array.isArray(d.destinations)
-    ? d.destinations.filter((s): s is string => typeof s === 'string' && s.trim() !== '').slice(0, 10)
-    : []
+  const destinations = list(d.destinations, 10)
   if (destinations.length === 0) return { ok: false, error: 'pick at least one destination' }
 
   if (typeof d.startDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(d.startDate)) {
@@ -47,10 +58,11 @@ export function validatePlanInput(raw: unknown): { ok: true; value: PlanInput } 
     }
   }
 
-  const styles = Array.isArray(d.styles) ? d.styles.filter((s): s is string => typeof s === 'string') : []
-  if (styles.length > 6) return { ok: false, error: 'too many styles' }
+  // 고를 수 있는 것이 12개 + 직접 적는 '그 외' 하나다.
+  const styles = list(d.styles, 13)
 
   const text = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : undefined)
+
 
   const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY']
   const budgetCurrency =
@@ -64,11 +76,18 @@ export function validatePlanInput(raw: unknown): { ok: true; value: PlanInput } 
       durationDays,
       travelers,
       budgetPerPerson,
+      budgetRange: text(d.budgetRange, 60),
       budgetCurrency,
       styles,
       audience: text(d.audience, 40),
-      interests: text(d.interests, 500),
-      dietaryNotes: text(d.dietaryNotes, 300),
+      pace: text(d.pace, 40),
+      visitedBefore: text(d.visitedBefore, 40),
+      transport: text(d.transport, 40),
+      stayArea: text(d.stayArea, 40),
+      dayRhythm: text(d.dayRhythm, 40),
+      occasion: text(d.occasion, 40),
+      avoid: list(d.avoid, 8),
+      dietary: list(d.dietary, 12),
       language: typeof d.language === 'string' && /^[a-z]{2}$/.test(d.language) ? d.language : 'en',
     },
   }
