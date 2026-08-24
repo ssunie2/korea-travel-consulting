@@ -551,7 +551,14 @@ export default async function Home() {
               **왼쪽 글 칸에도 같은 값이 걸려 있다. 한쪽만 바꾸면 다시 어긋난다.**
             */}
             <div className="ktc-deck-sticky mx-auto w-full max-w-[31rem] md:min-h-[40rem]">
-              <div className="relative aspect-[4/5] w-full shadow-[14px_16px_0_rgba(5,19,16,.58)] md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
+              {/*
+                모서리 굴림은 **폰 16px, PC 24px** 로 둔다. 큰 면일수록 더 굴려야
+                같은 정도로 부드러워 보인다 — 작은 화면에서 24px 을 쓰면 과하게 둥글다.
+                그림자가 이 상자에 붙어 있어 모서리를 그대로 따라간다.
+                **안쪽 사진 카드에도 같은 값을 준다.** 바깥에 overflow-hidden 을 걸면
+                넘어가는 카드가 잘려버려서, 각자 제 모서리를 갖게 했다.
+              */}
+              <div className="relative aspect-[4/5] w-full rounded-2xl shadow-[14px_16px_0_rgba(5,19,16,.58)] md:rounded-3xl md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
               {HERO_CARDS.map((card, index) => (
                 <figure
                   key={card.number}
@@ -563,7 +570,7 @@ export default async function Home() {
                     ["--ktc-from" as string]: `${index * 23}%`,
                     ["--ktc-to" as string]: `${(index + 1) * 23}%`,
                   }}
-                  className={`absolute inset-0 overflow-hidden border border-[var(--c-line-2)] bg-[var(--c-deep)] ${
+                  className={`absolute inset-0 overflow-hidden rounded-2xl border border-[var(--c-line-2)] bg-[var(--c-deep)] md:rounded-3xl ${
                     index < HERO_CARDS.length - 1 ? "ktc-deck-card" : ""
                   }`}
                 >
@@ -667,7 +674,7 @@ export default async function Home() {
                 key={tip.day}
                 id={`ktc-tip-${tip.day}`}
                 aria-live="polite"
-                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-[3px] border border-[var(--c-line-2)] bg-[var(--c-surface)] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.6)] md:grid-cols-[.8fr_1.2fr]`}
+                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-2xl border border-[var(--c-line-2)] md:rounded-3xl bg-[var(--c-surface)] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.6)] md:grid-cols-[.8fr_1.2fr]`}
               >
                 <figcaption className="flex flex-col justify-between gap-8 bg-[var(--c-surface-2)] p-6 text-[var(--c-text)] sm:p-8">
                   <div>
