@@ -20,9 +20,6 @@ export default function RouteScrollDays({ days }: { days: number }) {
   useEffect(() => {
     const route = document.querySelector<HTMLElement>(".ktc-route");
     if (!route) return;
-    // 폰에서 기준으로 삼는 것. 노선 그림이 화면에 있는 동안 날짜가 다 넘어가야
-    // 바뀔 때마다 그 위 문양이 보인다.
-    const scene = route.querySelector<HTMLElement>(".ktc-route-scene") ?? route;
 
     // 움직임을 줄여 달라고 설정한 사람에게는 스크롤 전환을 걸지 않는다. 눌러서 고르면 된다.
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -36,30 +33,11 @@ export default function RouteScrollDays({ days }: { days: number }) {
       const box = route.getBoundingClientRect();
       const view = window.innerHeight;
 
-      /*
-        재는 방법이 화면 크기마다 다르다.
-
-        **PC** 는 노선도가 화면에 붙어 있다. 붙어 있는 동안 흐르는 스크롤(구간 높이 − 화면 높이)을
-        넷으로 나눈다. 이때는 그림이 그대로 있고 날짜만 바뀐다.
-
-        **폰** 은 붙이지 않는다(노선 그림과 팁을 합치면 화면보다 커서 아래가 잘린다).
-        그래서 **구간이 화면을 지나가는 동안** 으로 잰다 — 아래에서 올라와 위로 빠져나갈 때까지.
-
-        가르는 기준을 화면 높이의 절반으로 뒀다. 붙여 둔 구간은 이보다 훨씬 길고,
-        안 붙인 구간은 훨씬 짧아서 애매한 중간이 없다.
-      */
-      const pinned = box.height - view;
-      let passed: number;
-      if (pinned > view / 2) {
-        // 붙여 둔 구간(PC) — 붙어 있는 동안 흐르는 스크롤을 넷으로 나눈다
-        passed = -box.top / pinned;
-      } else {
-        // 안 붙인 구간(폰) — **노선 그림** 이 화면을 지나가는 동안으로 잰다.
-        // 구간 전체로 재면 마지막 날짜가 올 때쯤 그림이 이미 화면 밖이라 문양이 안 보인다.
-        const sb = scene.getBoundingClientRect();
-        passed = (view - sb.top) / (sb.height + view);
-      }
-      passed = Math.min(1, Math.max(0, passed));
+      // 노선도가 화면에 붙어 있는 동안 흐르는 스크롤(구간 높이 − 화면 높이)을 넷으로 나눈다.
+      // 붙어 있으니 그림은 그대로 있고 날짜만 바뀐다. PC 와 폰이 같은 방식이다.
+      const span = box.height - view;
+      if (span <= 0) return;
+      const passed = Math.min(1, Math.max(0, -box.top / span));
 
       // 1 → 2 → 3 → 4. 끝에서 passed 가 딱 1 이 되면 5 가 나오므로 잘라 준다.
       const day = Math.min(days, Math.floor(passed * days) + 1);

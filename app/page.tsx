@@ -79,15 +79,23 @@ const MOTION = `
   글을 읽을 틈은 주되 지루하지 않을 만큼으로 잡았다.
   실제로 날짜를 옮기는 것은 components/RouteScrollDays.tsx 다.
 */
-@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .ktc-route { min-height: calc(100vh + 200vh) }
-  .ktc-route-pin { position: sticky; top: 3rem }
-}
 /*
-  폰에서는 붙이지 않는다. 노선 그림만 붙여 봤더니 아래 팁이 그 밑으로 들어가면서
-  팁 제목이 잘렸다. 대신 **노선 그림이 화면에 있는 동안** 날짜가 다 넘어가게 했다 —
-  components/RouteScrollDays.tsx 가 폰에서는 노선 그림을 기준으로 잰다.
+  노선도를 화면에 붙여 두고 그 동안 날짜를 넘긴다. 카드 묶음과 같은 방식이다.
+  붙여 두지 않으면 팁이 화면 밖으로 밀려나 읽을 새가 없다.
+
+  200vh 는 날짜 넷이 나눠 갖는 스크롤 길이다 — 한 날에 50vh 씩.
+  실제로 날짜를 옮기는 것은 components/RouteScrollDays.tsx 다.
+
+  **붙이는 위치가 화면마다 다르다.** 폰은 노선 그림(179px) + 사이(32px) + 팁(586px) = 797px 라
+  812px 화면에 겨우 들어간다. PC 처럼 3rem 을 띄우면 팁 아래가 잘리므로 0.5rem 만 띄운다.
 */
+@media (prefers-reduced-motion: no-preference) {
+  .ktc-route { min-height: calc(100vh + 200vh) }
+  .ktc-route-pin { position: sticky; top: 0.5rem }
+}
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .ktc-route-pin { top: 3rem }
+}
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .ktc-deck {
