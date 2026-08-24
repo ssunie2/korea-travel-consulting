@@ -58,8 +58,17 @@ export default function Select({
   const listId = useId();
   const labelId = useId();
 
+  /**
+   * 목록에 올릴 것들.
+   *
+   * **기본값이 정해진 칸에는 '안 고름' 줄을 만들지 않는다.** 언어처럼 처음부터
+   * English 가 골라져 있는 칸에 그 줄을 넣으면 English 가 두 번 나온다 —
+   * 위는 "아직 안 골랐다" 는 뜻이고 아래는 실제 보기라 뜻은 다르지만, 손님에게는
+   * 같은 글자가 두 줄 보일 뿐이다. 기본값이 있다는 건 답이 늘 있다는 뜻이므로
+   * 안 고른 상태가 아예 없다.
+   */
   const all: Option[] = [
-    { value: "", label: placeholder },
+    ...(defaultValue ? [] : [{ value: "", label: placeholder }]),
     ...options,
     ...(allowOther ? [{ value: OTHER, label: t({ ko: "기타", en: "Other" }) }] : []),
   ];
