@@ -155,8 +155,10 @@ const steps = [
     body: t({
       // '등' 으로 열어 둔다. 폼에서 묻는 것이 넷보다 많아졌고(속도·이동 수단·숙소·예산…),
       // 마침표로 닫으면 딱 넷만 묻는 것처럼 읽힌다.
-      ko: ["날짜, 기간, 동행, 관심사 등", "2분이면 되고 가입도 필요 없습니다."],
-      en: ["Dates, how long, who's coming, what you're into, and more", "Two minutes, no account."],
+      // '가입도 필요 없습니다' 를 뺐다 — 첫 화면 버튼 옆에 '가입 없음' 이 이미 있다.
+      // '적는' 이 아니라 '선택하는' 이다. 폼이 거의 다 눌러서 고르는 방식으로 바뀌었다.
+      ko: ["날짜, 기간, 동행, 관심사 등", "선택하는 데 2분이면 충분합니다."],
+      en: ["Dates, how long, who's coming, what you're into, and more", "Two minutes to pick your answers."],
     }),
   },
   {
