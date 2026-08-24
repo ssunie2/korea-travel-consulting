@@ -456,7 +456,7 @@ export default function PlanForm() {
               label={t({ ko: "누구와 가시나요", en: "Who\u2019s coming" })}
               name="audience"
               options={AUDIENCES.map((a) => ({ value: a.v, label: t({ ko: a.ko, en: a.v }) }))}
-              placeholder={t({ ko: "상관없음", en: "No preference" })}
+              placeholder={t({ ko: "고르세요", en: "Choose one" })}
             />
 
           {/*
@@ -472,7 +472,7 @@ export default function PlanForm() {
                 label={t({ ko: "여행 속도", en: "Pace" })}
                 name="pace"
                 options={PACES.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
-                placeholder={t({ ko: "상관없음", en: "No preference" })}
+                placeholder={t({ ko: "고르세요", en: "Choose one" })}
               />
 
             <Select
@@ -487,21 +487,21 @@ export default function PlanForm() {
                 label={t({ ko: "어떻게 다니실 건가요?", en: "How will you get around?" })}
                 name="transport"
                 options={TRANSPORTS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
-                placeholder={t({ ko: "상관없음", en: "No preference" })}
+                placeholder={t({ ko: "고르세요", en: "Choose one" })}
               />
 
             <Select
                 label={t({ ko: "숙소는 어디쯤이 좋으세요?", en: "Where would you rather stay?" })}
                 name="stayArea"
                 options={STAY_AREAS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
-                placeholder={t({ ko: "상관없음", en: "No preference" })}
+                placeholder={t({ ko: "고르세요", en: "Choose one" })}
               />
 
             <Select
                 label={t({ ko: "하루를 언제 시작하세요?", en: "When do you start your day?" })}
                 name="dayRhythm"
                 options={RHYTHMS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
-                placeholder={t({ ko: "상관없음", en: "No preference" })}
+                placeholder={t({ ko: "고르세요", en: "Choose one" })}
               />
 
             {/*
