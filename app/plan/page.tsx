@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Instrument_Serif } from "next/font/google";
 import { t } from "@/lib/copy";
+import DateRangePicker, { nightsBetween } from "@/components/DateRangePicker";
 
 // 표제용 서체. 랜딩·결과 화면과 같은 방식으로 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -45,6 +46,52 @@ const AUDIENCES = [
   { v: "Solo", ko: "혼자" }, { v: "Couple", ko: "커플" }, { v: "Friends", ko: "친구" },
   { v: "Family with kids", ko: "아이와 함께" }, { v: "With parents", ko: "부모님과" },
 ];
+/**
+ * 아래 목록들은 **문서의 짜임을 바꾸는 답**이다. 같은 도시라도 이 값에 따라
+ * 하루에 넣는 일정 수, 동선, 시작 시각이 달라진다. 값(v)은 영어 라벨을 그대로 쓴다 —
+ * 이 글자가 그대로 AI 프롬프트로 나가기 때문에 코드값을 따로 두면 번역을 한 번 더 해야 한다.
+ */
+const PACES = [
+  { v: "Packed", ko: "빡빡하게 — 많이 보고 싶어요" },
+  { v: "Balanced", ko: "보통" },
+  { v: "Relaxed", ko: "여유롭게 — 쉬엄쉬엄" },
+];
+const VISITS = [
+  { v: "First time", ko: "처음이에요" },
+  { v: "Been before", ko: "와본 적 있어요" },
+];
+const TRANSPORTS = [
+  { v: "Subway and bus", ko: "지하철·버스" },
+  { v: "Rental car", ko: "렌터카" },
+  { v: "Mostly taxi", ko: "택시 위주" },
+];
+const STAY_AREAS = [
+  { v: "City centre", ko: "도심 한가운데" },
+  { v: "Quiet neighbourhood", ko: "조용한 동네" },
+];
+const RHYTHMS = [
+  { v: "Early start", ko: "일찍 시작할게요" },
+  { v: "Late start", ko: "늦게 시작할게요" },
+];
+const OCCASIONS = [
+  { v: "Birthday", ko: "생일" },
+  { v: "Anniversary", ko: "기념일" },
+  { v: "Honeymoon", ko: "신혼여행" },
+  { v: "Graduation", ko: "졸업·합격" },
+];
+/** 여러 개 고르는 것 */
+const DIETARY = [
+  { v: "Halal", ko: "할랄" }, { v: "Vegetarian", ko: "채식" }, { v: "Vegan", ko: "비건" },
+  { v: "Nut allergy", ko: "견과류 알레르기" }, { v: "Dairy allergy", ko: "유제품 알레르기" },
+  { v: "Seafood allergy", ko: "해산물 알레르기" }, { v: "No spicy food", ko: "매운 음식 못 먹음" },
+  { v: "Wheelchair access", ko: "휠체어 접근" }, { v: "Stroller", ko: "유아차" },
+  { v: "Hard to walk far", ko: "오래 걷기 어려움" },
+];
+const AVOIDS = [
+  { v: "Crowded places", ko: "사람 많은 곳" }, { v: "Lots of stairs", ko: "계단 많은 곳" },
+  { v: "Spicy food", ko: "매운 음식" }, { v: "Late nights", ko: "늦은 밤 일정" },
+  { v: "Long travel legs", ko: "긴 이동" }, { v: "Drinking", ko: "술자리" },
+];
 const CURRENCIES = ["KRW", "USD", "EUR", "JPY"];
 const LANGUAGES = [
   { code: "en", label: "English" },
@@ -68,8 +115,6 @@ const TIMEOUT_MS = 60_000;
 
 export default function PlanForm() {
   const router = useRouter();
-  // 오늘보다 이전 날짜를 못 고르게 막는 값
-  const today = new Date().toISOString().slice(0, 10);
   const [destinations, setDestinations] = useState<string[]>([]);
   // "그 외" — 목록에 없는 곳을 직접 적는 칸. 눌렀을 때만 칸이 나온다.
   const [otherOn, setOtherOn] = useState(false);
@@ -77,9 +122,30 @@ export default function PlanForm() {
   // 관심사 쪽 "그 외". 여행지와 같은 방식이다.
   const [styleOtherOn, setStyleOtherOn] = useState(false);
   const [otherStyle, setOtherStyle] = useState("");
+  // 달력에서 고른 두 날짜. 기간은 이 둘에서 계산한다.
+  const [dateStart, setDateStart] = useState<string | null>(null);
+  const [dateEnd, setDateEnd] = useState<string | null>(null);
+  // 여러 개 고르는 문항들
+  const [dietary, setDietary] = useState<string[]>([]);
+  const [avoid, setAvoid] = useState<string[]>([]);
+  const [dietOtherOn, setDietOtherOn] = useState(false);
+  const [otherDiet, setOtherDiet] = useState("");
+  const [avoidOtherOn, setAvoidOtherOn] = useState(false);
+  const [otherAvoid, setOtherAvoid] = useState("");
   const [styles, setStyles] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  /**
+   * 누르는 칸의 생김새. 고른 것은 채우고, '그 외' 는 점선으로 둬서
+   * **보기와 직접 적는 칸이 다르다는 걸 눈으로 구분**하게 한다.
+   */
+  const chip = (on: boolean, dashed = false) =>
+    `rounded-full border px-4 py-2.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)] ${
+      on
+        ? "border-[var(--c-deep)] bg-[var(--c-text)] text-[var(--c-bg)]"
+        : `${dashed ? "border-dashed" : ""} border-[var(--c-line)] bg-[var(--c-surface)] hover:border-[var(--c-text-3)]`
+    }`;
 
   // 반드시 이전 값을 받아서 계산한다.
   // `list` 를 그대로 쓰면 빠르게 두 번 연속 누를 때 두 번째가 첫 번째를 지운다 (실제로 겪었다).
@@ -110,6 +176,14 @@ export default function PlanForm() {
       return;
     }
 
+    if (!dateStart || !dateEnd) {
+      setError(t({ ko: "가는 날과 오는 날을 골라주세요.", en: "Pick your check-in and check-out dates." }));
+      return;
+    }
+
+    const dietTyped = dietOtherOn ? otherDiet.trim() : "";
+    const avoidTyped = avoidOtherOn ? otherAvoid.trim() : "";
+
     setError(null);
     setSubmitting(true);
 
@@ -127,12 +201,21 @@ export default function PlanForm() {
         body: JSON.stringify({
           destinations: picked,
           styles: pickedStyles,
-          startDate: f.get("startDate"),
-          durationDays: Number(f.get("durationDays")),
+          startDate: dateStart,
+          // 9/13 에 와서 9/15 에 간다면 이틀 밤, 사흘치 일정이다
+          durationDays: nightsBetween(dateStart, dateEnd) + 1,
           travelers: Number(f.get("travelers")),
           budgetPerPerson: f.get("budgetPerPerson") ? Number(f.get("budgetPerPerson")) : undefined,
           budgetCurrency: f.get("budgetCurrency"),
           audience: f.get("audience") || undefined,
+          pace: f.get("pace") || undefined,
+          visitedBefore: f.get("visitedBefore") || undefined,
+          transport: f.get("transport") || undefined,
+          stayArea: f.get("stayArea") || undefined,
+          dayRhythm: f.get("dayRhythm") || undefined,
+          occasion: f.get("occasion") || undefined,
+          dietary: dietTyped ? [...dietary, dietTyped] : dietary,
+          avoid: avoidTyped ? [...avoid, avoidTyped] : avoid,
           dietaryNotes: f.get("dietaryNotes") || undefined,
           interests: f.get("interests") || undefined,
           language: f.get("language"),
@@ -247,16 +330,20 @@ export default function PlanForm() {
             )}
           </fieldset>
 
-          <div className="grid gap-6 sm:grid-cols-3">
-            <label className="block">
-              <span className={label}>{t({ ko: "출발일 *", en: "Start date *" })}</span>
-              {/* 지나간 날짜를 고르면 AI가 이미 끝난 여행의 일정을 만든다. 서버에서도 한 번 더 막는다 */}
-              <input type="date" name="startDate" required min={today} className={field} />
-            </label>
-            <label className="block">
-              <span className={label}>{t({ ko: "기간(일) *", en: "Days *" })}</span>
-              <input type="number" name="durationDays" required min={1} max={30} defaultValue={5} className={field} />
-            </label>
+          {/*
+            날짜는 달력에서 고른다. 전에는 `출발일` 과 `기간(일)` 두 칸이었는데,
+            손님은 달력을 보고 고르지 며칠짜리인지를 먼저 세지 않는다.
+            기간은 고른 두 날짜에서 계산한다 — 손님이 따로 적을 필요가 없다.
+            지나간 날짜는 달력이 막고, 서버(lib/validate.ts)에서 한 번 더 막는다.
+          */}
+          <fieldset>
+            <legend className={label}>{t({ ko: "언제 가시나요? *", en: "When are you going? *" })}</legend>
+            <div className="mt-3">
+              <DateRangePicker start={dateStart} end={dateEnd} onChange={(v) => { setDateStart(v.start); setDateEnd(v.end); }} />
+            </div>
+          </fieldset>
+
+          <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
               <span className={label}>{t({ ko: "인원 *", en: "Travelers *" })}</span>
               <input type="number" name="travelers" required min={1} max={20} defaultValue={2} className={field} />
@@ -344,27 +431,112 @@ export default function PlanForm() {
             </select>
           </label>
 
-          {/* 제약사항 — 무슬림·채식 손님에게는 여행의 성패고, 이걸 챙기는 게 우리가 돈 받는 이유에 가깝다 */}
-          <label className="block">
-            <span className={label}>{t({ ko: "꼭 맞춰야 할 것이 있나요?", en: "Anything we must work around?" })}</span>
-            <textarea
-              name="dietaryNotes"
-              rows={2}
-              placeholder={t({ ko: "할랄, 채식, 알레르기, 휠체어 접근…", en: "Halal, vegetarian, allergies, wheelchair access…" })}
-              className={field}
-            />
-          </label>
+          {/*
+            여기부터는 **일정의 짜임을 정하는 답들**이다. 한 개만 고르는 것은 목록 상자로,
+            여러 개 고르는 것은 누르는 칸으로 뒀다. 문항이 일곱이라 전부 칸으로 두면
+            화면이 칸으로만 가득 찬다.
 
-          <label className="block">
-            <span className={label}>{t({ ko: "이미 하고 싶은 것이 있나요?", en: "Anything you already want to do?" })}</span>
-            <textarea
-              name="interests"
-              rows={3}
-              maxLength={500}
-              placeholder={t({ ko: "전통시장, 커피, 야경…", en: "Traditional markets, coffee, night views…" })}
-              className={field}
-            />
-          </label>
+            전부 답하지 않아도 된다 — 답 안 한 항목은 AI 에게 아예 전하지 않는다.
+            'not specified' 를 잔뜩 보내면 AI 가 그 빈칸을 지어내 채운다(lib/prompt.ts 의 shape()).
+          */}
+          <div className="grid gap-6 sm:grid-cols-2">
+            <label className="block">
+              <span className={label}>{t({ ko: "여행 속도", en: "Pace" })}</span>
+              <select name="pace" defaultValue="" className={field}>
+                <option value="">{t({ ko: "상관없음", en: "No preference" })}</option>
+                {PACES.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className={label}>{t({ ko: "한국은 처음이신가요?", en: "First time in Korea?" })}</span>
+              <select name="visitedBefore" defaultValue="" className={field}>
+                <option value="">{t({ ko: "말하지 않을래요", en: "Rather not say" })}</option>
+                {VISITS.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className={label}>{t({ ko: "어떻게 다니실 건가요?", en: "How will you get around?" })}</span>
+              <select name="transport" defaultValue="" className={field}>
+                <option value="">{t({ ko: "상관없음", en: "No preference" })}</option>
+                {TRANSPORTS.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className={label}>{t({ ko: "숙소는 어디쯤이 좋으세요?", en: "Where would you rather stay?" })}</span>
+              <select name="stayArea" defaultValue="" className={field}>
+                <option value="">{t({ ko: "상관없음", en: "No preference" })}</option>
+                {STAY_AREAS.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className={label}>{t({ ko: "하루를 언제 시작하세요?", en: "When do you start your day?" })}</span>
+              <select name="dayRhythm" defaultValue="" className={field}>
+                <option value="">{t({ ko: "상관없음", en: "No preference" })}</option>
+                {RHYTHMS.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className={label}>{t({ ko: "특별한 날인가요?", en: "Any special occasion?" })}</span>
+              <select name="occasion" defaultValue="" className={field}>
+                <option value="">{t({ ko: "아니요", en: "No" })}</option>
+                {OCCASIONS.map((o) => <option key={o.v} value={o.v}>{t({ ko: o.ko, en: o.v })}</option>)}
+              </select>
+            </label>
+          </div>
+
+          {/* 제약사항 — 무슬림·채식 손님에게는 여행의 성패고, 이걸 챙기는 게 우리가 돈 받는 이유에 가깝다 */}
+          <fieldset>
+            <legend className={label}>{t({ ko: "꼭 맞춰야 할 것이 있나요?", en: "Anything we must work around?" })}</legend>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {DIETARY.map((o) => {
+                const on = dietary.includes(o.v);
+                return (
+                  <button key={o.v} type="button" aria-pressed={on} onClick={() => toggle(o.v, setDietary)} className={chip(on)}>
+                    {t({ ko: o.ko, en: o.v })}
+                  </button>
+                );
+              })}
+              <button type="button" aria-pressed={dietOtherOn} onClick={() => setDietOtherOn((v) => !v)} className={chip(dietOtherOn, true)}>
+                {t({ ko: "그 외", en: "Something else" })}
+              </button>
+            </div>
+            {dietOtherOn && (
+              <label className="mt-3 block">
+                <span className="sr-only">{t({ ko: "무엇을 맞춰야 하나요?", en: "What else?" })}</span>
+                <input type="text" value={otherDiet} onChange={(e) => setOtherDiet(e.target.value)} maxLength={40} autoFocus
+                  placeholder={t({ ko: "적어주세요 — 예: 글루텐 프리", en: "Type it — e.g. gluten free" })} className={field} />
+              </label>
+            )}
+          </fieldset>
+
+          <fieldset>
+            <legend className={label}>{t({ ko: "빼고 싶은 것이 있나요?", en: "Anything to leave out?" })}</legend>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {AVOIDS.map((o) => {
+                const on = avoid.includes(o.v);
+                return (
+                  <button key={o.v} type="button" aria-pressed={on} onClick={() => toggle(o.v, setAvoid)} className={chip(on)}>
+                    {t({ ko: o.ko, en: o.v })}
+                  </button>
+                );
+              })}
+              <button type="button" aria-pressed={avoidOtherOn} onClick={() => setAvoidOtherOn((v) => !v)} className={chip(avoidOtherOn, true)}>
+                {t({ ko: "그 외", en: "Something else" })}
+              </button>
+            </div>
+            {avoidOtherOn && (
+              <label className="mt-3 block">
+                <span className="sr-only">{t({ ko: "무엇을 뺄까요?", en: "What else?" })}</span>
+                <input type="text" value={otherAvoid} onChange={(e) => setOtherAvoid(e.target.value)} maxLength={40} autoFocus
+                  placeholder={t({ ko: "적어주세요 — 예: 이른 아침 일정", en: "Type it — e.g. early mornings" })} className={field} />
+              </label>
+            )}
+          </fieldset>
 
           <label className="block">
             <span className={label}>{t({ ko: "초안을 받을 언어 *", en: "Language for your draft *" })}</span>

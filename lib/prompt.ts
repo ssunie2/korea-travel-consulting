@@ -65,6 +65,27 @@ export const freeItinerarySchema = {
  * 초안이 너무 좋으면 손님이 상담을 사지 않는다. 항목을 늘리기 전에
  * "이걸 공짜로 주면 상담을 살까?"를 먼저 따진다.
  */
+/**
+ * 문서의 짜임을 바꾸는 답들을 프롬프트 줄로 만든다.
+ *
+ * **답하지 않은 것은 아예 줄을 만들지 않는다.** 'not specified' 를 잔뜩 넣으면
+ * AI 가 그 빈칸을 채우려 들면서 엉뚱한 가정을 지어낸다. 없으면 없는 대로 두는 편이 낫다.
+ *
+ * 각 줄에 **그 답이 무엇을 바꿔야 하는지** 를 같이 적는다. 값만 던지면
+ * AI 가 읽고도 일정에 반영하지 않는다.
+ */
+function shape(input: PlanInput): string {
+  const lines: string[] = []
+  if (input.pace) lines.push(`- Pace: ${input.pace} — adjust how many stops each day holds.`)
+  if (input.visitedBefore) lines.push(`- Been to Korea before: ${input.visitedBefore} — first-timers get the landmarks, repeat visitors get lesser-known places.`)
+  if (input.transport) lines.push(`- Getting around: ${input.transport} — build the route around this, not around what is closest on a map.`)
+  if (input.stayArea) lines.push(`- Prefers to stay: ${input.stayArea} — the one place to stay must match this.`)
+  if (input.dayRhythm) lines.push(`- Day rhythm: ${input.dayRhythm} — set the first activity's time to match.`)
+  if (input.occasion) lines.push(`- Occasion: ${input.occasion} — work one moment into the trip that fits it.`)
+  if (input.avoid?.length) lines.push(`- AVOID: ${input.avoid.join(', ')} — do not put these in the plan.`)
+  return lines.length ? lines.join('\n') + '\n' : ''
+}
+
 export function buildFreeDraftPrompt(input: PlanInput): string {
   const budget = input.budgetPerPerson
     ? `about ${input.budgetPerPerson.toLocaleString()} ${input.budgetCurrency} per person`
@@ -79,8 +100,7 @@ Trip:
 - Travelers: ${input.travelers} (${input.audience ?? 'unspecified group'})
 - Budget: ${budget}
 - Styles: ${input.styles.length ? input.styles.join(', ') : 'no preference'}
-- Interests: ${input.interests ?? 'none given'}
-${input.dietaryNotes ? `- MUST WORK AROUND: ${input.dietaryNotes}\n  Every food recommendation has to respect this. Do not suggest anything they cannot eat or reach.` : ''}
+${shape(input)}${input.dietary?.length ? `- MUST WORK AROUND: ${input.dietary.join(', ')}\n  Every food recommendation has to respect this. Do not suggest anything they cannot eat or reach.` : ''}
 - Stay inside the places listed above. Do not add cities they did not ask for.
 
 THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
@@ -233,8 +253,7 @@ Trip:
 - Travelers: ${input.travelers} (${input.audience ?? 'unspecified group'})
 - Budget: ${budget}
 - Styles: ${input.styles.length ? input.styles.join(', ') : 'no preference'}
-- Interests: ${input.interests ?? 'none given'}
-${input.dietaryNotes ? `- MUST WORK AROUND: ${input.dietaryNotes}\n  Every food recommendation must respect this. Do not suggest anything they cannot eat or reach.` : ''}
+${shape(input)}${input.dietary?.length ? `- MUST WORK AROUND: ${input.dietary.join(', ')}\n  Every food recommendation must respect this. Do not suggest anything they cannot eat or reach.` : ''}
 
 ## 1. Route — this is the main thing
 

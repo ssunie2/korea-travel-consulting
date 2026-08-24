@@ -13,9 +13,33 @@ export type PlanInput = {
   budgetCurrency: string
   styles: string[]
   audience?: string
-  interests?: string
-  /** 할랄·비건·알레르기·휠체어. 이걸 챙기는 게 우리가 돈 받는 이유에 가깝다 */
-  dietaryNotes?: string
+
+  /**
+   * 아래 일곱 가지는 **문서의 짜임을 바꾸는 답들이다.** 전부 객관식이라 짧은 글자다.
+   * 같은 도시라도 이 값에 따라 하루에 넣는 일정 수, 동선, 시작 시각이 달라진다.
+   */
+  /** 빡빡하게 / 보통 / 여유롭게 — 하루에 넣는 일정 개수가 달라진다 */
+  pace?: string
+  /** 처음인지 다시 오는지 — 처음이면 경복궁, 다시면 덜 알려진 곳 */
+  visitedBefore?: string
+  /** 지하철·버스 / 렌터카 / 택시 — 추천 동선이 통째로 달라진다 */
+  transport?: string
+  /** 도심 / 조용한 동네 — 숙소를 고르는 기준 */
+  stayArea?: string
+  /** 일찍 시작 / 늦게 시작 — 시간표의 첫 시각 */
+  dayRhythm?: string
+  /** 생일·기념일·신혼여행 같은 것 */
+  occasion?: string
+  /** 사람 많은 곳, 계단, 긴 이동처럼 빼 달라는 것들 */
+  avoid?: string[]
+
+  /**
+   * 할랄·비건·알레르기·휠체어. 이걸 챙기는 게 우리가 돈 받는 이유에 가깝다.
+   *
+   * ⚠️ **건강·종교 정보다.** AI 무료 등급에서는 넣은 내용이 학습에 쓰이고 사람이 볼 수 있다.
+   *    손님을 받기 전에 유료 등급으로 올려야 한다.
+   */
+  dietary?: string[]
   language: string
 }
 
@@ -124,8 +148,17 @@ export type Plan = {
   budget_currency: string
   styles: string[]
   audience: string | null
-  interests: string | null
+  pace: string | null
+  visited_before: string | null
+  transport: string | null
+  stay_area: string | null
+  day_rhythm: string | null
+  occasion: string | null
+  avoid: string[] | null
+  dietary: string[] | null
+  /** 옛 자유 입력 칸. 객관식(dietary)으로 바뀌기 전에 들어온 값이 남아 있다 */
   dietary_notes: string | null
+  interests: string | null
   language: string
   itinerary: FreeItinerary | null
 }

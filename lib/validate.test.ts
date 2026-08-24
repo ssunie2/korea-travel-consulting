@@ -58,7 +58,19 @@ test('언어 코드가 이상하면 영어로 되돌린다', () => {
   assert.equal(r.ok && r.value.language, 'en')
 })
 
-test('관심사가 너무 길면 잘라낸다', () => {
-  const r = validatePlanInput({ ...good, interests: 'a'.repeat(9999) })
-  assert.equal(r.ok && r.value.interests?.length, 500)
+test("'그 외' 로 적은 글이 너무 길면 잘라낸다", () => {
+  const r = validatePlanInput({ ...good, styles: ['a'.repeat(9999)] })
+  assert.equal(r.ok && r.value.styles[0].length, 40)
+})
+
+test('객관식 답 목록이 너무 많으면 잘라낸다', () => {
+  const many = Array.from({ length: 50 }, (_, i) => `x${i}`)
+  const r = validatePlanInput({ ...good, avoid: many, dietary: many })
+  assert.equal(r.ok && r.value.avoid?.length, 8)
+  assert.equal(r.ok && r.value.dietary?.length, 12)
+})
+
+test('빈 문자열은 답으로 치지 않는다', () => {
+  const r = validatePlanInput({ ...good, dietary: ['할랄', '   ', ''] })
+  assert.deepEqual(r.ok && r.value.dietary, ['할랄'])
 })
