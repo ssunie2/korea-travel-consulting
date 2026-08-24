@@ -504,12 +504,18 @@ export default function PlanForm() {
                 placeholder={t({ ko: "상관없음", en: "No preference" })}
               />
 
+            {/*
+              전에는 안 고른 상태를 '아니요' 라고 적었다. 첫 줄부터 부정으로 시작하면
+              답하기도 전에 닫히는 느낌이 든다. 안 고르고 넘어가면 그냥 특별한 날이
+              아닌 것으로 친다 — 굳이 아니라고 말하게 할 이유가 없다.
+            */}
             <Select
-                label={t({ ko: "특별한 날인가요?", en: "Any special occasion?" })}
-                name="occasion"
-                options={OCCASIONS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
-                placeholder={t({ ko: "아니요", en: "No" })}
-              />
+              label={t({ ko: "특별한 날인가요?", en: "Any special occasion?" })}
+              name="occasion"
+              options={OCCASIONS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+              placeholder={t({ ko: "고르세요", en: "Choose one" })}
+              allowOther
+            />
           </div>
 
           {/* 제약사항 — 무슬림·채식 손님에게는 여행의 성패고, 이걸 챙기는 게 우리가 돈 받는 이유에 가깝다 */}
