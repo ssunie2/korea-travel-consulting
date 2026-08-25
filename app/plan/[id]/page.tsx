@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Instrument_Serif } from "next/font/google";
 import { supabaseServer } from "@/lib/supabase-server";
-import type { Plan } from "@/lib/types";
+import type { FreeItinerary, Plan } from "@/lib/types";
 import { t } from "@/lib/copy";
 import CopyLinkButton from "@/components/CopyLinkButton";
 
@@ -17,6 +17,25 @@ const display = Instrument_Serif({
 // 주소를 열 때마다 DB에서 최신을 읽는다.
 export const dynamic = "force-dynamic";
 
+/**
+ * 며칠째가 실제로 몇 월 며칠 무슨 요일인지.
+ *
+ * **AI 에게 시키지 않는다.** 출발일과 며칠째만 있으면 정확히 나오는 계산이고,
+ * 맡기면 요일을 틀리게 쓴다. 요일이 중요한 이유는 **일요일에 문 닫는 곳이 많아서**다 —
+ * 요일을 모르면 헛걸음한다.
+ *
+ * 시간대에 따라 하루가 밀리지 않도록 UTC 로만 센다.
+ */
+function dayLabel(startDate: string, dayNumber: number) {
+  const d = new Date(`${startDate}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + dayNumber - 1);
+  const KO = ["일", "월", "화", "수", "목", "금", "토"];
+  return t({
+    ko: `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일 (${KO[d.getUTCDay()]})`,
+    en: d.toLocaleDateString("en-US", { month: "short", day: "numeric", weekday: "short", timeZone: "UTC" }),
+  });
+}
+
 function dateRange(startDate: string, days: number) {
   const start = new Date(`${startDate}T00:00:00Z`);
   const end = new Date(start);
@@ -24,6 +43,40 @@ function dateRange(startDate: string, days: number) {
   const fmt = (d: Date) =>
     d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
   return `${fmt(start)} – ${fmt(end)}, ${start.getUTCFullYear()}`;
+}
+
+/**
+ * 맛보기 팁 하나. **이 화면에서 제일 중요한 부분이다.**
+ *
+ * 그 팁이 걸린 날 바로 아래에 붙인다 — 전에는 맨 끝에 있어서, 나흘치를 다 읽고 나서야
+ * 1일차 팁을 봤다. 팁은 그 날의 이야기라 그 자리에서 읽혀야 한다.
+ * 몇 일째인지 모르는 옛 초안은 지금처럼 맨 아래에 둔다.
+ */
+function ConciergeTip({ tip, className = "" }: { tip: FreeItinerary["sampleTip"]; className?: string }) {
+  return (
+      <figure className={`${className} rounded-2xl bg-[var(--c-deep)] p-7 text-[var(--c-text-on-deep)] shadow-[0_24px_60px_-24px_rgba(18,33,28,0.55)] sm:p-9`}>
+        <figcaption className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-accent-dim)]">
+          {t({ ko: "컨시어지 팁 하나", en: "One concierge tip" })} · {tip.activityName}
+        </figcaption>
+        <p className="mt-4 font-[family-name:var(--font-display)] text-2xl leading-snug">
+          {tip.highlight}
+        </p>
+
+        <div className="mt-7 border-t border-[var(--c-line)] pt-5">
+          <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-accent)]">
+            {t({ ko: "피하실 것", en: "What to avoid" })}
+          </p>
+          <p className="mt-2 leading-relaxed text-[var(--c-text-on-deep)]">{tip.pitfall}</p>
+        </div>
+
+        <div className="mt-6 border-t border-[var(--c-line)] pt-5">
+          <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-focus)]">
+            {t({ ko: "여기 사는 사람이라면 이렇게 말합니다", en: "What someone here would tell you" })}
+          </p>
+          <p className="mt-2 leading-relaxed">{tip.insiderSecret}</p>
+        </div>
+      </figure>
+  );
 }
 
 export default async function PlanPage({ params }: { params: Promise<{ id: string }> }) {
@@ -97,9 +150,35 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
                   {day.theme}
                 </h2>
               </div>
+              {/*
+                날짜·요일과 그날 머무는 도시. 제목 아래 한 줄로 붙인다.
+                도시는 **여러 날에 걸쳐 같으면 굳이 반복하지 않고**, 바뀌는 날에만 눈에 띄면 되지만
+                지금은 매일 적는다 — 빠뜨리는 것보다 낫고, 손님이 하루씩 떼어 봐도 어디인지 안다.
+                city 가 없는 옛 초안도 있어서 있을 때만 그린다.
+              */}
+              <p className="ml-[calc(0.75rem+1rem)] mt-1 font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.14em] text-[var(--c-text-3)]">
+                {dayLabel(plan.start_date, day.dayNumber)}
+                {day.city && (
+                  <>
+                    <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
+                    <span className="text-[var(--c-accent-dim)]">{day.city}</span>
+                  </>
+                )}
+              </p>
               <ul className="mt-5 space-y-5 border-l border-[var(--c-line-2)] pl-6">
                 {day.activities.map((a, i) => (
                   <li key={i}>
+                    {/*
+                      앞 일정에서 여기까지 대략 얼마나 걸리는지. **동선이 말이 되는지**를 보여준다.
+                      그날 첫 일정에는 없다(앞이 없다). 옛 초안에도 없어서 있을 때만 그린다.
+                      자세한 길 안내는 유료다 — 여기서는 시간만.
+                    */}
+                    {a.travel && (
+                      <p className="mb-2 flex items-center gap-2 font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.1em] text-[var(--c-text-4)]">
+                        <span aria-hidden>↓</span>
+                        {a.travel}
+                      </p>
+                    )}
                     <p className="font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.15em] text-[var(--c-text-3)]">
                       {a.time}
                     </p>
@@ -108,33 +187,17 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
                   </li>
                 ))}
               </ul>
+
+              {/* 이 날의 팁이면 바로 아래에 붙인다 */}
+              {trip.sampleTip.dayNumber === day.dayNumber && (
+                <ConciergeTip tip={trip.sampleTip} className="mt-8" />
+              )}
             </li>
           ))}
         </ol>
 
-        {/* ── 맛보기 팁 하나. 이 화면에서 제일 중요한 부분이다 ── */}
-        <figure className="mt-16 rounded-2xl bg-[var(--c-deep)] p-7 text-[var(--c-text-on-deep)] shadow-[0_24px_60px_-24px_rgba(18,33,28,0.55)] sm:p-9">
-          <figcaption className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-accent-dim)]">
-            {t({ ko: "컨시어지 팁 하나", en: "One concierge tip" })} · {trip.sampleTip.activityName}
-          </figcaption>
-          <p className="mt-4 font-[family-name:var(--font-display)] text-2xl leading-snug">
-            {trip.sampleTip.highlight}
-          </p>
-
-          <div className="mt-7 border-t border-[var(--c-line)] pt-5">
-            <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-accent)]">
-              {t({ ko: "피하실 것", en: "What to avoid" })}
-            </p>
-            <p className="mt-2 leading-relaxed text-[var(--c-text-on-deep)]">{trip.sampleTip.pitfall}</p>
-          </div>
-
-          <div className="mt-6 border-t border-[var(--c-line)] pt-5">
-            <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-focus)]">
-              {t({ ko: "여기 사는 사람이라면 이렇게 말합니다", en: "What someone here would tell you" })}
-            </p>
-            <p className="mt-2 leading-relaxed">{trip.sampleTip.insiderSecret}</p>
-          </div>
-        </figure>
+        {/* 몇 일째인지 모르는 옛 초안만 여기(맨 아래)에 그린다 */}
+        {!trip.sampleTip.dayNumber && <ConciergeTip tip={trip.sampleTip} className="mt-16" />}
 
         {/* ── 숙소·식당·예산 ───────────────────────────── */}
         <dl className="mt-14 grid gap-8 border-t border-[var(--c-line-2)] pt-10 sm:grid-cols-3">
