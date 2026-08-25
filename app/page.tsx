@@ -266,6 +266,42 @@ const HERO_CARDS = [
  * 누르는 자리. `x` 는 화면 폭의 몇 %인지다 — 넓은 화면과 폰 장면이
  * 같은 비율로 정거장을 놓기 때문에 이 한 벌로 둘 다 덮는다.
  */
+/**
+ * 랜딩에 펼쳐 놓는 **진짜 초안 네 개.**
+ *
+ * 지어낸 글이 아니다. 실제 폼을 통해 만들어 저장된 초안이고, 누르면 그 초안 화면이 그대로 열린다.
+ * 손님이 "무료 초안을 받아보세요" 라는 말만 듣고 **그게 어떻게 생겼는지 모른 채** 폼을 채우는 것이
+ * 지금 랜딩의 제일 큰 구멍이었다.
+ *
+ * ⚠️ **이 네 줄은 DB 에서 지우면 안 된다.** 지우면 랜딩의 링크가 죽는다.
+ *    테스트 줄을 정리할 때 이 아이디들은 빼고 지운다.
+ *
+ * 네 개를 고른 기준은 **여행의 모양이 서로 다른 것** 이다 —
+ * 혼자/둘/가족, 한 도시/두 도시, 처음/다시. 손님이 자기와 비슷한 것을 찾을 수 있어야 한다.
+ */
+const SAMPLES = [
+  {
+    id: "d13cee4d-3294-42c8-9d46-229878eec896",
+    who: t({ ko: "혼자 · 서울 3일", en: "Solo · 3 days in Seoul" }),
+    title: "Seoul Express: Culture, Flavors & Photo Spots",
+  },
+  {
+    id: "775ead8b-7355-4045-8e07-d6ad05021374",
+    who: t({ ko: "둘이 · 서울과 부산 5일", en: "Two of you · 5 days, Seoul and Busan" }),
+    title: "Romantic Peaks & Coastal Breezes",
+  },
+  {
+    id: "c36decd3-4376-4856-ad48-20bf087c9d33",
+    who: t({ ko: "아이와 함께 · 서울 4일", en: "With kids · 4 days in Seoul" }),
+    title: "Magical Seoul Family Adventure",
+  },
+  {
+    id: "4cb2b2b9-d016-4653-997e-5d07caa4b9c2",
+    who: t({ ko: "다시 온 여행 · 경주와 안동 4일", en: "Been before · 4 days, Gyeongju and Andong" }),
+    title: "Autumn Heritage & Hidden Valleys",
+  },
+];
+
 const STATIONS = [
   // 양끝 여백 125, 정거장 사이 250. 끝을 좁혀 선이 화면 밖으로 이어지는 느낌을 남긴다
   { day: 1, x: 125, en: "INCHEON", ko: "인천공항", enSub: "인천공항", koSub: "INCHEON" },
@@ -756,6 +792,69 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ── 왜 우리인가 + 샘플 초안 ─────────────────────── */}
+      <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
+        <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+          <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
+            <span className="block md:inline">AI 는 아는 곳을 말하고,</span>{" "}
+            <span className="block md:inline">우리는 겪은 것을 적습니다.</span>
+          </h2>
+
+          {/*
+            말로 다르다고 하는 대신 **같은 질문에 대한 두 답을 나란히** 놓는다.
+            차이를 설명하면 읽는 사람이 판단해야 하지만, 나란히 놓으면 그냥 보인다.
+            오른쪽 글은 지어낸 것이 아니라 실제 초안에서 나온 팁이다.
+          */}
+          <div className="mt-10 grid gap-6 md:grid-cols-2 md:gap-10">
+            <div className="rounded-2xl border border-[var(--c-line-2)] p-6 sm:p-7 md:rounded-3xl">
+              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
+                {t({ ko: "물어보면", en: "Ask a chatbot" })}
+              </p>
+              <p className="mt-4 break-keep leading-relaxed text-[var(--c-text-3)]">
+                {t({
+                  ko: "경복궁에 가보세요. 조선의 정궁이고 서울에서 가장 큰 궁궐입니다.",
+                  en: "Visit Gyeongbokgung. It was the main royal palace of the Joseon dynasty.",
+                })}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[var(--c-line)] bg-[var(--c-deep)] p-6 text-[var(--c-text-on-deep)] sm:p-7 md:rounded-3xl">
+              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent-soft)]">
+                {t({ ko: "우리가 적는 것", en: "What we write" })}
+              </p>
+              <p className="mt-4 break-keep leading-relaxed">
+                {t({
+                  ko: "화요일은 닫습니다. 한복을 입으면 무료로 들어갑니다 — 다만 길가 가게 한복은 뻣뻣해서 사진에 부자연스럽게 나옵니다. 정문에서 두 블록 더 가면 손바느질 실크를 빌려주는 곳이 있습니다.",
+                  en: "It is closed on Tuesdays. Wearing hanbok gets you in free — but roadside rentals look stiff in photos. Two blocks past the main gate there are shops with hand-stitched silk.",
+                })}
+              </p>
+            </div>
+          </div>
+
+          {/* 샘플 — 말이 아니라 물건을 보여준다 */}
+          <p className="mt-14 font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
+            {t({ ko: "실제로 만들어진 초안입니다", en: "Real drafts we made" })}
+          </p>
+          <ul className="mt-4 grid gap-3 md:grid-cols-2">
+            {SAMPLES.map((sample) => (
+              <li key={sample.id}>
+                <Link
+                  href={`/plan/${sample.id}`}
+                  className="flex h-full flex-col justify-between gap-3 rounded-2xl border border-[var(--c-line-2)] bg-[var(--c-bg)] p-5 transition-colors hover:border-[var(--c-text-3)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)] sm:p-6"
+                >
+                  <span className="font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.14em] text-[var(--c-accent-dim)]">
+                    {sample.who}
+                  </span>
+                  <span className="break-keep font-[family-name:var(--font-display)] text-xl leading-snug text-[var(--c-text)]">
+                    {sample.title}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* ── free vs paid ────────────────────────────────── */}
       <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
@@ -983,6 +1082,17 @@ export default async function Home() {
           */}
           <div className="flex gap-5">
             <span>{t({ ko: "대한민국 서울", en: "Seoul, Korea" })}</span>
+            {/*
+              자주 묻는 것은 흐린 색 + 마우스 올릴 때만 밑줄이다.
+              **처리방침만 늘 밑줄이 그어져 있어야** 다른 안내와 구분된다(개인정보 보호법 시행령 제31조).
+              둘을 같은 모양으로 두면 그 구분이 사라진다.
+            */}
+            <Link
+              href="/faq"
+              className="underline-offset-4 hover:text-[var(--c-text)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+            >
+              {t({ ko: "자주 묻는 것", en: "Questions" })}
+            </Link>
             <Link
               href="/privacy"
               className="text-[var(--c-text)] underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
