@@ -106,11 +106,17 @@ export default function FaqPage() {
             <details key={question} className="group">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)]">
                 {/*
-                  **닫힌 것은 작게, 연 것은 크게.** 여는 순간 글자가 커져서 확대되는 느낌이 난다.
-                  transition 이 없으면 툭 바뀌어 확대가 아니라 다른 글자로 갈아탄 것처럼 보인다.
-                  0.2초는 눈이 따라갈 수 있으면서 기다린다는 느낌은 안 드는 길이다.
+                  **닫힌 것은 작게, 연 것은 크고 주황으로.** 여는 순간 글자가 커지고 색이 바뀌어
+                  확대되는 느낌이 난다. transition 이 없으면 툭 바뀌어 확대가 아니라
+                  다른 글자로 갈아탄 것처럼 보인다. 0.2초는 눈이 따라갈 수 있으면서
+                  기다린다는 느낌은 안 드는 길이다.
+
+                  **진한 주황(--c-accent)이 아니라 밝은 주황(--c-accent-soft)을 쓴다.**
+                  이 바탕(#16302C)에서 진한 주황은 대비가 3.96 이라 읽기 기준(4.5)에 못 미친다.
+                  밝은 주황은 5.34 로 통과한다. 18px 는 '큰 글자' 예외에 안 들어가므로
+                  4.5 를 그대로 맞춰야 한다.
                 */}
-                <span className="break-keep text-base leading-snug text-[var(--c-text)] transition-[font-size] duration-200 group-open:text-lg">
+                <span className="break-keep text-base leading-snug text-[var(--c-text)] transition-[font-size,color] duration-200 group-open:text-lg group-open:text-[var(--c-accent-soft)]">
                   {question}
                 </span>
                 <span
