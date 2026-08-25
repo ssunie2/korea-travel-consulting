@@ -1083,13 +1083,14 @@ export default async function Home() {
           <div className="flex gap-5">
             <span>{t({ ko: "대한민국 서울", en: "Seoul, Korea" })}</span>
             {/*
-              자주 묻는 것은 흐린 색 + 마우스 올릴 때만 밑줄이다.
-              **처리방침만 늘 밑줄이 그어져 있어야** 다른 안내와 구분된다(개인정보 보호법 시행령 제31조).
-              둘을 같은 모양으로 두면 그 구분이 사라진다.
+              둘 다 밑줄을 긋되 **색을 다르게 둔다** — 자주 묻는 것은 흐리게, 처리방침은 밝게.
+              시행령 제31조가 요구하는 건 처리방침이 다른 고지사항과 **구분되게** 보이는 것이지
+              밑줄 자체가 아니다. 글자 크기·색상 등으로 구분하면 된다.
+              둘을 색까지 같게 두면 그 구분이 사라진다.
             */}
             <Link
               href="/faq"
-              className="underline-offset-4 hover:text-[var(--c-text)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+              className="underline underline-offset-4 hover:text-[var(--c-text)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
             >
               {t({ ko: "자주 묻는 것", en: "Questions" })}
             </Link>
