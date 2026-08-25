@@ -105,7 +105,14 @@ export default function FaqPage() {
           {FAQ.map(([question, answer]) => (
             <details key={question} className="group">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)]">
-                <span className="break-keep text-lg leading-snug text-[var(--c-text)]">{question}</span>
+                {/*
+                  **닫힌 것은 작게, 연 것은 크게.** 여는 순간 글자가 커져서 확대되는 느낌이 난다.
+                  transition 이 없으면 툭 바뀌어 확대가 아니라 다른 글자로 갈아탄 것처럼 보인다.
+                  0.2초는 눈이 따라갈 수 있으면서 기다린다는 느낌은 안 드는 길이다.
+                */}
+                <span className="break-keep text-base leading-snug text-[var(--c-text)] transition-[font-size] duration-200 group-open:text-lg">
+                  {question}
+                </span>
                 <span
                   aria-hidden
                   className="flex-none text-[var(--c-text-3)] transition-transform group-open:rotate-45"
