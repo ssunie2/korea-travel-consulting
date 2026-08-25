@@ -920,11 +920,11 @@ export default async function Home() {
             */}
             <div className="mt-4 max-w-md space-y-1.5 leading-relaxed text-[var(--c-text-2)] md:max-w-none">
               {/*
-                '여행이 며칠이든 값은 하나입니다.' 였다. 랜딩에서 값을 안 보여주기로 하면서
-                그 문장만 남으니 손님이 그 하나가 얼만지 알 수 없어 애매해졌다.
-                무게를 **얼마인지** 에서 **길이와 상관없다** 는 쪽으로 옮겼다.
+                값 이야기를 하던 줄을 아예 뺐다 (선경 판단).
+                '여행이 며칠이든 값은 하나입니다.' → '며칠을 가시든 값은 같습니다.' 로 한 번 고쳐 봤지만,
+                **값을 하나도 안 보여주는 자리에서 값을 설명하는 문장만 남는 것**이 문제였다.
+                아래 두 줄은 값 이야기가 아니라 그대로 말이 된다.
               */}
-              <p>{t({ ko: "며칠을 가시든 값은 같습니다.", en: "The price is the same however long you stay." })}</p>
               <p>
                 {t({
                   ko: (
