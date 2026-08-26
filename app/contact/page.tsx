@@ -53,7 +53,7 @@ export default async function ContactPage({
     <div
       className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
     >
-      <header className="mx-auto flex max-w-2xl items-center justify-between px-6 py-6">
+      <header className="mx-auto flex max-w-2xl items-center justify-between px-6 pt-6 pb-12">
         <Link
           href="/"
           className="-my-3 inline-flex min-h-11 items-center font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
@@ -89,8 +89,29 @@ export default async function ContactPage({
             </h1>
             <p className="mt-5 leading-relaxed text-[var(--c-text-2)]">
               {t({
-                ko: "여행 정보를 다 적기엔 아직 이르신가요? 그냥 물어보셔도 됩니다. 2월 한국이 무리인지, 서울과 부산에 나흘이면 되는지, 할랄이나 휠체어를 맞출 수 있는지 — 무엇이든요.",
-                en: "Not ready to fill in a form about your trip? Just ask. Whether Korea in February is a mistake, whether four days is enough for Seoul and Busan, whether we can work around halal or a wheelchair — anything.",
+                ko: (
+                  <>
+                    여행 정보를 다 적기엔 아직 이르신가요?{" "}
+                    <br className="md:hidden" />
+                    그냥 물어보셔도 됩니다.
+                    <br />
+                    2월의 한국은 여행하기에 너무 추운지,{" "}
+                    <br className="md:hidden" />
+                    서울과 부산 여행하는 데 나흘이면 가능한지,{" "}
+                    <br className="md:hidden" />
+                    할랄이나 휠체어를 맞출 수 있는지{" "}
+                    <br className="md:hidden" />
+                    — 무엇이든요.
+                  </>
+                ),
+                // ko 가 줄바꿈이 든 조각이라 en 도 조각으로 감싼다 — t() 는 둘이 같은 종류여야 한다
+                en: (
+                  <>
+                    Not ready to fill in a form about your trip? Just ask. Whether Korea in
+                    February is a mistake, whether four days is enough for Seoul and Busan,
+                    whether we can work around halal or a wheelchair — anything.
+                  </>
+                ),
               })}
             </p>
 
