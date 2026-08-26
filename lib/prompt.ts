@@ -133,7 +133,7 @@ THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
   in that order, in ${input.budgetCurrency}. The traveller told us their budget per person,
   so a group-only number leaves them doing the division themselves.
 - Do NOT include: per-activity tips, alternative options, photo spots, what to wear,
-  packing lists, booking instructions, or transport details. Those belong to the paid consultation.
+  packing lists, or booking instructions. Those belong to the paid consultation.
 
 Write everything in ${languageName(input.language)}.
 Tone: warm, specific, confident. Never salesy.
