@@ -4,6 +4,7 @@ import { Instrument_Serif } from "next/font/google";
 import { supabaseServer } from "@/lib/supabase-server";
 import type { FreeItinerary, Plan } from "@/lib/types";
 import { t } from "@/lib/copy";
+import { placeLabel } from "@/lib/places";
 import CopyLinkButton from "@/components/CopyLinkButton";
 
 // 표제용 서체. 랜딩(app/page.tsx)과 같은 방식으로 이 화면에서만 불러온다.
@@ -40,9 +41,16 @@ function dateRange(startDate: string, days: number) {
   const start = new Date(`${startDate}T00:00:00Z`);
   const end = new Date(start);
   end.setUTCDate(end.getUTCDate() + days - 1);
-  const fmt = (d: Date) =>
-    d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-  return `${fmt(start)} – ${fmt(end)}, ${start.getUTCFullYear()}`;
+  // 아래 dayLabel 과 같은 방식으로 직접 만든다. toLocaleDateString("ko-KR") 은
+  // "2026. 10. 4." 처럼 점을 찍어서 우리 화면의 다른 날짜 표기와 어긋난다.
+  return t({
+    ko: `${start.getUTCFullYear()}년 ${start.getUTCMonth() + 1}월 ${start.getUTCDate()}일 – ${end.getUTCMonth() + 1}월 ${end.getUTCDate()}일`,
+    en: (() => {
+      const fmt = (d: Date) =>
+        d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+      return `${fmt(start)} – ${fmt(end)}, ${start.getUTCFullYear()}`;
+    })(),
+  });
 }
 
 /**
@@ -146,7 +154,7 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
         <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
           {dateRange(plan.start_date, plan.duration_days)} · {plan.travelers}{" "}
           {t({ ko: "명", en: plan.travelers === 1 ? "traveler" : "travelers" })}
-          {plan.destinations.length > 0 && ` · ${plan.destinations.join(", ")}`}
+          {plan.destinations.length > 0 && ` · ${plan.destinations.map(placeLabel).join(", ")}`}
         </p>
         <h1 className="mt-4 font-[family-name:var(--font-display)] text-[clamp(2.25rem,6vw,3.5rem)] leading-[1.02] tracking-tight">
           {trip.tripTitle}

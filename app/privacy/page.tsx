@@ -15,8 +15,11 @@ const CONTACT = "hello@example.com";
 const UPDATED = "12 August 2026";
 
 export const metadata = {
-  title: "Privacy Policy — mohallae",
-  description: "What we collect, why, how long we keep it, and how to have it deleted.",
+  title: t({ ko: "개인정보 처리방침 — mohallae", en: "Privacy Policy — mohallae" }),
+  description: t({
+    ko: "무엇을 받는지, 왜 받는지, 얼마나 두는지, 어떻게 지우는지.",
+    en: "What we collect, why, how long we keep it, and how to have it deleted.",
+  }),
 };
 
 const collected = [

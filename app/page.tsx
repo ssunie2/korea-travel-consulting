@@ -536,7 +536,10 @@ function MetroScene({ scene, className }: { scene: Scene; className: string }) {
       viewBox={`0 0 ${scene.w} 220`}
       className={className}
       role="img"
-      aria-label="A subway line. DAY 1 through DAY 4 are the stations."
+      aria-label={t({
+        ko: "지하철 노선도입니다. DAY 1 부터 DAY 4 까지가 정거장입니다.",
+        en: "A subway line. DAY 1 through DAY 4 are the stations.",
+      })}
     >
       {/* 노선 — 10px 이던 것을 2.5px 로. 굵기가 유아틱함의 절반이었다 */}
       <line

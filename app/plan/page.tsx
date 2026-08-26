@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Instrument_Serif } from "next/font/google";
-import { t } from "@/lib/copy";
+import { LANG, t } from "@/lib/copy";
+import { DESTINATIONS } from "@/lib/places";
 import DateRangePicker, { nightsBetween } from "@/components/DateRangePicker";
 import Select from "@/components/Select";
 
@@ -23,14 +24,6 @@ const display = Instrument_Serif({
  *
  * 여기 없는 곳은 아래 "그 외" 를 눌러 직접 적는다.
  */
-const DESTINATIONS = [
-  { v: "Seoul", ko: "서울" }, { v: "Incheon", ko: "인천" },
-  { v: "Chuncheon", ko: "춘천" }, { v: "Gangneung", ko: "강릉" }, { v: "Sokcho", ko: "속초" },
-  { v: "Gyeongju", ko: "경주" }, { v: "Andong", ko: "안동" }, { v: "Pohang", ko: "포항" },
-  { v: "Daegu", ko: "대구" }, { v: "Busan", ko: "부산" }, { v: "Tongyeong", ko: "통영" },
-  { v: "Jeonju", ko: "전주" }, { v: "Yeosu", ko: "여수" }, { v: "Mokpo", ko: "목포" },
-  { v: "Jeju", ko: "제주" },
-];
 /**
  * 관심사. **비슷한 것끼리 붙여 뒀다** — 먹고 보는 것, 한국다운 것, 밖에서 노는 것,
  * 실내에서 보는 것, 사고 노는 것 순이다. 여기 없는 것은 "그 외" 에 적는다.
@@ -570,7 +563,13 @@ export default function PlanForm() {
           <Select
               label={t({ ko: "초안을 받을 언어 *", en: "Language for your draft *" })}
               name="language"
-              defaultValue="en"
+              /*
+                AI 가 초안을 쓰는 말. **화면 언어(LANG)를 따라간다.**
+                검토 중인 지금은 한국어라 초안도 한국어로 나오고, 손님을 받을 때
+                LANG 을 "en" 으로 바꾸면 초안도 같이 영어가 된다 — 한 글자만 고치면 된다.
+                손님은 이 칸에서 네 언어 중 원하는 것으로 바꿀 수 있다.
+              */
+              defaultValue={LANG}
               options={LANGUAGES.map((l) => ({ value: l.code, label: l.label }))}
               placeholder="English"
             />
