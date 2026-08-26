@@ -158,21 +158,36 @@ const steps = [
       // '가입도 필요 없습니다' 를 뺐다 — 첫 화면 버튼 옆에 '가입 없음' 이 이미 있다.
       // '적는' 이 아니라 '선택하는' 이다. 폼이 거의 다 눌러서 고르는 방식으로 바뀌었다.
       ko: ["날짜, 기간, 동행, 관심사 등", "선택하는 데 2분이면 충분합니다."],
-      en: ["Dates, how long, who's coming, what you're into, and more", "Two minutes to pick your answers."],
+      en: [
+        "Dates, how long, who's coming, what you're into, and more",
+        "Two minutes to pick your answers.",
+      ],
     }),
   },
   {
     title: t({ ko: "무료 초안을 받으세요", en: "Get a free draft" }),
     body: t({
-      ko: ["일자별 개요와 컨시어지 팁 하나.", "나머지가 어떨지 판단하실 수 있습니다."],
-      en: ["A day-by-day outline, plus one concierge tip", "so you can judge the rest."],
+      ko: [
+        "일자별 개요와 컨시어지 팁 하나.",
+        "나머지가 어떨지 판단하실 수 있습니다.",
+      ],
+      en: [
+        "A day-by-day outline, plus one concierge tip",
+        "so you can judge the rest.",
+      ],
     }),
   },
   {
     title: t({ ko: "전체 일정을 받으세요", en: "Get the full plan" }),
     body: t({
-      ko: ["모든 정거장에 팁이 붙고,", "시간을 효율적으로 쓸 수 있게 동선을 짜드립니다."],
-      en: ["A tip at every stop,", "and a route that makes good use of your time."],
+      ko: [
+        "모든 정거장에 팁이 붙고,",
+        "시간을 효율적으로 쓸 수 있게 동선을 짜드립니다.",
+      ],
+      en: [
+        "A tip at every stop,",
+        "and a route that makes good use of your time.",
+      ],
     }),
   },
 ];
@@ -214,7 +229,10 @@ const paid = t<(string | [string, string])[]>({
     ["A tip on every stop", "what to skip, what locals do"],
     "Five stays and five restaurants, with reasons",
     "Costs broken down, routes and timing worked out",
-    ["Exactly what to book and when", "including the places that only take Korean phone reservations"],
+    [
+      "Exactly what to book and when",
+      "including the places that only take Korean phone reservations",
+    ],
   ],
 });
 
@@ -226,7 +244,10 @@ const HERO_CARDS = [
     place: t({ ko: "남산", en: "Namsan" }),
     localName: t({ ko: "NAMSAN", en: "남산" }),
     line: t({ ko: "서울의 능선을 따라", en: "Above Seoul's ridgelines" }),
-    alt: t({ ko: "파란 하늘 아래 남산과 N서울타워", en: "Namsan and N Seoul Tower beneath a blue sky" }),
+    alt: t({
+      ko: "파란 하늘 아래 남산과 N서울타워",
+      en: "Namsan and N Seoul Tower beneath a blue sky",
+    }),
   },
   {
     src: bukchon,
@@ -234,7 +255,10 @@ const HERO_CARDS = [
     place: t({ ko: "북촌", en: "Bukchon" }),
     localName: t({ ko: "BUKCHON", en: "북촌" }),
     line: t({ ko: "한옥 골목 사이로", en: "Through the hanok lanes" }),
-    alt: t({ ko: "한옥 골목 사이로 보이는 남산", en: "Namsan seen between the hanok lanes of Bukchon" }),
+    alt: t({
+      ko: "한옥 골목 사이로 보이는 남산",
+      en: "Namsan seen between the hanok lanes of Bukchon",
+    }),
   },
   {
     src: gwangjangMarket,
@@ -242,7 +266,10 @@ const HERO_CARDS = [
     place: t({ ko: "광장시장", en: "Gwangjang Market" }),
     localName: t({ ko: "GWANGJANG", en: "광장시장" }),
     line: t({ ko: "시장 불빛과 한 끼", en: "Market lights and a warm meal" }),
-    alt: t({ ko: "따뜻한 조명 아래 손님들이 앉아 있는 광장시장", en: "Diners seated beneath warm lights at Gwangjang Market" }),
+    alt: t({
+      ko: "따뜻한 조명 아래 손님들이 앉아 있는 광장시장",
+      en: "Diners seated beneath warm lights at Gwangjang Market",
+    }),
   },
   {
     src: hanRiver,
@@ -250,7 +277,10 @@ const HERO_CARDS = [
     place: t({ ko: "한강", en: "Han River" }),
     localName: t({ ko: "HAN RIVER", en: "한강" }),
     line: t({ ko: "해 질 무렵 강변에서", en: "By the river at sunset" }),
-    alt: t({ ko: "노을 진 한강의 반포대교와 남산", en: "Banpo Bridge and Namsan at sunset over the Han River" }),
+    alt: t({
+      ko: "노을 진 한강의 반포대교와 남산",
+      en: "Banpo Bridge and Namsan at sunset over the Han River",
+    }),
   },
   {
     src: gyeongbokgung,
@@ -258,7 +288,10 @@ const HERO_CARDS = [
     place: t({ ko: "경복궁", en: "Gyeongbokgung" }),
     localName: t({ ko: "GYEONGBOKGUNG", en: "경복궁" }),
     line: t({ ko: "밤의 궁궐 지붕", en: "Palace roofs after dark" }),
-    alt: t({ ko: "불이 켜진 경복궁과 어두운 산", en: "Illuminated Gyeongbokgung Palace beneath a dark mountain" }),
+    alt: t({
+      ko: "불이 켜진 경복궁과 어두운 산",
+      en: "Illuminated Gyeongbokgung Palace beneath a dark mountain",
+    }),
   },
 ];
 
@@ -283,30 +316,69 @@ const SAMPLES = [
   {
     id: "d13cee4d-3294-42c8-9d46-229878eec896",
     who: t({ ko: "혼자 · 서울 3일", en: "Solo · 3 days in Seoul" }),
-    title: "Seoul Express: Culture, Flavors & Photo Spots",
+    title: t({
+      ko: "서울 익스프레스: 문화·맛·사진 명소",
+      en: "Seoul Express: Culture, Flavors & Photo Spots",
+    }),
   },
   {
     id: "775ead8b-7355-4045-8e07-d6ad05021374",
-    who: t({ ko: "둘이 · 서울과 부산 5일", en: "Two of you · 5 days, Seoul and Busan" }),
-    title: "Romantic Peaks & Coastal Breezes",
+    who: t({
+      ko: "둘이 · 서울과 부산 5일",
+      en: "Two of you · 5 days, Seoul and Busan",
+    }),
+    title: t({
+      ko: "낭만적인 산과 바닷바람",
+      en: "Romantic Peaks & Coastal Breezes",
+    }),
   },
   {
     id: "c36decd3-4376-4856-ad48-20bf087c9d33",
     who: t({ ko: "아이와 함께 · 서울 4일", en: "With kids · 4 days in Seoul" }),
-    title: "Magical Seoul Family Adventure",
+    title: t({
+      ko: "마법 같은 서울 가족 여행",
+      en: "Magical Seoul Family Adventure",
+    }),
   },
   {
     id: "4cb2b2b9-d016-4653-997e-5d07caa4b9c2",
-    who: t({ ko: "다시 온 여행 · 경주와 안동 4일", en: "Been before · 4 days, Gyeongju and Andong" }),
-    title: "Autumn Heritage & Hidden Valleys",
+    who: t({
+      ko: "다시 온 여행 · 경주와 안동 4일",
+      en: "Been before · 4 days, Gyeongju and Andong",
+    }),
+    title: t({
+      ko: "가을 문화유산과 숨은 골짜기",
+      en: "Autumn Heritage & Hidden Valleys",
+    }),
   },
 ];
 
 const STATIONS = [
   // 양끝 여백 125, 정거장 사이 250. 끝을 좁혀 선이 화면 밖으로 이어지는 느낌을 남긴다
-  { day: 1, x: 125, en: "INCHEON", ko: "인천공항", enSub: "인천공항", koSub: "INCHEON" },
-  { day: 2, x: 375, en: "GYEONGBOKGUNG", ko: "경복궁", enSub: "경복궁", koSub: "GYEONGBOKGUNG" },
-  { day: 3, x: 625, en: "BUKCHON", ko: "북촌", enSub: "북촌", koSub: "BUKCHON" },
+  {
+    day: 1,
+    x: 125,
+    en: "INCHEON",
+    ko: "인천공항",
+    enSub: "인천공항",
+    koSub: "INCHEON",
+  },
+  {
+    day: 2,
+    x: 375,
+    en: "GYEONGBOKGUNG",
+    ko: "경복궁",
+    enSub: "경복궁",
+    koSub: "GYEONGBOKGUNG",
+  },
+  {
+    day: 3,
+    x: 625,
+    en: "BUKCHON",
+    ko: "북촌",
+    enSub: "북촌",
+    koSub: "BUKCHON",
+  },
   { day: 4, x: 875, en: "NAMSAN", ko: "남산", enSub: "남산", koSub: "NAMSAN" },
 ];
 
@@ -338,7 +410,10 @@ const TIPS = [
       ),
     }),
     place: t({ ko: "인천공항", en: "Incheon Airport" }),
-    dont: t({ ko: "공항 환전소에서 현금을 다 바꾼다.", en: "Change all your cash at the airport counter." }),
+    dont: t({
+      ko: "공항 환전소에서 현금을 다 바꾼다.",
+      en: "Change all your cash at the airport counter.",
+    }),
     do: t({
       ko: "공항 환율이 한국에서 제일 나쁩니다. 들어오는 교통비만 바꾸고 나머지는 카드로 쓰세요 — 시장 노점까지 거의 다 받습니다. 온 김에 편의점에서 티머니 카드를 사두면 전국 버스와 지하철에서 그대로 씁니다.",
       en: "Airport rates are the worst you'll see in Korea. Change just enough for the ride in, then pay by card — almost everywhere takes it, down to market stalls. Pick up a T-money card at any convenience store while you're there; it works on every bus and subway in the country.",
@@ -364,7 +439,10 @@ const TIPS = [
       ),
     }),
     place: t({ ko: "경복궁", en: "Gyeongbokgung Palace" }),
-    dont: t({ ko: "화요일 오전 10시, 여기서 시작.", en: "Tuesday morning, 10:00 — start here." }),
+    dont: t({
+      ko: "화요일 오전 10시, 여기서 시작.",
+      en: "Tuesday morning, 10:00 — start here.",
+    }),
     do: t({
       ko: "화요일은 휴관입니다. 수요일에 가시고, 한복을 입으세요. 대여점이 정문 바로 앞에 있고 한복을 입으면 입장료가 무료입니다.",
       en: "It's closed on Tuesdays. Go Wednesday — and wear hanbok. The rental shops are right outside the gate, and wearing it makes admission free.",
@@ -390,7 +468,10 @@ const TIPS = [
       ),
     }),
     place: t({ ko: "북촌한옥마을", en: "Bukchon Hanok Village" }),
-    dont: t({ ko: "사람 없는 사진을 찍으려고 아침 8시에 간다.", en: "Arrive at 8am for empty photos." }),
+    dont: t({
+      ko: "사람 없는 사진을 찍으려고 아침 8시에 간다.",
+      en: "Arrive at 8am for empty photos.",
+    }),
     do: t({
       ko: "사람이 사는 동네라 관람 시간이 정해져 있습니다 — 대략 10시부터 17시까지, 주요 골목은 일요일에 닫습니다. 그 시간 안에 오시고 목소리만 낮춰주시면 환영받습니다.",
       en: "People live here, so the lanes have posted visiting hours — roughly 10:00 to 17:00, and the main alley closes to visitors on Sundays. Come inside those hours, keep your voice down, and you'll be welcome.",
@@ -416,7 +497,10 @@ const TIPS = [
       ),
     }),
     place: t({ ko: "남산 · N서울타워", en: "Namsan & N Seoul Tower" }),
-    dont: t({ ko: "타워 입구까지 택시를 탄다.", en: "Take a taxi to the tower entrance." }),
+    dont: t({
+      ko: "타워 입구까지 택시를 탄다.",
+      en: "Take a taxi to the tower entrance.",
+    }),
     do: t({
       ko: "남산은 자가용이 못 올라갑니다. 명동에서 케이블카를 타거나 01·02·05번 버스를 타야 합니다 — 올라갈 수 있는 건 그것뿐입니다. 해 지기 전에 올라가서 어두워진 뒤에 내려오시면 낮과 밤을 한 번에 봅니다.",
       en: "Private cars can't drive up Namsan. Your options are the cable car from Myeongdong or the 01, 02 and 05 buses — those are the only vehicles allowed. Go up before sunset and come down after dark; you get both views for one trip.",
@@ -455,7 +539,14 @@ function MetroScene({ scene, className }: { scene: Scene; className: string }) {
       aria-label="A subway line. DAY 1 through DAY 4 are the stations."
     >
       {/* 노선 — 10px 이던 것을 2.5px 로. 굵기가 유아틱함의 절반이었다 */}
-      <line x1="0" y1="120" x2={scene.w} y2="120" stroke="var(--c-text)" strokeWidth="2.5" />
+      <line
+        x1="0"
+        y1="120"
+        x2={scene.w}
+        y2="120"
+        stroke="var(--c-text)"
+        strokeWidth="2.5"
+      />
     </svg>
   );
 }
@@ -471,118 +562,132 @@ export default async function Home() {
       <style dangerouslySetInnerHTML={{ __html: MOTION }} />
       <BackgroundMotifs />
       <div className="relative z-[1]">
-      {/* ── 역명판 + 하늘 ─────────────────────────────── */}
-      <section>
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12 md:[&>div:first-child]:sticky md:[&>div:first-child]:top-12 md:[&>div:first-child]:min-h-[40rem]">
-          {/*
+        {/* ── 역명판 + 하늘 ─────────────────────────────── */}
+        <section>
+          <div className="mx-auto grid max-w-6xl gap-10 px-6 pt-8 md:grid-cols-[1.05fr_.95fr] md:items-start md:gap-14 md:pt-12 md:[&>div:first-child]:sticky md:[&>div:first-child]:top-12 md:[&>div:first-child]:min-h-[40rem]">
+            {/*
             왼쪽 글 칸을 카드와 같은 높이(top-12 = 48px)에 고정한다.
             전에는 12vh(900px 화면에서 108px)였다 — 카드 윗선보다 60px 아래라
             둘이 어긋나 보였다. **카드의 .ktc-deck-sticky 도 top: 3rem(48px)이므로
             둘 중 하나를 고치면 다른 쪽도 같이 맞춰야 한다.**
           */}
-          <div>
-            {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
             <div>
-              <p className="font-[family-name:var(--font-geist-sans)] text-[1.6rem] font-semibold lowercase leading-none tracking-[-0.035em] text-[var(--c-text)]">
-                mohallae
-              </p>
-              <p className="mt-2 font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.18em] text-[var(--c-text-3)]">
-                모할래? <span aria-hidden className="mx-1 text-[var(--c-text-4)]">·</span>
-                <span className="lowercase">what shall we do?</span>
-              </p>
-            </div>
+              {/* 상호. 역명판의 역명 자리다 — 동그라미(역번호)는 빼고 이름만 남겼다 */}
+              <div>
+                <p className="font-[family-name:var(--font-geist-sans)] text-[1.6rem] font-semibold lowercase leading-none tracking-[-0.035em] text-[var(--c-text)]">
+                  mohallae
+                </p>
+                <p className="mt-2 font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.18em] text-[var(--c-text-3)]">
+                  모할래?{" "}
+                  <span aria-hidden className="mx-1 text-[var(--c-text-4)]">
+                    ·
+                  </span>
+                  <span className="lowercase">what shall we do?</span>
+                </p>
+              </div>
 
-            {/*
+              {/*
               제목만 조금 굵게. **굵은 서체로 바꾸지 않고 획을 두껍게 한다** —
               쓰는 명조 계열은 굵은 획이 따로 없어서, 굵게 지정하면 브라우저가
               억지로 늘려 뭉개진 글자가 된다. 획을 0.8px 키우면 서체 모양은 그대로다.
             */}
-            <h1
-              className="mt-12 font-[family-name:var(--font-display)] text-[clamp(2.25rem,5.4vw,3.875rem)] leading-[1.24] tracking-tight"
-              style={{ wordSpacing: ".16em", WebkitTextStroke: "0.8px currentColor" }}
-            >
-              <span className="whitespace-nowrap">
-                {t({ ko: "한국에 ", en: "Plan Korea like you know " })}
-                <span
-                  className="inline-block whitespace-nowrap text-[var(--c-accent)]"
-                  style={{
-                    fontFamily: '"AppleMyungjo", "Nanum Myeongjo", Georgia, "Times New Roman", serif',
-                    wordSpacing: "normal",
-                    textDecorationLine: "underline",
-                    textDecorationColor: "#C29338",
-                    textDecorationThickness: "3px",
-                    textUnderlineOffset: ".17em",
-                    textDecorationSkipInk: "none",
-                  }}
-                >
-                  {t({ ko: "아는 사람", en: "someone" })}
-                </span>
-              </span>
-              <br />
-              <span className="whitespace-nowrap">
-                {t({ ko: "있는 것처럼 여행하세요.", en: "who lives here." })}
-              </span>
-            </h1>
-
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-[var(--c-text-2)]">
-              {t({
-                ko: "여행 정보를 알려주시면 일자별 초안을 무료로 만들어 드립니다. 가이드북에 없는 팁 하나가 함께 갑니다.",
-                en: "Tell us about your trip and we'll write you a free day-by-day draft — with one tip a guidebook won't give you.",
-              })}
-            </p>
-
-            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3">
-              <Link
-                href="/plan"
-                className="inline-flex items-center rounded-full bg-[var(--c-text)] px-8 py-3.5 text-base text-[var(--c-bg)] transition-colors hover:bg-[var(--c-accent)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
+              <h1
+                className="mt-12 font-[family-name:var(--font-display)] text-[clamp(2.25rem,5.4vw,3.875rem)] leading-[1.24] tracking-tight"
+                style={{
+                  wordSpacing: ".16em",
+                  WebkitTextStroke: "0.8px currentColor",
+                }}
               >
-                {t({ ko: "무료 초안 받기", en: "Get your free draft" })}
-              </Link>
-              <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.18em] text-[var(--c-text-3)]">
-                {t({ ko: "가입 없음", en: "No account" })}
-              </span>
+                <span className="whitespace-nowrap">
+                  {t({ ko: "한국에 ", en: "Plan Korea like you know " })}
+                  <span
+                    className="inline-block whitespace-nowrap text-[var(--c-accent)]"
+                    style={{
+                      fontFamily:
+                        '"AppleMyungjo", "Nanum Myeongjo", Georgia, "Times New Roman", serif',
+                      wordSpacing: "normal",
+                      textDecorationLine: "underline",
+                      textDecorationColor: "#C29338",
+                      textDecorationThickness: "3px",
+                      textUnderlineOffset: ".17em",
+                      textDecorationSkipInk: "none",
+                    }}
+                  >
+                    {t({ ko: "아는 사람", en: "someone" })}
+                  </span>
+                </span>
+                <br />
+                <span className="whitespace-nowrap">
+                  {t({ ko: "있는 것처럼 여행하세요.", en: "who lives here." })}
+                </span>
+              </h1>
+
+              <p className="mt-6 max-w-lg text-lg leading-relaxed text-[var(--c-text-2)]">
+                {t({
+                  ko: "여행 정보를 알려주시면 일자별 초안을 무료로 만들어 드립니다. 가이드북에 없는 팁 하나가 함께 갑니다.",
+                  en: "Tell us about your trip and we'll write you a free day-by-day draft — with one tip a guidebook won't give you.",
+                })}
+              </p>
+
+              <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3">
+                <Link
+                  href="/plan"
+                  className="inline-flex items-center rounded-full bg-[var(--c-text)] px-8 py-3.5 text-base text-[var(--c-bg)] transition-colors hover:bg-[var(--c-accent)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
+                >
+                  {t({ ko: "무료 초안 받기", en: "Get your free draft" })}
+                </Link>
+                <span className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.18em] text-[var(--c-text-3)]">
+                  {t({ ko: "가입 없음", en: "No account" })}
+                </span>
+              </div>
+
+              {/* 지금 서울 몇 시인지. 손님은 시차 반대편에 있다 */}
+              <p className="mt-7 inline-flex items-center gap-2 border-t border-[var(--c-line-2)] pt-3 font-[family-name:var(--font-geist-mono)] text-[0.7rem] tracking-[0.1em] text-[var(--c-text-3)]">
+                {t({ ko: "서울", en: "Seoul" })}{" "}
+                <b className="font-semibold tabular-nums text-[var(--c-text)]">
+                  {now.label}
+                </b>
+                <span aria-hidden>·</span>{" "}
+                {t({ ko: "북위 37.5665°", en: "37.5665° N" })}
+              </p>
+
+              <p className="mt-3 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.08em] text-[var(--c-text-3)] sm:tracking-[0.3em]">
+                {t({ ko: "서울 지하철 · 4일", en: "Seoul Metro · 4 Days" })}
+                {weather.tempC !== null && (
+                  <>
+                    <span aria-hidden className="mx-2 text-[var(--c-text-4)]">
+                      ·
+                    </span>
+                    {weather.tempC}°
+                  </>
+                )}
+                <span aria-hidden className="mx-2 text-[var(--c-text-4)]">
+                  ·
+                </span>
+                {weather.sky === "clear"
+                  ? t({ ko: "맑음", en: "Clear" })
+                  : weather.sky === "cloud"
+                    ? t({ ko: "흐림", en: "Cloudy" })
+                    : weather.sky === "rain"
+                      ? t({ ko: "비", en: "Rain" })
+                      : t({ ko: "눈", en: "Snow" })}
+              </p>
             </div>
 
-            {/* 지금 서울 몇 시인지. 손님은 시차 반대편에 있다 */}
-            <p className="mt-7 inline-flex items-center gap-2 border-t border-[var(--c-line-2)] pt-3 font-[family-name:var(--font-geist-mono)] text-[0.7rem] tracking-[0.1em] text-[var(--c-text-3)]">
-              {t({ ko: "서울", en: "Seoul" })}{" "}
-              <b className="font-semibold tabular-nums text-[var(--c-text)]">{now.label}</b>
-              <span aria-hidden>·</span> {t({ ko: "북위 37.5665°", en: "37.5665° N" })}
-            </p>
-
-            <p className="mt-3 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.08em] text-[var(--c-text-3)] sm:tracking-[0.3em]">
-              {t({ ko: "서울 지하철 · 4일", en: "Seoul Metro · 4 Days" })}
-              {weather.tempC !== null && (
-                <>
-                  <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
-                  {weather.tempC}°
-                </>
-              )}
-              <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
-              {weather.sky === "clear"
-                ? t({ ko: "맑음", en: "Clear" })
-                : weather.sky === "cloud"
-                  ? t({ ko: "흐림", en: "Cloudy" })
-                  : weather.sky === "rain"
-                    ? t({ ko: "비", en: "Rain" })
-                    : t({ ko: "눈", en: "Snow" })}
-            </p>
-          </div>
-
-          {/* 밝은 사진부터 시작해 스크롤할 때 한 장씩 걷히는 서울 카드 묶음. */}
-          {/*
+            {/* 밝은 사진부터 시작해 스크롤할 때 한 장씩 걷히는 서울 카드 묶음. */}
+            {/*
             md:mt-0 — **PC 에서는 위 여백을 없앤다.** mt-14(56px)가 카드를 처음에
             아래로 밀어놔서, 스크롤을 조금 하면 카드가 스티키 자리(48px)로 올라앉는
             한 번의 움직임이 생겼다. 그 56px 이 화면에 보이던 단차다.
             폰은 카드가 글 아래에 오므로 이 여백이 그대로 필요하다.
           */}
-          <div className="ktc-deck mt-14 w-full md:mt-0 md:justify-self-end">
-            {/*
+            <div className="ktc-deck mt-14 w-full md:mt-0 md:justify-self-end">
+              {/*
               그림자 크기를 화면마다 달리 준다. **카드가 커지면 그림자도 같이 커져야 한다** —
               PC 카드는 폰보다 37% 넓은데 그림자를 14px 로 두면 상대적으로 얇아져
               폰에서 보이던 두께가 PC 에서는 사라진 것처럼 보인다. 카드 폭에 맞춰 같은 비율로 키웠다.
             */}
-            {/*
+              {/*
               **붙는 칸(바깥)과 카드 상자(안)를 나눠 둔다.** 둘을 한 요소에 두면
               aspect-[4/5] 와 min-h 가 서로 싸워서 폭이 튄다(전에 겪었다).
 
@@ -592,397 +697,465 @@ export default async function Home() {
               40rem 은 카드가 제일 클 때(31rem × 5/4 = 38.75rem)보다 크게 잡은 값이다.
               **왼쪽 글 칸에도 같은 값이 걸려 있다. 한쪽만 바꾸면 다시 어긋난다.**
             */}
-            <div className="ktc-deck-sticky mx-auto w-full max-w-[31rem] md:min-h-[40rem]">
-              {/*
+              <div className="ktc-deck-sticky mx-auto w-full max-w-[31rem] md:min-h-[40rem]">
+                {/*
                 모서리 굴림은 **폰 16px, PC 24px** 로 둔다. 큰 면일수록 더 굴려야
                 같은 정도로 부드러워 보인다 — 작은 화면에서 24px 을 쓰면 과하게 둥글다.
                 그림자가 이 상자에 붙어 있어 모서리를 그대로 따라간다.
                 **안쪽 사진 카드에도 같은 값을 준다.** 바깥에 overflow-hidden 을 걸면
                 넘어가는 카드가 잘려버려서, 각자 제 모서리를 갖게 했다.
               */}
-              <div className="relative aspect-[4/5] w-full rounded-2xl shadow-[14px_16px_0_rgba(5,19,16,.58)] md:rounded-3xl md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
-              {HERO_CARDS.map((card, index) => (
-                <figure
-                  key={card.number}
-                  style={{
-                    zIndex: HERO_CARDS.length - index,
-                    // 0% 부터 시작한다. 전에는 6% 부터라 카드가 제자리에 앉고도
-                    // 한참(228px) 스크롤해야 첫 장이 넘어갔다. 네 장이 23% 씩 나눠 갖고
-                    // 마지막 8% 는 남은 한 장을 보는 자리로 둔다.
-                    ["--ktc-from" as string]: `${index * 23}%`,
-                    ["--ktc-to" as string]: `${(index + 1) * 23}%`,
-                  }}
-                  className={`absolute inset-0 overflow-hidden rounded-2xl border border-[var(--c-line-2)] bg-[var(--c-deep)] md:rounded-3xl ${
-                    index < HERO_CARDS.length - 1 ? "ktc-deck-card" : ""
-                  }`}
-                >
-                  <Image
-                    src={card.src}
-                    alt={card.alt}
-                    fill
-                    sizes="(min-width: 768px) 42vw, calc(100vw - 3rem)"
-                    className="object-cover"
-                    placeholder="blur"
-                    preload={index === 0}
-                  />
-                  <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,27,24,.04)_48%,rgba(10,27,24,.9)_100%)]" />
-                  <span className="absolute left-5 top-5 font-[family-name:var(--font-geist-mono)] text-xs tracking-[.2em] text-white/85 sm:left-7 sm:top-7">
-                    {card.number}
-                  </span>
-                  <div aria-hidden className="absolute right-5 top-5 flex gap-1.5 sm:right-7 sm:top-7">
-                    {HERO_CARDS.map((_, dot) => (
-                      <span key={dot} className={`h-px w-5 ${dot === index ? "bg-[var(--c-accent)]" : "bg-white/40"}`} />
-                    ))}
-                  </div>
-                  <figcaption className="absolute inset-x-0 bottom-0 p-5 text-white sm:p-7">
-                    <div className="flex items-end justify-between gap-4 border-b border-white/45 pb-4">
-                      <p className="font-[family-name:var(--font-display)] text-4xl leading-none sm:text-5xl">{card.place}</p>
-                      <span className="font-[family-name:var(--font-geist-mono)] text-[.62rem] tracking-[.14em] text-white/70">{card.localName}</span>
-                    </div>
-                    <p className="mt-3 font-[family-name:var(--font-geist-mono)] text-[.68rem] tracking-[.08em] text-white/75">{card.line}</p>
-                  </figcaption>
-                </figure>
-              ))}
+                <div className="relative aspect-[4/5] w-full rounded-2xl shadow-[14px_16px_0_rgba(5,19,16,.58)] md:rounded-3xl md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
+                  {HERO_CARDS.map((card, index) => (
+                    <figure
+                      key={card.number}
+                      style={{
+                        zIndex: HERO_CARDS.length - index,
+                        // 0% 부터 시작한다. 전에는 6% 부터라 카드가 제자리에 앉고도
+                        // 한참(228px) 스크롤해야 첫 장이 넘어갔다. 네 장이 23% 씩 나눠 갖고
+                        // 마지막 8% 는 남은 한 장을 보는 자리로 둔다.
+                        ["--ktc-from" as string]: `${index * 23}%`,
+                        ["--ktc-to" as string]: `${(index + 1) * 23}%`,
+                      }}
+                      className={`absolute inset-0 overflow-hidden rounded-2xl border border-[var(--c-line-2)] bg-[var(--c-deep)] md:rounded-3xl ${
+                        index < HERO_CARDS.length - 1 ? "ktc-deck-card" : ""
+                      }`}
+                    >
+                      <Image
+                        src={card.src}
+                        alt={card.alt}
+                        fill
+                        sizes="(min-width: 768px) 42vw, calc(100vw - 3rem)"
+                        className="object-cover"
+                        placeholder="blur"
+                        preload={index === 0}
+                      />
+                      <div
+                        aria-hidden
+                        className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,27,24,.04)_48%,rgba(10,27,24,.9)_100%)]"
+                      />
+                      <span className="absolute left-5 top-5 font-[family-name:var(--font-geist-mono)] text-xs tracking-[.2em] text-white/85 sm:left-7 sm:top-7">
+                        {card.number}
+                      </span>
+                      <div
+                        aria-hidden
+                        className="absolute right-5 top-5 flex gap-1.5 sm:right-7 sm:top-7"
+                      >
+                        {HERO_CARDS.map((_, dot) => (
+                          <span
+                            key={dot}
+                            className={`h-px w-5 ${dot === index ? "bg-[var(--c-accent)]" : "bg-white/40"}`}
+                          />
+                        ))}
+                      </div>
+                      <figcaption className="absolute inset-x-0 bottom-0 p-5 text-white sm:p-7">
+                        <div className="flex items-end justify-between gap-4 border-b border-white/45 pb-4">
+                          <p className="font-[family-name:var(--font-display)] text-4xl leading-none sm:text-5xl">
+                            {card.place}
+                          </p>
+                          <span className="font-[family-name:var(--font-geist-mono)] text-[.62rem] tracking-[.14em] text-white/70">
+                            {card.localName}
+                          </span>
+                        </div>
+                        <p className="mt-3 font-[family-name:var(--font-geist-mono)] text-[.68rem] tracking-[.08em] text-white/75">
+                          {card.line}
+                        </p>
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="ktc-route mt-14">
-          <RouteScrollDays days={STATIONS.length} />
-          {/* PC 에서 이 칸이 화면에 붙어 있는 동안 날짜가 넘어간다 */}
-          <div className="ktc-route-pin">
-          {/* 누르는 자리를 그림 위에 겹쳐야 해서 relative 가 필요하다 */}
-          <div className="ktc-route-scene relative">
-            <MetroScene scene={NARROW} className="block h-auto w-full md:hidden" />
-            <MetroScene scene={WIDE} className="hidden h-auto w-full md:block" />
+          <div className="ktc-route mt-14">
+            <RouteScrollDays days={STATIONS.length} />
+            {/* PC 에서 이 칸이 화면에 붙어 있는 동안 날짜가 넘어간다 */}
+            <div className="ktc-route-pin">
+              {/* 누르는 자리를 그림 위에 겹쳐야 해서 relative 가 필요하다 */}
+              <div className="ktc-route-scene relative">
+                <MetroScene
+                  scene={NARROW}
+                  className="block h-auto w-full md:hidden"
+                />
+                <MetroScene
+                  scene={WIDE}
+                  className="hidden h-auto w-full md:block"
+                />
 
-            <fieldset className="absolute inset-0 m-0 border-0 p-0">
-              <legend className="sr-only">{t({ ko: "날짜를 골라 그 날의 컨시어지 팁을 보세요", en: "Choose a day to preview its concierge tip" })}</legend>
-              {STATIONS.map((station) => (
-                <label
-                  key={station.day}
-                  style={{ left: `${station.x / 10}%` }}
-                  className="group absolute top-[54.5%] h-[92px] w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:h-[112px] sm:w-28 md:h-[160px] md:w-44"
-                >
-                  {/*
+                <fieldset className="absolute inset-0 m-0 border-0 p-0">
+                  <legend className="sr-only">
+                    {t({
+                      ko: "날짜를 골라 그 날의 컨시어지 팁을 보세요",
+                      en: "Choose a day to preview its concierge tip",
+                    })}
+                  </legend>
+                  {STATIONS.map((station) => (
+                    <label
+                      key={station.day}
+                      style={{ left: `${station.x / 10}%` }}
+                      className="group absolute top-[54.5%] h-[92px] w-16 -translate-x-1/2 -translate-y-1/2 cursor-pointer sm:h-[112px] sm:w-28 md:h-[160px] md:w-44"
+                    >
+                      {/*
                     전통 문양 — DAY 글자 위. 원래 전동차가 지나가던 자리다.
                     크기는 그 전동차(주황 타원)의 좁은 폭에서 출발했고, PC 가 답답해 보여 1.5배로 키웠다.
                     폰도 16px 로 올렸다 — 문양이 세 겹이라 11px 에서는 뭉개진다.
                     `opacity` 로만 켜고 끈다. `hidden` 으로 하면 켜질 때 줄이 밀린다.
                   */}
-                  <span
-                    aria-hidden
-                    className="ktc-mark absolute bottom-[calc(50%+28.9px)] left-1/2 h-[24px] w-[24px] -translate-x-1/2 text-[var(--c-accent-soft)] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+36.8px)] sm:h-[30px] sm:w-[30px] md:bottom-[calc(50%+52.2px)] md:h-[39px] md:w-[39px]"
+                      <span
+                        aria-hidden
+                        className="ktc-mark absolute bottom-[calc(50%+28.9px)] left-1/2 h-[24px] w-[24px] -translate-x-1/2 text-[var(--c-accent-soft)] opacity-0 group-has-[:checked]:opacity-100 sm:bottom-[calc(50%+36.8px)] sm:h-[30px] sm:w-[30px] md:bottom-[calc(50%+52.2px)] md:h-[39px] md:w-[39px]"
+                      >
+                        <DayPattern day={station.day} />
+                      </span>
+
+                      {/* 날짜 — 점 위 */}
+                      <span className="absolute bottom-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-none tracking-[0.16em] text-[var(--c-text)] group-has-[:checked]:text-[var(--c-accent)] sm:bottom-[calc(50%+15px)] sm:text-[0.8rem] sm:tracking-[0.2em] md:bottom-[calc(50%+21px)] md:text-[1.2rem]">
+                        DAY {station.day}
+                      </span>
+
+                      {/* 새로고침하면 늘 DAY 1 이 눌린 채로 시작한다 */}
+                      <input
+                        id={`ktc-day-${station.day}`}
+                        type="radio"
+                        name="ktc-day"
+                        value={station.day}
+                        defaultChecked={station.day === 1}
+                        aria-controls={`ktc-tip-${station.day}`}
+                        className="peer sr-only"
+                      />
+
+                      {/* 역 — 작고 정확한 점. 고른 역에만 가는 테두리가 하나 더 */}
+                      <span
+                        aria-hidden
+                        className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--c-text)] peer-checked:bg-[var(--c-accent)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[var(--c-focus)] sm:h-3 sm:w-3 md:h-[18px] md:w-[18px]"
+                      />
+
+                      {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
+                      <span className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.75rem] leading-none tracking-[0.02em] text-[var(--c-text-3)] sm:top-[calc(50%+15px)] sm:text-[0.65rem] sm:tracking-[0.14em] sm:tracking-[0.14em] md:top-[calc(50%+21px)] md:text-[0.98rem]">
+                        {station.en}
+                      </span>
+                      <span className="absolute top-[calc(50%+27px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.75rem] leading-none text-[var(--c-text-4)] sm:top-[calc(50%+34.4px)] sm:text-[0.6rem] md:top-[calc(50%+48.7px)] md:text-[0.9rem]">
+                        {station.ko}
+                      </span>
+                    </label>
+                  ))}
+                </fieldset>
+              </div>
+
+              {/* 선택한 역 아래에 그 DAY의 컨시어지 팁을 보여준다. */}
+              <div className="mx-auto max-w-5xl px-6 pb-16 pt-8">
+                {TIPS.map((tip) => (
+                  <figure
+                    key={tip.day}
+                    id={`ktc-tip-${tip.day}`}
+                    aria-live="polite"
+                    className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-2xl border border-[var(--c-line-2)] md:rounded-3xl bg-[var(--c-surface)] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.6)] md:grid-cols-[.8fr_1.2fr]`}
                   >
-                    <DayPattern day={station.day} />
-                  </span>
-
-                  {/* 날짜 — 점 위 */}
-                  <span className="absolute bottom-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-geist-mono)] text-[0.62rem] font-bold leading-none tracking-[0.16em] text-[var(--c-text)] group-has-[:checked]:text-[var(--c-accent)] sm:bottom-[calc(50%+15px)] sm:text-[0.8rem] sm:tracking-[0.2em] md:bottom-[calc(50%+21px)] md:text-[1.2rem]">
-                    DAY {station.day}
-                  </span>
-
-                  {/* 새로고침하면 늘 DAY 1 이 눌린 채로 시작한다 */}
-                  <input
-                    id={`ktc-day-${station.day}`}
-                    type="radio"
-                    name="ktc-day"
-                    value={station.day}
-                    defaultChecked={station.day === 1}
-                    aria-controls={`ktc-tip-${station.day}`}
-                    className="peer sr-only"
-                  />
-
-                  {/* 역 — 작고 정확한 점. 고른 역에만 가는 테두리가 하나 더 */}
-                  <span
-                    aria-hidden
-                    className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--c-text)] peer-checked:bg-[var(--c-accent)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[var(--c-focus)] sm:h-3 sm:w-3 md:h-[18px] md:w-[18px]"
-                  />
-
-                  {/* 지역 — 점 아래. 그림 대신 글자가 일하는 자리다 */}
-                  <span className="absolute top-[calc(50%+12px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.75rem] leading-none tracking-[0.02em] text-[var(--c-text-3)] sm:top-[calc(50%+15px)] sm:text-[0.65rem] sm:tracking-[0.14em] sm:tracking-[0.14em] md:top-[calc(50%+21px)] md:text-[0.98rem]">
-                    {station.en}
-                  </span>
-                  <span className="absolute top-[calc(50%+27px)] left-1/2 -translate-x-1/2 whitespace-nowrap text-center font-[family-name:var(--font-geist-mono)] text-[0.75rem] leading-none text-[var(--c-text-4)] sm:top-[calc(50%+34.4px)] sm:text-[0.6rem] md:top-[calc(50%+48.7px)] md:text-[0.9rem]">
-                    {station.ko}
-                  </span>
-                </label>
-              ))}
-            </fieldset>
-          </div>
-
-          {/* 선택한 역 아래에 그 DAY의 컨시어지 팁을 보여준다. */}
-          <div className="mx-auto max-w-5xl px-6 pb-16 pt-8">
-            {TIPS.map((tip) => (
-              <figure
-                key={tip.day}
-                id={`ktc-tip-${tip.day}`}
-                aria-live="polite"
-                className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-2xl border border-[var(--c-line-2)] md:rounded-3xl bg-[var(--c-surface)] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.6)] md:grid-cols-[.8fr_1.2fr]`}
-              >
-                <figcaption className="flex flex-col justify-between gap-8 bg-[var(--c-surface-2)] p-6 text-[var(--c-text)] sm:p-8">
-                  <div>
-                    <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-accent-soft)]">
-                      {t({ ko: `DAY ${tip.day} · 환승역`, en: `Day ${tip.day} · Transfer here` })}
-                    </p>
-                    {/*
+                    <figcaption className="flex flex-col justify-between gap-8 bg-[var(--c-surface-2)] p-6 text-[var(--c-text)] sm:p-8">
+                      <div>
+                        <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-accent-soft)]">
+                          {t({
+                            ko: `DAY ${tip.day} · 환승역`,
+                            en: `Day ${tip.day} · Transfer here`,
+                          })}
+                        </p>
+                        {/*
                       break-keep: 한국어는 기본값이 **글자 아무 데서나 끊는 것**이라
                       "나흘을" 이 "나흘 / 을" 로 갈라진다. 낱말(띄어쓰기) 단위로만 끊게 한다.
                     */}
-                    <p className="mt-4 break-keep font-[family-name:var(--font-display)] text-3xl leading-tight sm:text-4xl">
-                      {tip.headline}
-                    </p>
-                  </div>
-                  <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.16em] text-[var(--c-accent-dim)]">
-                    {t({ ko: `컨시어지 팁 ${String(tip.day).padStart(2, "0")}`, en: `Concierge tip ${String(tip.day).padStart(2, "0")}` })}
-                  </span>
-                </figcaption>
-                <div className="flex flex-col gap-5 bg-[var(--c-bg)] p-6 sm:p-8">
-                  <p className="font-[family-name:var(--font-display)] text-2xl leading-snug sm:text-3xl">
-                    {tip.place}
-                  </p>
-                  <div className="flex items-start gap-3">
-                    <span className="mt-1 flex-none rounded bg-[var(--c-accent)] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-[var(--c-bg)]">
-                      {t({ ko: "이렇게 마세요", en: "Don\u2019t" })}
-                    </span>
-                    <span className="leading-relaxed text-[var(--c-text-4)] line-through">{tip.dont}</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <span className="mt-1 flex-none rounded bg-[var(--c-focus)] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-[var(--c-bg)]">
-                      {t({ ko: "이렇게 하세요", en: "Do" })}
-                    </span>
-                    <span className="leading-relaxed">{tip.do}</span>
-                  </div>
-                </div>
-              </figure>
-            ))}
-          </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── how it works ────────────────────────────────── */}
-      <section className="border-t border-[var(--c-line-2)]">
-        <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
-            {t({ ko: "진행 방식", en: "How it works" })}
-          </h2>
-          <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-12">
-            {steps.map((step, i) => (
-              <li key={step.title}>
-                <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-accent)]">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl leading-tight">
-                  {step.title}
-                </h3>
-                {/* break-keep: 한국어가 낱말 가운데서 끊기지 않게. 큰제목과 같은 처리다. */}
-                {step.body.map((line, li) => (
-                  <p
-                    key={li}
-                    className={`break-keep leading-relaxed text-[var(--c-text-2)] ${li === 0 ? "mt-2" : "mt-1.5"}`}
-                  >
-                    {line}
-                  </p>
+                        <p className="mt-4 break-keep font-[family-name:var(--font-display)] text-3xl leading-tight sm:text-4xl">
+                          {tip.headline}
+                        </p>
+                      </div>
+                      <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.16em] text-[var(--c-accent-dim)]">
+                        {t({
+                          ko: `컨시어지 팁 ${String(tip.day).padStart(2, "0")}`,
+                          en: `Concierge tip ${String(tip.day).padStart(2, "0")}`,
+                        })}
+                      </span>
+                    </figcaption>
+                    <div className="flex flex-col gap-5 bg-[var(--c-bg)] p-6 sm:p-8">
+                      <p className="font-[family-name:var(--font-display)] text-2xl leading-snug sm:text-3xl">
+                        {tip.place}
+                      </p>
+                      <div className="flex items-start gap-3">
+                        <span className="mt-1 flex-none rounded bg-[var(--c-accent)] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-[var(--c-bg)]">
+                          {t({ ko: "이렇게 마세요", en: "Don\u2019t" })}
+                        </span>
+                        <span className="leading-relaxed text-[var(--c-text-4)] line-through">
+                          {tip.dont}
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="mt-1 flex-none rounded bg-[var(--c-focus)] px-2 py-0.5 font-[family-name:var(--font-geist-mono)] text-[0.6rem] font-bold uppercase tracking-wider text-[var(--c-bg)]">
+                          {t({ ko: "이렇게 하세요", en: "Do" })}
+                        </span>
+                        <span className="leading-relaxed">{tip.do}</span>
+                      </div>
+                    </div>
+                  </figure>
                 ))}
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      {/* ── 왜 우리인가 + 샘플 초안 ─────────────────────── */}
-      <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
-        <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
-            <span className="block md:inline">AI 는 아는 곳을 말하고,</span>{" "}
-            <span className="block md:inline">우리는 겪은 것을 적습니다.</span>
-          </h2>
+        {/* ── how it works ────────────────────────────────── */}
+        <section className="border-t border-[var(--c-line-2)]">
+          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+            <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
+              {t({ ko: "진행 방식", en: "How it works" })}
+            </h2>
+            <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-12">
+              {steps.map((step, i) => (
+                <li key={step.title}>
+                  <span className="font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-accent)]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl leading-tight">
+                    {step.title}
+                  </h3>
+                  {/* break-keep: 한국어가 낱말 가운데서 끊기지 않게. 큰제목과 같은 처리다. */}
+                  {step.body.map((line, li) => (
+                    <p
+                      key={li}
+                      className={`break-keep leading-relaxed text-[var(--c-text-2)] ${li === 0 ? "mt-2" : "mt-1.5"}`}
+                    >
+                      {line}
+                    </p>
+                  ))}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
 
-          {/*
+        {/* ── 왜 우리인가 + 샘플 초안 ─────────────────────── */}
+        <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
+          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+            <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
+              <span className="block md:inline">AI 는 아는 곳을 말하고,</span>{" "}
+              <span className="block md:inline">
+                우리는 겪은 것을 적습니다.
+              </span>
+            </h2>
+
+            {/*
             말로 다르다고 하는 대신 **같은 질문에 대한 두 답을 나란히** 놓는다.
             차이를 설명하면 읽는 사람이 판단해야 하지만, 나란히 놓으면 그냥 보인다.
             오른쪽 글은 지어낸 것이 아니라 실제 초안에서 나온 팁이다.
           */}
-          <div className="mt-10 grid gap-6 md:grid-cols-2 md:gap-10">
-            <div className="rounded-2xl border border-[var(--c-line-2)] p-6 sm:p-7 md:rounded-3xl">
-              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
-                {t({ ko: "물어보면", en: "Ask a chatbot" })}
-              </p>
-              <p className="mt-4 break-keep leading-relaxed text-[var(--c-text-3)]">
-                {t({
-                  ko: "경복궁에 가보세요. 조선의 정궁이고 서울에서 가장 큰 궁궐입니다.",
-                  en: "Visit Gyeongbokgung. It was the main royal palace of the Joseon dynasty.",
-                })}
-              </p>
+            <div className="mt-10 grid gap-6 md:grid-cols-2 md:gap-10">
+              <div className="rounded-2xl border border-[var(--c-line-2)] p-6 sm:p-7 md:rounded-3xl">
+                <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
+                  {t({ ko: "물어보면", en: "Ask a chatbot" })}
+                </p>
+                <p className="mt-4 break-keep leading-relaxed text-[var(--c-text-3)]">
+                  {t({
+                    ko: "경복궁에 가보세요. 조선의 정궁이고 서울에서 가장 큰 궁궐입니다.",
+                    en: "Visit Gyeongbokgung. It was the main royal palace of the Joseon dynasty.",
+                  })}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-[var(--c-line)] bg-[var(--c-deep)] p-6 text-[var(--c-text-on-deep)] sm:p-7 md:rounded-3xl">
+                <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent-soft)]">
+                  {t({ ko: "우리가 적는 것", en: "What we write" })}
+                </p>
+                <p className="mt-4 break-keep leading-relaxed">
+                  {t({
+                    ko: "화요일은 닫습니다. 한복을 입으면 무료로 들어갑니다 — 다만 길가 가게 한복은 뻣뻣해서 사진에 부자연스럽게 나옵니다. 정문에서 두 블록 더 가면 손바느질 실크를 빌려주는 곳이 있습니다.",
+                    en: "It is closed on Tuesdays. Wearing hanbok gets you in free — but roadside rentals look stiff in photos. Two blocks past the main gate there are shops with hand-stitched silk.",
+                  })}
+                </p>
+              </div>
             </div>
 
-            <div className="rounded-2xl border border-[var(--c-line)] bg-[var(--c-deep)] p-6 text-[var(--c-text-on-deep)] sm:p-7 md:rounded-3xl">
-              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent-soft)]">
-                {t({ ko: "우리가 적는 것", en: "What we write" })}
-              </p>
-              <p className="mt-4 break-keep leading-relaxed">
-                {t({
-                  ko: "화요일은 닫습니다. 한복을 입으면 무료로 들어갑니다 — 다만 길가 가게 한복은 뻣뻣해서 사진에 부자연스럽게 나옵니다. 정문에서 두 블록 더 가면 손바느질 실크를 빌려주는 곳이 있습니다.",
-                  en: "It is closed on Tuesdays. Wearing hanbok gets you in free — but roadside rentals look stiff in photos. Two blocks past the main gate there are shops with hand-stitched silk.",
-                })}
-              </p>
-            </div>
-          </div>
-
-          {/* 샘플 — 말이 아니라 물건을 보여준다 */}
-          <p className="mt-14 font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
-            {t({ ko: "실제로 만들어진 초안입니다", en: "Real drafts we made" })}
-          </p>
-          <ul className="mt-4 grid gap-3 md:grid-cols-2">
-            {SAMPLES.map((sample) => (
-              <li key={sample.id}>
-                <Link
-                  href={`/plan/${sample.id}`}
-                  className="flex h-full flex-col justify-between gap-3 rounded-2xl border border-[var(--c-line-2)] bg-[var(--c-bg)] p-5 transition-colors hover:border-[var(--c-text-3)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)] sm:p-6"
-                >
-                  <span className="font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.14em] text-[var(--c-accent-dim)]">
-                    {sample.who}
-                  </span>
-                  <span className="break-keep font-[family-name:var(--font-display)] text-xl leading-snug text-[var(--c-text)]">
-                    {sample.title}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ── free vs paid ────────────────────────────────── */}
-      <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
-        <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
-            {t({
-              // block md:inline — 폰에서는 줄을 나누고 PC 에서는 이어 붙인다.
-              // PC 는 칸이 넓어 두 줄로 끊으면 오른쪽이 비어 왼쪽으로 쏠려 보인다.
-              ko: (
-                <>
-                  <span className="block md:inline">무엇이 무료이고,</span>{" "}
-                  <span className="block md:inline">무엇에 값을 치르는지</span>
-                </>
-              ),
-              en: (
-                <>
-                  <span className="block md:inline">What&rsquo;s free,</span>{" "}
-                  <span className="block md:inline">and what you&rsquo;re paying for</span>
-                </>
-              ),
-            })}
-          </h2>
-          <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-16">
-            <div>
-              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
-                {t({ ko: "무료 초안", en: "Free draft" })}
-              </p>
-              <ul className="mt-4 space-y-3">
-                {free.map((item) => (
-                  <li key={item} className="flex gap-3 leading-relaxed">
-                    {/* 목록 기호. aria-hidden 은 화면 낭독기가 ul/li 로 이미 목록임을 알리기 때문이다 */}
-                    <span aria-hidden className="select-none text-lg leading-relaxed text-[var(--c-text-3)]">
-                      •
+            {/* 샘플 — 말이 아니라 물건을 보여준다 */}
+            <p className="mt-14 font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
+              {t({
+                ko: "실제로 만들어진 초안입니다",
+                en: "Real drafts we made",
+              })}
+            </p>
+            <ul className="mt-4 grid gap-3 md:grid-cols-2">
+              {SAMPLES.map((sample) => (
+                <li key={sample.id}>
+                  <Link
+                    href={`/plan/${sample.id}`}
+                    className="flex h-full flex-col justify-between gap-3 rounded-2xl border border-[var(--c-line-2)] bg-[var(--c-bg)] p-5 transition-colors hover:border-[var(--c-text-3)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)] sm:p-6"
+                  >
+                    <span className="font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.14em] text-[var(--c-accent-dim)]">
+                      {sample.who}
                     </span>
-                    <span className="text-[var(--c-text-2)]">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent)]">
-                {/*
+                    <span className="break-keep font-[family-name:var(--font-display)] text-xl leading-snug text-[var(--c-text)]">
+                      {sample.title}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ── free vs paid ────────────────────────────────── */}
+        <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
+          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+            <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
+              {t({
+                // block md:inline — 폰에서는 줄을 나누고 PC 에서는 이어 붙인다.
+                // PC 는 칸이 넓어 두 줄로 끊으면 오른쪽이 비어 왼쪽으로 쏠려 보인다.
+                ko: (
+                  <>
+                    <span className="block md:inline">무엇이 무료이고,</span>{" "}
+                    <span className="block md:inline">
+                      무엇에 값을 치르는지
+                    </span>
+                  </>
+                ),
+                en: (
+                  <>
+                    <span className="block md:inline">What&rsquo;s free,</span>{" "}
+                    <span className="block md:inline">
+                      and what you&rsquo;re paying for
+                    </span>
+                  </>
+                ),
+              })}
+            </h2>
+            <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-16">
+              <div>
+                <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]">
+                  {t({ ko: "무료 초안", en: "Free draft" })}
+                </p>
+                <ul className="mt-4 space-y-3">
+                  {free.map((item) => (
+                    <li key={item} className="flex gap-3 leading-relaxed">
+                      {/* 목록 기호. aria-hidden 은 화면 낭독기가 ul/li 로 이미 목록임을 알리기 때문이다 */}
+                      <span
+                        aria-hidden
+                        className="select-none text-lg leading-relaxed text-[var(--c-text-3)]"
+                      >
+                        •
+                      </span>
+                      <span className="text-[var(--c-text-2)]">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent)]">
+                  {/*
                   값은 여기서 빼 두었다 (선경·뮤조 판단, 2026-08-24).
                   이 칸은 **무엇을 받는지** 를 보여주는 자리다. 목록 머리에 값부터 나오면
                   아래 내용을 읽기 전에 값으로 먼저 판단하게 된다.
                   값은 아래 '가격' 칸과 진행 방식 03 에 그대로 있다.
                 */}
-                {t({ ko: "전체 일정", en: "Full plan" })}
-              </p>
-              <ul className="mt-4 space-y-3">
-                {paid.map((item) => {
-                  const [head, note] = Array.isArray(item) ? item : [item, null];
-                  return (
-                    <li key={head} className="flex gap-3 leading-relaxed">
-                      <span aria-hidden className="select-none text-lg leading-relaxed text-[var(--c-accent)]">
-                        •
-                      </span>
-                      <span>
-                        {head}
-                        {/*
+                  {t({ ko: "전체 일정", en: "Full plan" })}
+                </p>
+                <ul className="mt-4 space-y-3">
+                  {paid.map((item) => {
+                    const [head, note] = Array.isArray(item)
+                      ? item
+                      : [item, null];
+                    return (
+                      <li key={head} className="flex gap-3 leading-relaxed">
+                        <span
+                          aria-hidden
+                          className="select-none text-lg leading-relaxed text-[var(--c-accent)]"
+                        >
+                          •
+                        </span>
+                        <span>
+                          {head}
+                          {/*
                           풀어 주는 말. 아랫줄에 한 단계 작게, **줄표를 맨 앞에 둔다.**
                           이 span 은 block 이라 왼쪽 끝이 윗줄 첫 글자와 같은 자리다 —
                           그래서 줄표가 윗 항목과 나란히 선다. 들여쓰기를 더 주면 안 된다.
                         */}
-                        {note && (
-                          <span className="block text-sm">
-                            <span aria-hidden className="select-none">— </span>
-                            {note}
-                          </span>
-                        )}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
+                          {note && (
+                            <span className="block text-sm">
+                              <span aria-hidden className="select-none">
+                                —{" "}
+                              </span>
+                              {note}
+                            </span>
+                          )}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </div>
-          </div>
-          {/* 우리는 여행사가 아니다. 이 선을 손님에게도 분명히 해둔다 (규칙 6번) */}
-          {/*
+            {/* 우리는 여행사가 아니다. 이 선을 손님에게도 분명히 해둔다 (규칙 6번) */}
+            {/*
             네 도막으로 끊어 읽힌다. **여기가 규칙 6번을 손님에게 밝히는 자리라**
             한 덩어리로 뭉쳐 있으면 "안 한다"는 말이 문단에 묻힌다.
             무엇을 하는지 / 무엇을 안 하는지 / 대금은 안 받는지 / 대신 무엇을 하는지, 넷을 갈랐다.
           */}
-          {/*
+            {/*
             앞 세 도막은 **폰에서만 줄을 나눈다.** PC 에서는 이어 붙어 한 문단이 된다 —
             칸이 넓은데 짧게 끊으면 오른쪽이 비어 글이 왼쪽으로 쏠려 보인다.
             줄표로 시작하는 마지막 도막은 어디서나 제 줄에 남는다. 그게 이 문단의 결론이다.
           */}
-          <div className="mt-10 max-w-4xl space-y-1.5 leading-relaxed text-[var(--c-text-3)]">
-            <p>
-              {t({
-                ko: (
-                  <>
-                    <span className="block md:inline">저희는 계획을 세우고, 예약은 손님이 하십니다.</span>{" "}
-                    <span className="block mt-1.5 md:mt-0 md:inline">숙소·식당·입장권을 대신 예약해 드리거나</span>{" "}
-                    <span className="block mt-1.5 md:mt-0 md:inline">그 대금을 받지 않습니다.</span>
-                  </>
-                ),
-                en: (
-                  <>
-                    <span className="block md:inline">We plan; you book.</span>{" "}
-                    <span className="block mt-1.5 md:mt-0 md:inline">We don&rsquo;t make reservations for you or take payment</span>{" "}
-                    <span className="block mt-1.5 md:mt-0 md:inline">for hotels, restaurants or tickets.</span>
-                  </>
-                ),
-              })}
-            </p>
-            <p>
-              {t({
-                ko: "— 무엇을 어떻게 예약하면 되는지 알려드립니다.",
-                en: "— We tell you exactly what to book and how.",
-              })}
-            </p>
+            <div className="mt-10 max-w-4xl space-y-1.5 leading-relaxed text-[var(--c-text-3)]">
+              <p>
+                {t({
+                  ko: (
+                    <>
+                      <span className="block md:inline">
+                        저희는 계획을 세우고, 예약은 손님이 하십니다.
+                      </span>{" "}
+                      <span className="block mt-1.5 md:mt-0 md:inline">
+                        숙소·식당·입장권을 대신 예약해 드리거나
+                      </span>{" "}
+                      <span className="block mt-1.5 md:mt-0 md:inline">
+                        그 대금을 받지 않습니다.
+                      </span>
+                    </>
+                  ),
+                  en: (
+                    <>
+                      <span className="block md:inline">
+                        We plan; you book.
+                      </span>{" "}
+                      <span className="block mt-1.5 md:mt-0 md:inline">
+                        We don&rsquo;t make reservations for you or take payment
+                      </span>{" "}
+                      <span className="block mt-1.5 md:mt-0 md:inline">
+                        for hotels, restaurants or tickets.
+                      </span>
+                    </>
+                  ),
+                })}
+              </p>
+              <p>
+                {t({
+                  ko: "— 무엇을 어떻게 예약하면 되는지 알려드립니다.",
+                  en: "— We tell you exactly what to book and how.",
+                })}
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── pricing + contact ───────────────────────────── */}
-      <section id="pricing" className="scroll-mt-20 border-t border-[var(--c-line-2)]">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
-          <div>
-            <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
-              {/*
+        {/* ── pricing + contact ───────────────────────────── */}
+        <section
+          id="pricing"
+          className="scroll-mt-20 border-t border-[var(--c-line-2)]"
+        >
+          <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
+            <div>
+              <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
+                {/*
                 전에는 '가격' 이었다. 값을 뺀 자리라 그 이름은 더 이상 맞지 않는다 —
                 가격이라 적어 두고 값이 없으면 손님이 값을 찾다가 못 찾는다.
               */}
-              {t({ ko: "시작하기", en: "Get started" })}
-            </p>
-            {/*
+                {t({ ko: "시작하기", en: "Get started" })}
+              </p>
+              {/*
               두 문장을 각각 한 줄에 놓는다. **줄이 넘치면 줄바꿈 대신 글자가 작아진다.**
 
               고정 크기로 두면 375px 폰에서 제일 긴 줄이 자리를 넘겨 낱말 가운데서 잘린다.
@@ -997,82 +1170,100 @@ export default async function Home() {
               여백(24px)과 단 사이(40px)를 뺀다. clamp 의 양 끝은 원래 크기(30px / 36px)를
               넘지 않게, 그리고 너무 작아지지 않게 잡은 것이다.
             */}
-            <p className="mt-4 font-[family-name:var(--font-display)] leading-tight text-[clamp(1.25rem,calc((100vw_-_3rem)/12.6),1.875rem)] md:text-[clamp(1.5rem,calc((50vw_-_44px)/12.6),2.25rem)]">
-              {t({
-                ko: (
-                  <>
-                    <span className="block">초안은 무료입니다.</span>
-                    <span className="block">지금 바로 여행 일정 받아보세요.</span>
-                  </>
-                ),
-                en: (
-                  <>
-                    <span className="block">The draft is free.</span>
-                    <span className="block">Get your itinerary now.</span>
-                  </>
-                ),
-              })}
-            </p>
-            {/*
+              <p className="mt-4 font-[family-name:var(--font-display)] leading-tight text-[clamp(1.25rem,calc((100vw_-_3rem)/12.6),1.875rem)] md:text-[clamp(1.5rem,calc((50vw_-_44px)/12.6),2.25rem)]">
+                {t({
+                  ko: (
+                    <>
+                      <span className="block">초안은 무료입니다.</span>
+                      <span className="block">
+                        지금 바로 여행 일정 받아보세요.
+                      </span>
+                    </>
+                  ),
+                  en: (
+                    <>
+                      <span className="block">The draft is free.</span>
+                      <span className="block">Get your itinerary now.</span>
+                    </>
+                  ),
+                })}
+              </p>
+              {/*
               값 이야기는 늘 제 줄에 두고, 뒤의 두 도막만 PC 에서 이어 붙인다.
               폰은 셋 다 나뉜 채로 둔다. max-w 를 PC 에서 넓히지 않으면 이어 붙여도 다시 접힌다.
             */}
-            <div className="mt-4 max-w-md space-y-1.5 leading-relaxed text-[var(--c-text-2)] md:max-w-none">
-              {/*
+              <div className="mt-4 max-w-md space-y-1.5 leading-relaxed text-[var(--c-text-2)] md:max-w-none">
+                {/*
                 값 이야기를 하던 줄을 아예 뺐다 (선경 판단).
                 '여행이 며칠이든 값은 하나입니다.' → '며칠을 가시든 값은 같습니다.' 로 한 번 고쳐 봤지만,
                 **값을 하나도 안 보여주는 자리에서 값을 설명하는 문장만 남는 것**이 문제였다.
                 아래 두 줄은 값 이야기가 아니라 그대로 말이 된다.
               */}
-              <p>
+                <p>
+                  {t({
+                    ko: (
+                      <>
+                        <span className="block md:inline">
+                          처음부터 끝까지 만들어져 나오니
+                        </span>{" "}
+                        <span className="block mt-1.5 md:mt-0 md:inline">
+                          예약할 통화도, 기다릴 사람도 없습니다.
+                        </span>
+                      </>
+                    ),
+                    en: (
+                      <>
+                        <span className="block md:inline">
+                          It&rsquo;s put together for you start to finish —
+                        </span>{" "}
+                        <span className="block mt-1.5 md:mt-0 md:inline">
+                          no call to book, nobody to wait on.
+                        </span>
+                      </>
+                    ),
+                  })}
+                </p>
+              </div>
+            </div>
+            <div id="contact" className="scroll-mt-20 md:justify-self-end">
+              <Link
+                href="/plan"
+                className="inline-flex items-center rounded-full bg-[var(--c-text)] px-8 py-3.5 text-base text-[var(--c-bg)] transition-colors hover:bg-[var(--c-accent)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
+              >
                 {t({
-                  ko: (
-                    <>
-                      <span className="block md:inline">처음부터 끝까지 만들어져 나오니</span>{" "}
-                      <span className="block mt-1.5 md:mt-0 md:inline">예약할 통화도, 기다릴 사람도 없습니다.</span>
-                    </>
-                  ),
-                  en: (
-                    <>
-                      <span className="block md:inline">It&rsquo;s put together for you start to finish —</span>{" "}
-                      <span className="block mt-1.5 md:mt-0 md:inline">no call to book, nobody to wait on.</span>
-                    </>
-                  ),
+                  ko: "무료 초안부터 받아보기",
+                  en: "Start with the free draft",
                 })}
-              </p>
+              </Link>
+              {/* 묻는 말과 누를 곳을 갈라 놓는다. 한 줄에 붙어 있으면 밑줄이 문장 끝에 묻힌다. */}
+              <div className="mt-5 space-y-1.5 leading-relaxed text-[var(--c-text-2)]">
+                <p>
+                  {t({
+                    ko: "먼저 물어보고 싶으신가요?",
+                    en: "Rather just ask a question first?",
+                  })}
+                </p>
+                <p>
+                  <Link
+                    href="/contact"
+                    className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+                  >
+                    {t({ ko: "무엇이든 물어보세요", en: "Ask us anything" })}
+                  </Link>
+                  .
+                </p>
+              </div>
             </div>
           </div>
-          <div id="contact" className="scroll-mt-20 md:justify-self-end">
-            <Link
-              href="/plan"
-              className="inline-flex items-center rounded-full bg-[var(--c-text)] px-8 py-3.5 text-base text-[var(--c-bg)] transition-colors hover:bg-[var(--c-accent)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
-            >
-              {t({ ko: "무료 초안부터 받아보기", en: "Start with the free draft" })}
-            </Link>
-            {/* 묻는 말과 누를 곳을 갈라 놓는다. 한 줄에 붙어 있으면 밑줄이 문장 끝에 묻힌다. */}
-            <div className="mt-5 space-y-1.5 leading-relaxed text-[var(--c-text-2)]">
-              <p>{t({ ko: "먼저 물어보고 싶으신가요?", en: "Rather just ask a question first?" })}</p>
-              <p>
-                <Link
-                  href="/contact"
-                  className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
-                >
-                  {t({ ko: "무엇이든 물어보세요", en: "Ask us anything" })}
-                </Link>
-                .
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <footer className="border-t border-[var(--c-line-2)]">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-text-3)] sm:flex-row sm:items-center sm:justify-between">
-          {/* 상호는 어디서든 같은 서체로. 크기는 꼬리말 기준(text-xs)을 그대로 물려받는다 */}
-          <span className="font-[family-name:var(--font-geist-sans)] font-semibold tracking-[-0.02em]">
-            mohallae
-          </span>
-          {/*
+        <footer className="border-t border-[var(--c-line-2)]">
+          <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-text-3)] sm:flex-row sm:items-center sm:justify-between">
+            {/* 상호는 어디서든 같은 서체로. 크기는 꼬리말 기준(text-xs)을 그대로 물려받는다 */}
+            <span className="font-[family-name:var(--font-geist-sans)] font-semibold tracking-[-0.02em]">
+              mohallae
+            </span>
+            {/*
             자리는 **대한민국 서울 → 개인정보 처리방침** 순이다.
 
             처리방침 링크는 **평소에도 밑줄을 그어 둔다.** 개인정보 보호법 시행령 제31조와
@@ -1080,29 +1271,38 @@ export default async function Home() {
             전에는 마우스를 올려야만 밑줄이 나와서 평소에는 옆의 '대한민국 서울' 과
             똑같아 보였다. 글자색도 한 단계 밝게 둬서 누를 수 있는 곳임을 알린다.
           */}
-          <div className="flex gap-5">
-            <span>{t({ ko: "대한민국 서울", en: "Seoul, Korea" })}</span>
             {/*
-              둘 다 밑줄을 긋되 **색을 다르게 둔다** — 자주 묻는 것은 흐리게, 처리방침은 밝게.
-              시행령 제31조가 요구하는 건 처리방침이 다른 고지사항과 **구분되게** 보이는 것이지
-              밑줄 자체가 아니다. 글자 크기·색상 등으로 구분하면 된다.
-              둘을 색까지 같게 두면 그 구분이 사라진다.
+            justify-between: 폰에서 이 줄은 화면 폭을 다 쓰는데 글자는 왼쪽에만 몰려
+            오른쪽이 60px 남았다. 서울은 왼쪽 끝, 링크 둘은 오른쪽 끝에 붙인다.
+            PC 는 이 칸이 글자만큼만 넓어서(바깥이 이미 justify-between) 그대로다.
+          */}
+            <div className="flex items-center justify-between gap-5">
+              <span>{t({ ko: "대한민국 서울", en: "Seoul, Korea" })}</span>
+              {/*
+              꼬리말 링크 둘. 밑줄도 색도 같게 뒀다 (선경 결정, 2026-08-25).
+
+              처리방침은 **다른 안내와 구분되게** 보여야 한다는 지침이 있어서 전에는
+              밝은 색 + 밑줄로 두드러지게 해 뒀었다. 지금은 둘이 같은 모양이라
+              그 구분이 글자색으로는 남아 있지 않다 — 위치와 이름으로만 구분된다.
+              다시 구분이 필요하면 처리방침 쪽에 font-semibold 만 더하면 된다.
             */}
-            <Link
-              href="/faq"
-              className="underline underline-offset-4 hover:text-[var(--c-text)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
-            >
-              {t({ ko: "자주 묻는 것", en: "Questions" })}
-            </Link>
-            <Link
-              href="/privacy"
-              className="text-[var(--c-text)] underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
-            >
-              {t({ ko: "개인정보 처리방침", en: "Privacy" })}
-            </Link>
+              <span className="flex gap-5">
+                <Link
+                  href="/faq"
+                  className="underline underline-offset-4 hover:text-[var(--c-text)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+                >
+                  {t({ ko: "자주 묻는 것", en: "Questions" })}
+                </Link>
+                <Link
+                  href="/privacy"
+                  className="underline underline-offset-4 hover:text-[var(--c-text)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+                >
+                  {t({ ko: "개인정보 처리방침", en: "Privacy" })}
+                </Link>
+              </span>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
       </div>
     </div>
   );
