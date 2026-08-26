@@ -82,30 +82,29 @@ export default function FaqPage() {
         <h1 className="mt-4 font-[family-name:var(--font-display)] text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight">
           {t({ ko: "자주 묻는 것", en: "Questions people ask" })}
         </h1>
-        <p className="mt-5 break-keep text-lg leading-relaxed text-[var(--c-text-2)]">
-          {t({
-            ko: "여기 없는 것이 궁금하시면 물어봐 주세요.",
-            en: "If your question isn't here, just ask.",
-          })}{" "}
-          <Link
-            href="/contact"
-            className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
-          >
-            {t({ ko: "무엇이든 물어보세요", en: "Ask us anything" })}
-          </Link>
-          .
-        </p>
-
         {/*
           details/summary 를 쓴다. **여닫는 데 자바스크립트가 하나도 안 든다** —
           브라우저가 원래 하는 일이라 화면 낭독기도 알아서 읽고, 느려지지도 않는다.
           group-open: 은 열렸을 때 + 를 × 로 돌리는 것뿐이다.
         */}
-        <div className="mt-12 divide-y divide-[var(--c-line-2)] border-y border-[var(--c-line-2)]">
+        <div className="mt-10 divide-y divide-[var(--c-line-2)] border-y border-[var(--c-line-2)]">
           {FAQ.map(([question, answer]) => (
             <details key={question} className="group">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--c-focus)]">
-                <span className="break-keep text-lg leading-snug text-[var(--c-text)]">{question}</span>
+                {/*
+                  **닫힌 것은 작게, 연 것은 크고 주황으로.** 여는 순간 글자가 커지고 색이 바뀌어
+                  확대되는 느낌이 난다. transition 이 없으면 툭 바뀌어 확대가 아니라
+                  다른 글자로 갈아탄 것처럼 보인다. 0.2초는 눈이 따라갈 수 있으면서
+                  기다린다는 느낌은 안 드는 길이다.
+
+                  **진한 주황(--c-accent)이 아니라 밝은 주황(--c-accent-soft)을 쓴다.**
+                  이 바탕(#16302C)에서 진한 주황은 대비가 3.96 이라 읽기 기준(4.5)에 못 미친다.
+                  밝은 주황은 5.34 로 통과한다. 18px 는 '큰 글자' 예외에 안 들어가므로
+                  4.5 를 그대로 맞춰야 한다.
+                */}
+                <span className="break-keep text-base leading-snug text-[var(--c-text)] transition-[font-size,color] duration-200 group-open:text-lg group-open:text-[var(--c-accent-soft)]">
+                  {question}
+                </span>
                 <span
                   aria-hidden
                   className="flex-none text-[var(--c-text-3)] transition-transform group-open:rotate-45"
@@ -117,6 +116,21 @@ export default function FaqPage() {
             </details>
           ))}
         </div>
+
+        {/*
+          문의 안내는 **목록 아래**에 둔다. 위에 두면 아직 읽지도 않은 사람에게 먼저 물어보라고 하는 셈이다.
+          여덟 개를 다 훑고도 답이 없을 때 바로 눈에 들어오는 자리가 여기다.
+        */}
+        <p className="mt-10 break-keep text-lg leading-relaxed text-[var(--c-text-2)]">
+          {t({ ko: "그 외 궁금하신가요?", en: "Anything else?" })}{" "}
+          <Link
+            href="/contact"
+            className="text-[var(--c-text)] underline underline-offset-4 hover:text-[var(--c-accent-soft)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+          >
+            {t({ ko: "무엇이든 물어보세요", en: "Ask us anything" })}
+          </Link>
+          .
+        </p>
 
         <p className="mt-12 border-t border-[var(--c-line-2)] pt-8">
           <Link
