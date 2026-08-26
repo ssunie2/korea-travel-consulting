@@ -389,7 +389,7 @@ export default function PlanForm() {
               name="budgetCurrency"
               defaultValue="USD"
               options={CURRENCIES.map((c) => ({ value: c, label: c }))}
-              placeholder="USD"
+              placeholder={t({ ko: "고르세요", en: "Choose one" })}
             />
           </div>
 
@@ -571,7 +571,7 @@ export default function PlanForm() {
               */
               defaultValue={LANG}
               options={LANGUAGES.map((l) => ({ value: l.code, label: l.label }))}
-              placeholder="English"
+              placeholder={t({ ko: "고르세요", en: "Choose one" })}
             />
 
           {error && (
