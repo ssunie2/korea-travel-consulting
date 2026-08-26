@@ -10,8 +10,11 @@ const display = Instrument_Serif({
 });
 
 export const metadata = {
-  title: "Questions people ask — mohallae",
-  description: "What the free draft includes, when you get it, and what we do and don't do.",
+  title: t({ ko: "자주 묻는 것 — mohallae", en: "Questions people ask — mohallae" }),
+  description: t({
+    ko: "무료 초안에 무엇이 들어 있는지, 언제 받는지, 저희가 하는 것과 안 하는 것.",
+    en: "What the free draft includes, when you get it, and what we do and don't do.",
+  }),
 };
 
 /**

@@ -12,8 +12,11 @@ const display = Instrument_Serif({
 });
 
 export const metadata = {
-  title: "Contact — mohallae",
-  description: "Ask us anything about planning your trip to Korea.",
+  title: t({ ko: "문의 — mohallae", en: "Contact — mohallae" }),
+  description: t({
+    ko: "한국 여행 계획에 대해 무엇이든 물어보세요.",
+    en: "Ask us anything about planning your trip to Korea.",
+  }),
 };
 
 const label = "font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-text-3)]";
