@@ -109,6 +109,21 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
     );
   }
 
+  /*
+    팁이 걸린 날을 **먼저 찾아 둔다.** 전에는 그리는 자리에서 조건 둘을 따로 따졌는데
+    (같은 날이면 그 날 아래 / dayNumber 가 없으면 맨 아래) **"날짜는 있는데 그 날이
+    일정에 없는"** 경우가 둘 다 안 걸려 팁이 통째로 사라졌다. AI 가 4일 여행에
+    dayNumber: 5 를 주거나 숫자 대신 글자 "3" 을 주면 그렇게 된다.
+
+    팁이 안 보여도 아래 문구는 그대로 남는다 — "팁 하나를 보셨습니다." 손님은 보지도
+    못한 것을 봤다고 하는 화면을 본다. 에러도 로그도 안 남는다.
+
+    찾은 날이 있으면 그 날에 한 번, 없으면 맨 아래에 한 번. **어떤 값이 와도 정확히
+    한 번 나온다.** 날짜(===)가 아니라 찾아낸 날 자체를 비교하므로 dayNumber 가
+    겹쳐도 두 번 그려지지 않는다.
+  */
+  const tipDay = trip.days.find((d) => d.dayNumber === trip.sampleTip.dayNumber);
+
   return (
     <div
       className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
@@ -189,15 +204,13 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
               </ul>
 
               {/* 이 날의 팁이면 바로 아래에 붙인다 */}
-              {trip.sampleTip.dayNumber === day.dayNumber && (
-                <ConciergeTip tip={trip.sampleTip} className="mt-8" />
-              )}
+              {tipDay === day && <ConciergeTip tip={trip.sampleTip} className="mt-8" />}
             </li>
           ))}
         </ol>
 
-        {/* 몇 일째인지 모르는 옛 초안만 여기(맨 아래)에 그린다 */}
-        {!trip.sampleTip.dayNumber && <ConciergeTip tip={trip.sampleTip} className="mt-16" />}
+        {/* 걸릴 날을 못 찾은 팁은 여기(맨 아래)에 그린다 — 옛 초안, 그리고 엉뚱한 날짜 */}
+        {!tipDay && <ConciergeTip tip={trip.sampleTip} className="mt-16" />}
 
         {/* ── 숙소·식당·예산 ───────────────────────────── */}
         <dl className="mt-14 grid gap-8 border-t border-[var(--c-line-2)] pt-10 sm:grid-cols-3">
