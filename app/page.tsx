@@ -107,6 +107,26 @@ const MOTION = `
     transform: translate(-26%, -3.5%) rotate(-5deg) scale(.95);
     opacity: 0;
   }
+  /*
+    앞 장이 걷히고 **새로 올라온 장**이 살짝 커졌다 제자리로 온다.
+
+    작아졌다 커지는 게 아니라 **커졌다 돌아온다.** 쉬는 크기를 1보다 작게 두면
+    카드가 제 상자보다 작아져서, 상자에 붙은 그림자(오른쪽 아래로 14px)와의 사이가
+    벌어져 틈이 보인다. 커지는 쪽은 그런 문제가 없다.
+
+    1.018 은 폰에서 9px 쯤이다. 더 키우면 그림자를 덮어서 카드가 눌린 것처럼 보인다.
+
+    transition 이 아니라 keyframes 인 이유 — 갔다가 돌아오는 움직임은 값 하나가
+    바뀌는 것으로는 안 되고 중간 지점이 필요하다.
+  */
+  .ktc-deck-stack > figure[data-top] {
+    animation: ktc-card-pop .5s cubic-bezier(.3, .7, .3, 1);
+  }
+}
+@keyframes ktc-card-pop {
+  0% { transform: scale(1) }
+  38% { transform: scale(1.018) }
+  100% { transform: scale(1) }
 }
 /*
   문양이 뜰 때. 그냥 켜면 툭 나타나서 딱딱하다.
@@ -706,7 +726,7 @@ export default async function Home() {
                 **안쪽 사진 카드에도 같은 값을 준다.** 바깥에 overflow-hidden 을 걸면
                 넘어가는 카드가 잘려버려서, 각자 제 모서리를 갖게 했다.
               */}
-                <div className="relative aspect-[4/5] w-full rounded-2xl shadow-[14px_16px_0_rgba(5,19,16,.58)] md:rounded-3xl md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
+                <div className="ktc-deck-stack relative aspect-[4/5] w-full rounded-2xl shadow-[14px_16px_0_rgba(5,19,16,.58)] md:rounded-3xl md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
                   {HERO_CARDS.map((card, index) => (
                     <figure
                       key={card.number}
