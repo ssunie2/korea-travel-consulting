@@ -1,0 +1,321 @@
+{
+  "version": 1,
+  "jobId": "bcf54031-fe57-4736-adb2-cf690457ca35",
+  "sessionId": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+  "scopeKey": "6f3f767e9e34dbc3b34d855117c511be02860c40b8ccc49e67b5f079624fb1f8",
+  "revision": 41,
+  "createdAt": "2026-08-24T21:37:23.966Z",
+  "updatedAt": "2026-08-24T21:37:24.979Z",
+  "producerGraceExpiresAt": "2026-08-24T21:37:53.966Z",
+  "bestEffortDeadlineAt": "2026-08-24T21:38:44.966Z",
+  "producers": {
+    "core": {
+      "state": "sealed",
+      "intentKey": "16300b084f9a8b9f8ba7c68baaddb7281161c77b1c4b731fbd01b94b5b54deeb",
+      "payloadDigest": "16300b084f9a8b9f8ba7c68baaddb7281161c77b1c4b731fbd01b94b5b54deeb",
+      "sealedAt": "2026-08-24T21:37:24.015Z",
+      "sealedBy": "foreground"
+    },
+    "wiki": {
+      "state": "no-op",
+      "sealedAt": "2026-08-24T21:37:23.966Z",
+      "sealedBy": "wiki-producer"
+    }
+  },
+  "actions": {
+    "foreground-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 0,
+      "idempotencyKey": "febf6dba2f2536433960a07f7cedce72e946b43ced0896570df80f017b8914d2",
+      "payload": {
+        "transcriptPath": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+        "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+        "reason": "other",
+        "input": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "transcript_path": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+          "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "ended_at": "2026-08-24T21:37:23.955Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {},
+        "foregroundResult": {
+          "removedTransientFiles": 0,
+          "completedAt": "2026-08-24T21:37:24.015Z"
+        }
+      },
+      "budgetMs": 9000,
+      "completedAt": "2026-08-24T21:37:24.015Z",
+      "lastOutcomeCode": "completed"
+    },
+    "wiki-capture": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 0,
+      "idempotencyKey": "1719cd1ef5b51e0269b78c4cb8c9308c9c1f7b82fd1c067fc034c060f23863f5",
+      "payload": {},
+      "budgetMs": 9000,
+      "completedAt": "2026-08-24T21:37:23.966Z"
+    },
+    "team-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "cee6ac31df545408e1e822247ac249b3f8182a98a5fe8e448ae3b251e55bdee1",
+      "payload": {
+        "transcriptPath": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+        "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+        "reason": "other",
+        "input": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "transcript_path": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+          "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "ended_at": "2026-08-24T21:37:23.955Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "claimedAt": "2026-08-24T21:37:24.053Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "1cbc0981-632c-4a80-86b7-80139373b77b",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-24T21:37:34.018Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-24T21:37:24.210Z"
+    },
+    "python-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "1f1370c4ac056606059d517e2f106b602d8cbcb04587b3fcc5f3b9f89e649cd0",
+      "payload": {
+        "transcriptPath": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+        "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+        "reason": "other",
+        "input": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "transcript_path": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+          "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "ended_at": "2026-08-24T21:37:23.955Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "claimedAt": "2026-08-24T21:37:24.240Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "0282aefe-b8e1-4928-ab97-7874b1573da7",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-24T21:37:34.018Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-24T21:37:24.372Z"
+    },
+    "reply-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "0b3a8b47c28b26d56aca004d4f572b96c118f16819c0d35162418816f9a5420a",
+      "payload": {
+        "transcriptPath": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+        "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+        "reason": "other",
+        "input": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "transcript_path": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+          "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "ended_at": "2026-08-24T21:37:23.955Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "claimedAt": "2026-08-24T21:37:24.392Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "a8708481-b103-4c97-9f60-8e861aff7a02",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-24T21:37:34.018Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-24T21:37:24.514Z"
+    },
+    "callback": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "d068ede2655bf89e0c0950e087d0603d7dcf45538e94f20a654d08c6f4841895",
+      "payload": {
+        "transcriptPath": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+        "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+        "reason": "other",
+        "input": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "transcript_path": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+          "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "ended_at": "2026-08-24T21:37:23.955Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000,
+      "claimedAt": "2026-08-24T21:37:24.537Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "3546f58b-76e7-43dd-a25b-79e6fb8af15b",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-24T21:37:34.018Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-24T21:37:24.670Z"
+    },
+    "notification": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "89c0438ff63097ce04beb60efb87292ff68a7af350a0ee331f3de9dbf42d62fc",
+      "payload": {
+        "transcriptPath": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+        "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+        "reason": "other",
+        "input": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "transcript_path": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+          "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "ended_at": "2026-08-24T21:37:23.955Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000,
+      "claimedAt": "2026-08-24T21:37:24.691Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "dc8fccbc-2cc6-494b-9ecf-1316d4f197c0",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-24T21:37:34.018Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-24T21:37:24.808Z"
+    },
+    "openclaw": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "completed",
+      "attempts": 1,
+      "idempotencyKey": "31fe8f6e1cf204e27006de511df257326fdd98655122ca437013e8779ffc735b",
+      "payload": {
+        "transcriptPath": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+        "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+        "reason": "other",
+        "input": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "transcript_path": "/Users/muxo/.claude/projects/-Users-muxo-Claude-Code----------------/3eb8a802-deff-4f5a-b503-6715c69f41ae.jsonl",
+          "cwd": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "metrics": {
+          "session_id": "3eb8a802-deff-4f5a-b503-6715c69f41ae",
+          "ended_at": "2026-08-24T21:37:23.955Z",
+          "reason": "other",
+          "agents_spawned": 0,
+          "agents_completed": 0,
+          "modes_used": []
+        },
+        "initialTeamNames": [],
+        "openClawEnabled": false,
+        "openClawRouting": {}
+      },
+      "budgetMs": 2000,
+      "claimedAt": "2026-08-24T21:37:24.828Z",
+      "runner": {
+        "attempt": 1,
+        "runnerNonce": "84bf2acc-ae83-4def-91b3-c1e3d7bca05e",
+        "phase": "terminal",
+        "deadlineAt": "2026-08-24T21:37:34.018Z"
+      },
+      "lastOutcomeCode": "completed",
+      "completedAt": "2026-08-24T21:37:24.939Z"
+    }
+  },
+  "owner": null,
+  "phase": "complete",
+  "completion": {
+    "completedAt": "2026-08-24T21:37:24.959Z",
+    "terminalDigest": "0b08e63bc97f3789bc64aac04538aff9e1afc33055e0105aea96990e814b16e7",
+    "terminalRevision": 40
+  }
+}
