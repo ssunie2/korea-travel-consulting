@@ -95,13 +95,15 @@ const MOTION = `
 */
 @media (prefers-reduced-motion: no-preference) {
   /*
-    한 장을 넘기는 데 드는 스크롤 길이. 넷이 이 높이의 92% 를 나눠 가지므로
-    310vh 일 때는 한 장에 화면 높이의 71% 였다 — 손가락 한 번이면 끝나서
-    "휘리릭 넘어간다"는 말이 나왔다. 460vh 로 늘려 한 장에 106% 로 둔다.
-    한 장 보려면 화면 하나만큼은 넘겨야 하는 셈이다.
+    한 장을 넘기는 데 드는 스크롤 길이. 넷이 이 높이의 92% 를 나눠 가진다.
+
+      310vh → 한 장에 화면 높이의 71%   손가락 한 번이면 끝나 "휘리릭" 했다
+      460vh → 106%                     한 화면만큼
+      600vh → 138%  ← 지금             한 화면 반쯤. 선경이 고른 값이다
+
     (마지막 8% 는 남은 한 장을 보는 자리로 그대로 둔다)
   */
-  .ktc-deck { height: calc(100vh + 460vh) }
+  .ktc-deck { height: calc(100vh + 600vh) }
   .ktc-deck-sticky { position: sticky; top: 3rem }
   .ktc-deck-card {
     transform-origin: 50% 85%;
