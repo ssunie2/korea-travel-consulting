@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 플러그인(oh-my-claudecode)이 만드는 실행 기록. 저장소에 들어갈 것이 아니다.
+.omc/
