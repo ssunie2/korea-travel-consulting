@@ -1,0 +1,173 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1787931563233,
+  "projectRoot": "/Users/muxo/Claude/Code/여행 컨설팅 사이트 프로젝트",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "16.3.0",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.2.8",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.8",
+        "category": "frontend"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": "npm test",
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "lint": "eslint",
+      "test": "node --test lib/*.test.ts"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "app",
+      "components",
+      "lib",
+      "public"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 5,
+      "lastAccessed": 1787931563219,
+      "keyFiles": [
+        "favicon.ico",
+        "globals.css",
+        "layout.tsx",
+        "page.tsx",
+        "robots.ts"
+      ]
+    },
+    "components": {
+      "path": "components",
+      "purpose": "UI components",
+      "fileCount": 5,
+      "lastAccessed": 1787931563220,
+      "keyFiles": [
+        "CopyLinkButton.tsx",
+        "DateRangePicker.tsx",
+        "DayPattern.tsx",
+        "RouteScrollDays.tsx",
+        "Select.tsx"
+      ]
+    },
+    "lib": {
+      "path": "lib",
+      "purpose": "Library code",
+      "fileCount": 8,
+      "lastAccessed": 1787931563221,
+      "keyFiles": [
+        "ai.ts",
+        "copy.ts",
+        "prompt.ts",
+        "supabase-server.ts",
+        "types.ts"
+      ]
+    },
+    "plans": {
+      "path": "plans",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1787931563221,
+      "keyFiles": [
+        "001-limit-input-length.md",
+        "002-launch-checklist.md",
+        "003-rate-limit-contact.md",
+        "README.md"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 6,
+      "lastAccessed": 1787931563221,
+      "keyFiles": [
+        "file.svg",
+        "globe.svg",
+        "next.svg",
+        "seoul-blue-hour.jpg",
+        "vercel.svg"
+      ]
+    },
+    "supabase": {
+      "path": "supabase",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1787931563222,
+      "keyFiles": [
+        "config.toml"
+      ]
+    },
+    "app/api": {
+      "path": "app/api",
+      "purpose": "API routes",
+      "fileCount": 0,
+      "lastAccessed": 1787931563222,
+      "keyFiles": []
+    },
+    "supabase/migrations": {
+      "path": "supabase/migrations",
+      "purpose": "Database migrations",
+      "fileCount": 6,
+      "lastAccessed": 1787931563223,
+      "keyFiles": [
+        "20260809120000_init.sql",
+        "20260810120000_grants.sql",
+        "20260810130000_review_fixes.sql"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}
