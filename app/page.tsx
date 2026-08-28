@@ -94,7 +94,14 @@ const MOTION = `
   들려서 사라지는 게 아니라 손끝으로 옆으로 넘기는 것으로 읽힌다.
 */
 @media (prefers-reduced-motion: no-preference) {
-  .ktc-deck { height: calc(100vh + 310vh) }
+  /*
+    한 장을 넘기는 데 드는 스크롤 길이. 넷이 이 높이의 92% 를 나눠 가지므로
+    310vh 일 때는 한 장에 화면 높이의 71% 였다 — 손가락 한 번이면 끝나서
+    "휘리릭 넘어간다"는 말이 나왔다. 460vh 로 늘려 한 장에 106% 로 둔다.
+    한 장 보려면 화면 하나만큼은 넘겨야 하는 셈이다.
+    (마지막 8% 는 남은 한 장을 보는 자리로 그대로 둔다)
+  */
+  .ktc-deck { height: calc(100vh + 460vh) }
   .ktc-deck-sticky { position: sticky; top: 3rem }
   .ktc-deck-card {
     transform-origin: 50% 85%;
