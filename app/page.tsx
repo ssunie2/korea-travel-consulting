@@ -9,6 +9,7 @@ import bukchon from "@/public/landing/bukchon.webp";
 import gwangjangMarket from "@/public/landing/gwangjang-market.webp";
 import hanRiver from "@/public/landing/han-river.webp";
 import gyeongbokgung from "@/public/landing/gyeongbokgung.webp";
+import DeckScrollCards from "@/components/DeckScrollCards";
 import RouteScrollDays from "@/components/RouteScrollDays";
 
 // 표제용 서체. layout.tsx 를 건드리지 않으려고 이 화면에서만 불러온다.
@@ -49,27 +50,6 @@ const MOTION = `
   .ktc-route:has(#ktc-day-4:checked) .ktc-tip-4 { display: grid }
 }
 /*
-  카드가 넘어가는 모양. **꺾지 않되 밋밋하지도 않게.**
-
-  처음엔 튕기는 맛을 주려고 55% 에서 아래로 눌렀다가 올리고, 88% 에서 되돌아오게 했다.
-  **방향이 꺾이는 지점마다 눈에 걸린다** — 스크롤로 도는 애니메이션이라 손가락은 계속
-  한 쪽으로 가는데 그림만 반대로 가서 어긋난다. 그래서 다섯 값 전부 한 방향으로만 두되,
-  꺾는 대신 **두 가지로 성격을 낸다.**
-
-  하나, **속도를 고르지 않게.** 22% 지점에서 회전은 벌써 갈 길의 27% 를 갔는데 위치는 4% 뿐이다 —
-  제자리에서 기울기만 하다가 마지막에 확 빠진다. 고르게 움직이면 부드럽긴 해도 볼 게 없다.
-
-  둘, **옆으로 민다.** 네 장 모두 같은 쪽(왼쪽)으로 나간다. 가로로 26% 가는 동안
-  세로로는 3.5% 만 움직여서, 들려서 사라지는 게 아니라 옆으로 넘겨지는 것으로 읽힌다.
-  기울기 5도는 넘길 때 손끝이 한쪽을 미는 느낌을 내려고 남겨둔 것이다.
-*/
-@keyframes ktc-deck-lift {
-  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1 }
-  22% { transform: translate(-1.2%, -.2%) rotate(-.8deg) scale(.997); opacity: 1 }
-  55% { transform: translate(-6%, -1%) rotate(-2.4deg) scale(.986); opacity: 1 }
-  100% { transform: translate(-26%, -3.5%) rotate(-5deg) scale(.95); opacity: 0 }
-}
-/*
   노선도를 스크롤로 넘기기 위한 자리.
 
   **PC 에서만 붙여 둔다.** 폰에서는 노선 그림과 팁을 합친 높이(861px)가
@@ -96,21 +76,66 @@ const MOTION = `
 @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
   .ktc-route-pin { top: 3rem }
 }
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .ktc-deck {
-      height: calc(100vh + 310vh);
-      view-timeline-name: --ktc-deck;
-      view-timeline-axis: block;
-    }
-    .ktc-deck-sticky { position: sticky; top: 3rem }
-    .ktc-deck-card {
-      transform-origin: 50% 85%;
-      animation: ktc-deck-lift linear forwards;
-      animation-timeline: --ktc-deck;
-      animation-range: contain var(--ktc-from) contain var(--ktc-to);
-    }
+/*
+  카드 묶음. **한 번 휙 하면 한 장이 딱 넘어간다.**
+
+  전에는 스크롤 위치에 카드를 실시간으로 붙여 뒀다(animation-timeline: view()).
+  그래서 중간에 손을 멈추면 **반쯤 넘어간 채로 서서 두 장이 겹쳐 보였다.**
+
+  이제 스크롤은 "몇 장 넘어갔는지"만 정하고(components/DeckScrollCards.tsx),
+  넘어가는 모양은 아래 transition 이 자기 시계로 그린다. 손을 어디서 멈추든
+  카드는 제자리이거나 완전히 넘어간 상태다 — **중간이 없다.**
+
+  스크롤에 붙어 있지 않으니 **이제 튕겨도 된다.** 전에 스프링을 뺀 이유는
+  손가락은 내려가는데 카드만 되돌아와서였는데, 자기 시계로 도는 지금은 그 문제가 없다.
+  cubic-bezier 의 셋째 값이 1 을 넘는 것이 살짝 지나쳤다 돌아오는 그 맛이다.
+
+  나가는 모양은 전에 쓰던 것을 그대로 옮겼다 — 옆으로 26%, 기울기 5도.
+  들려서 사라지는 게 아니라 손끝으로 옆으로 넘기는 것으로 읽힌다.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  /*
+    한 장을 넘기는 데 드는 스크롤 길이. 넷이 이 높이의 92% 를 나눠 가진다.
+
+      310vh → 한 장에 화면 높이의 71%   손가락 한 번이면 끝나 "휘리릭" 했다
+      460vh → 106%                     한 화면만큼
+      600vh → 138%  ← 지금             한 화면 반쯤. 선경이 고른 값이다
+
+    (마지막 8% 는 남은 한 장을 보는 자리로 그대로 둔다)
+  */
+  .ktc-deck { height: calc(100vh + 600vh) }
+  .ktc-deck-sticky { position: sticky; top: 3rem }
+  .ktc-deck-card {
+    transform-origin: 50% 85%;
+    transition:
+      transform .46s cubic-bezier(.34, 1.28, .48, 1),
+      opacity .34s ease-out;
   }
+  /* 넘어간 장. 표시는 자바스크립트가 붙이고, 모양은 여기서만 정한다 */
+  .ktc-deck-card[data-gone] {
+    transform: translate(-26%, -3.5%) rotate(-5deg) scale(.95);
+    opacity: 0;
+  }
+  /*
+    앞 장이 걷히고 **새로 올라온 장**이 살짝 커졌다 제자리로 온다.
+
+    작아졌다 커지는 게 아니라 **커졌다 돌아온다.** 쉬는 크기를 1보다 작게 두면
+    카드가 제 상자보다 작아져서, 상자에 붙은 그림자(오른쪽 아래로 14px)와의 사이가
+    벌어져 틈이 보인다. 커지는 쪽은 그런 문제가 없다.
+
+    1.018 은 폰에서 9px 쯤이다. 더 키우면 그림자를 덮어서 카드가 눌린 것처럼 보인다.
+
+    transition 이 아니라 keyframes 인 이유 — 갔다가 돌아오는 움직임은 값 하나가
+    바뀌는 것으로는 안 되고 중간 지점이 필요하다.
+  */
+  .ktc-deck-stack > figure[data-top] {
+    animation: ktc-card-pop .5s cubic-bezier(.3, .7, .3, 1);
+  }
+}
+@keyframes ktc-card-pop {
+  0% { transform: scale(1) }
+  38% { transform: scale(1.018) }
+  100% { transform: scale(1) }
 }
 /*
   문양이 뜰 때. 그냥 켜면 툭 나타나서 딱딱하다.
@@ -684,6 +709,8 @@ export default async function Home() {
             한 번의 움직임이 생겼다. 그 56px 이 화면에 보이던 단차다.
             폰은 카드가 글 아래에 오므로 이 여백이 그대로 필요하다.
           */}
+            {/* 스크롤로 카드를 한 장씩 넘긴다. 그림은 CSS 가 그리고, 이 부품은 표시만 옮긴다 */}
+            <DeckScrollCards />
             <div className="ktc-deck mt-14 w-full md:mt-0 md:justify-self-end">
               {/*
               그림자 크기를 화면마다 달리 준다. **카드가 커지면 그림자도 같이 커져야 한다** —
@@ -708,18 +735,11 @@ export default async function Home() {
                 **안쪽 사진 카드에도 같은 값을 준다.** 바깥에 overflow-hidden 을 걸면
                 넘어가는 카드가 잘려버려서, 각자 제 모서리를 갖게 했다.
               */}
-                <div className="relative aspect-[4/5] w-full rounded-2xl shadow-[14px_16px_0_rgba(5,19,16,.58)] md:rounded-3xl md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
+                <div className="ktc-deck-stack relative aspect-[4/5] w-full rounded-2xl shadow-[14px_16px_0_rgba(5,19,16,.58)] md:rounded-3xl md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
                   {HERO_CARDS.map((card, index) => (
                     <figure
                       key={card.number}
-                      style={{
-                        zIndex: HERO_CARDS.length - index,
-                        // 0% 부터 시작한다. 전에는 6% 부터라 카드가 제자리에 앉고도
-                        // 한참(228px) 스크롤해야 첫 장이 넘어갔다. 네 장이 23% 씩 나눠 갖고
-                        // 마지막 8% 는 남은 한 장을 보는 자리로 둔다.
-                        ["--ktc-from" as string]: `${index * 23}%`,
-                        ["--ktc-to" as string]: `${(index + 1) * 23}%`,
-                      }}
+                      style={{ zIndex: HERO_CARDS.length - index }}
                       className={`absolute inset-0 overflow-hidden rounded-2xl border border-[var(--c-line-2)] bg-[var(--c-deep)] md:rounded-3xl ${
                         index < HERO_CARDS.length - 1 ? "ktc-deck-card" : ""
                       }`}
