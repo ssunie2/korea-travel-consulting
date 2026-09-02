@@ -1,7 +1,7 @@
-# 여행 컨설팅 사이트 — 팀 공통 규칙 v1.3
+# 여행 컨설팅 사이트 — 팀 공통 규칙 v1.4
 
 > 이 문서는 **이 저장소에서 일하는 모든 사람과 AI(Claude·Codex)** 에게 주는 규칙이다.
-> 작성: 뮤조 / 최초 작성일: 2026-08-09 / 버전: 1.3
+> 작성: 뮤조 / 최초 작성일: 2026-08-09 / 버전: 1.4
 >
 > 이 파일이 규칙의 유일한 원본이다. 따로 파일을 주고받지 않는다 — `git pull` 하면 항상 최신본이 따라온다.
 > 규칙을 바꾸고 싶으면 이 파일을 고쳐서 PR로 올린다. (`CLAUDE.md`는 이 파일을 불러오기만 한다)
@@ -17,6 +17,9 @@
 - 각 단계가 끝나면 "이게 제대로 됐는지 확인하는 법"을 알려주고, 확인된 뒤에 다음으로 넘어간다.
 - 결제·삭제 등 **되돌리기 어려운 작업은 실행 전에 반드시 확인**받는다.
 - 시키지 않은 작업을 미리 만들어두지 않는다. 다음 단계가 뭔지 애매하면 물어본다.
+- **웹사이트를 열어야 하는 안내에는 항상 링크를 붙인다** (선경 요청, 2026-09-02).
+  "Supabase 대시보드에서" 처럼 이름만 말하지 않는다 — 눌러서 바로 갈 수 있는 주소를 함께 준다.
+  자주 쓰는 주소는 1장 계정 정리 표에 있다.
 
 ---
 
@@ -41,11 +44,21 @@
 
 ### 계정 정리
 
-| 서비스 | 소유자 | 뮤조 상태 |
-|---|---|---|
-| GitHub 저장소 `ssunie2/korea-travel-consulting` | 선경 (@ssunie2) | 초대 수락 완료 ✅ |
-| Supabase 조직 / 프로젝트 `korea-travel-consulting` | 선경 | 초대 수락 완료 ✅ |
-| Vercel `korea-travel-consulting` | 선경 | **대시보드 접근 불가** — 무료 플랜은 팀원 초대가 없다 |
+| 서비스 | 링크 | 소유자 | 뮤조 상태 |
+|---|---|---|---|
+| GitHub 저장소 `ssunie2/korea-travel-consulting` | https://github.com/ssunie2/korea-travel-consulting | 선경 (@ssunie2) | 초대 수락 완료 ✅ |
+| Supabase 조직 / 프로젝트 `korea-travel-consulting` | https://supabase.com/dashboard/projects | 선경 | 초대 수락 완료 ✅ |
+| Vercel `korea-travel-consulting` | https://vercel.com/dashboard | 선경 | **대시보드 접근 불가** — 무료 플랜은 팀원 초대가 없다 |
+| Google AI Studio (초안 쓰는 AI 키·사용량) | https://aistudio.google.com | 선경 | — |
+
+### 자주 여는 주소
+
+| 어디 | 링크 |
+|---|---|
+| 살아있는 사이트 | https://korea-travel-consulting.vercel.app |
+| 초안 만드는 폼 | https://korea-travel-consulting.vercel.app/plan |
+| 관리자 화면 (비밀번호 필요) | https://korea-travel-consulting.vercel.app/admin |
+| 상표 검색 (키프리스) | https://www.kipris.or.kr |
 
 ---
 
@@ -226,6 +239,7 @@ supabase/migrations/  DB 구조 변경 기록 (SQL 파일)
 | 1.1 | 2026-08-09 | 뼈대 추가에 맞춰 폴더 구조(8장)와 충돌 방지 규칙(9장) 추가 |
 | 1.2 | 2026-08-10 | 머지는 선경이 담당, 로컬 직접 배포 금지 (3장). 배포 방식·사이트 주소·현재 상태 갱신 (1·10장) |
 | 1.3 | 2026-08-11 | **법적 경계 6가지를 3장 1번으로 추가** — 여행업 등록을 피하는 전제. 기능·문구 추가 시 대조 필수. 서비스명 잠정 확정(모할래 / Mohallae) |
+| 1.4 | 2026-09-02 | 웹사이트 안내에 링크를 항상 붙이는 규칙 추가 (0장). 계정 정리 표에 링크 칸과 '자주 여는 주소' 표 추가 (1장) |
 
 <!-- BEGIN:nextjs-agent-rules -->
 
