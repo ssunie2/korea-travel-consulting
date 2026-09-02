@@ -62,7 +62,7 @@ function dateRange(startDate: string, days: number) {
  */
 function ConciergeTip({ tip, className = "" }: { tip: FreeItinerary["sampleTip"]; className?: string }) {
   return (
-      <figure className={`${className} rounded-2xl bg-[var(--c-deep)] p-7 text-[var(--c-text-on-deep)] shadow-[0_24px_60px_-24px_rgba(28,43,38,0.28)] sm:p-9`}>
+      <figure className={`${className} rounded-2xl bg-[var(--c-deep)] p-7 text-[var(--c-text-on-deep)] shadow-[0_24px_60px_-24px_rgba(18,33,28,0.55)] sm:p-9`}>
         <figcaption className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-dim-on-deep)]">
           {t({ ko: "컨시어지 팁 하나", en: "One concierge tip" })} · {tip.activityName}
         </figcaption>

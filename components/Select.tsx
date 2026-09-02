@@ -206,7 +206,7 @@ export default function Select({
             스크롤해야 보였다. 화면 높이의 70% 까지 늘려 웬만한 목록은 한눈에 들어온다.
             그보다 긴 목록만 스크롤이 생긴다.
           */
-          className={`absolute z-20 max-h-[70vh] w-full overflow-auto rounded-2xl border border-[var(--c-line)] bg-[var(--c-surface-2)] p-1.5 shadow-[0_24px_60px_-24px_rgba(28,43,38,0.25)] ${
+          className={`absolute z-20 max-h-[70vh] w-full overflow-auto rounded-2xl border border-[var(--c-line)] bg-[var(--c-surface-2)] p-1.5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.7)] ${
             dropUp ? "bottom-full mb-2" : "top-full mt-2"
           }`}
         >
