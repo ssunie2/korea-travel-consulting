@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
+/*
+ * Next 기본 틀이 쓰는 두 값. **사이트 색을 그대로 따라가게 묶어 둔다.**
+ * 전에는 흰색/검정으로 따로 놀아서, 본문이 짧은 화면에서 body 바탕이 그대로 비쳤다.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: var(--c-bg);
+  --foreground: var(--c-text);
 }
 
 /**
@@ -16,11 +20,11 @@
  * "무슨 색인지"가 아니라 "어디에 쓰는지"로 불러야 나중에 색을 갈 때 이름이 안 어긋난다.
  */
 :root {
-  /* 바탕 — 뒤로 갈수록 한 단씩 밝다 */
+  /* 바탕 — 짙은 초록. **뒤로 갈수록 한 단씩 밝다.** */
   --c-bg: #16302C;
   --c-surface: #1C3A35;
   --c-surface-2: #24463F;
-  /* 제일 어두운 칸. 어두운 바탕 위에서 한 번 더 눌러 강조할 때 쓴다 (컨시어지 팁) */
+  /* 한 번 더 눌러 강조하는 칸 (컨시어지 팁). 바탕보다 한 단 어둡다 */
   --c-deep: #102421;
 
   /* 글자 — 아래로 갈수록 흐리다 */
@@ -28,20 +32,41 @@
   --c-text-2: #C2CFC7;
   --c-text-3: #9AAFA4;
   --c-text-4: #8FA298;
-  /* 어두운 칸 안에서 쓰는 글자 */
+
+  /*
+   * 어두운 칸(--c-deep) 안에서 쓰는 색.
+   * **바탕이 이미 어두우므로 바깥 색과 거의 같다** — 한지 시절에는 바깥이 밝고
+   * 이 칸만 어두워서 따로 필요했다. 이름을 지우지 않고 남겨 두는 이유는,
+   * 여섯 화면이 이미 이 이름으로 색을 부르고 있어서다. 지우면 그 자리가 전부 깨진다.
+   */
   --c-text-on-deep: #DCE7DF;
+  --c-accent-on-deep: #E9846B;
+  --c-focus-on-deep: #D1AA55;
+  --c-dim-on-deep: #5AA88E;
 
   /* 선 */
   --c-line: #3C6259;
   --c-line-2: #2E524B;
 
-  /* 강조 */
+  /* 강조. `-soft` 는 대비가 더 필요할 때 쓰는 쪽 — 어두운 바탕에서는 더 밝은 주황이다 */
   --c-accent: #E0603F;
   --c-accent-soft: #E9846B;
   --c-accent-dim: #5AA88E;
 
   /* 누른 자리 표시(포커스). 눈에 띄어야 해서 강조색과 다른 계열로 둔다 */
   --c-focus: #D1AA55;
+
+  /*
+   * 단청 안료. **글자나 버튼에 쓰지 않는다 — 휘(아래) 전용이다.**
+   *
+   * 이 둘만 안료 이름을 그대로 쓴다. 단청은 정해진 안료 이름이 곧 그 색의 정체라
+   * 역할로 바꿔 부르면 어느 색인지 알 수 없어진다.
+   *
+   * **짙은 초록 위에 올라가므로 원 안료보다 한 단계 밝힌다.** 원값(삼청 #2E5FA3,
+   * 양록 #2A6E51)은 한지처럼 밝은 바탕에서나 보이고, 여기서는 바탕에 묻힌다.
+   */
+  --c-samcheong: #5B8FD4;
+  --c-yangnok: #4FA87A;
 
   /* 잘못됐을 때 */
   --c-error-bg: #3A1E19;
@@ -55,12 +80,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/*
+ * 운영체제 다크모드로 body 만 검게 뒤집던 블록을 뺐다.
+ * 사이트는 한지 한 벌로 간다 — 여기서만 색이 갈리면 바탕과 글자가 서로 다른 테마가 된다.
+ */
 
 /**
  * 한국어 줄바꿈. **낱말 가운데서 끊기지 않게 한다.**
@@ -84,4 +107,38 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   word-break: keep-all;
   overflow-wrap: break-word;
+}
+
+/**
+ * 휘(暉) — 구역과 구역이 만나는 자리에 긋는 단청 띠.
+ *
+ * 단청에서 색 띠는 장식이 아니라 **기둥과 보가 만나는 이음매**에 칠한다.
+ * 그래서 아무 데나 긋지 않는다. **랜딩에서 큰 구역이 갈리는 다섯 자리에만** 쓴다 —
+ * 처리방침처럼 문서 안 소제목을 가르는 줄이나 카드 안의 줄에는 쓰지 않는다.
+ * 거기까지 색을 넣으면 이음매라는 뜻이 사라지고 그냥 무늬가 된다.
+ *
+ * 원래 있던 `border-t border-[var(--c-line-2)]` 를 이 클래스 하나로 대신한다.
+ *
+ * **선을 요소 위에 덧그리지 않고 테두리 자리에 직접 칠한다.**
+ * `::before` 로 얹으려면 `position: relative` 가 있어야 하는데, 그러면 그 구역 안에서
+ * 자리를 잡던 요소들의 기준점이 바뀐다. 배경으로 칠하면 그럴 일이 없다.
+ *
+ * 양 끝이 투명하게 사라지므로 화면을 가로지르는 딱딱한 선이 아니라
+ * 가운데가 도드라지는 띠로 보인다. 순색이면 인쇄물처럼 쨍해서 조금씩 묽혔다.
+ */
+.ktc-hwi {
+  border-top: 2px solid transparent;
+  background-origin: border-box;
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: 100% 2px;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--c-samcheong) 72%, transparent) 20%,
+    color-mix(in srgb, var(--c-yangnok) 72%, transparent) 42%,
+    color-mix(in srgb, var(--c-focus) 78%, transparent) 62%,
+    color-mix(in srgb, var(--c-accent) 72%, transparent) 84%,
+    transparent 100%
+  );
 }

@@ -144,21 +144,21 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
                     <div className="mt-4 rounded-xl bg-[var(--c-deep)] p-5 text-[var(--c-text-on-deep)]">
                       <p className="leading-relaxed">{a.tips.highlight}</p>
                       <p className="mt-3 border-t border-[var(--c-line)] pt-3 leading-relaxed text-[var(--c-text-on-deep)]">
-                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[var(--c-accent)]">
+                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[var(--c-accent-on-deep)]">
                           {t({ ko: "피하실 것", en: "Avoid" })}
                         </span>
                         <br />
                         {a.tips.pitfall}
                       </p>
                       <p className="mt-3 border-t border-[var(--c-line)] pt-3 leading-relaxed">
-                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[var(--c-focus)]">
+                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[var(--c-focus-on-deep)]">
                           {t({ ko: "여기 사는 사람은 이렇게", en: "Local knows" })}
                         </span>
                         <br />
                         {a.tips.insiderSecret}
                       </p>
                       {a.tips.reservationRequired && (
-                        <p className="mt-3 font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[var(--c-accent)]">
+                        <p className="mt-3 font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[var(--c-accent-on-deep)]">
                           {t({ ko: "미리 예약하세요", en: "Book ahead" })}
                         </p>
                       )}

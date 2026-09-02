@@ -100,10 +100,11 @@ export default function FaqPage() {
                   다른 글자로 갈아탄 것처럼 보인다. 0.2초는 눈이 따라갈 수 있으면서
                   기다린다는 느낌은 안 드는 길이다.
 
-                  **진한 주황(--c-accent)이 아니라 밝은 주황(--c-accent-soft)을 쓴다.**
-                  이 바탕(#16302C)에서 진한 주황은 대비가 3.96 이라 읽기 기준(4.5)에 못 미친다.
-                  밝은 주황은 5.34 로 통과한다. 18px 는 '큰 글자' 예외에 안 들어가므로
-                  4.5 를 그대로 맞춰야 한다.
+                  **--c-accent 가 아니라 --c-accent-soft 를 쓴다.**
+                  `-soft` 는 늘 **대비가 더 필요할 때 쓰는 쪽**이다 (globals.css 참고).
+                  한지 바탕(--c-bg)에서 --c-accent 는 5.23, --c-accent-soft 는 6.82 다.
+                  둘 다 기준(4.5)을 넘지만 열린 문항은 이 화면에서 제일 중요한 글이라 진한 쪽을 쓴다.
+                  18px 는 '큰 글자' 예외에 안 들어가므로 4.5 를 그대로 맞춰야 한다.
                 */}
                 <span className="break-keep text-base leading-snug text-[var(--c-text)] transition-[font-size,color] duration-200 group-open:text-lg group-open:text-[var(--c-accent-soft)]">
                   {question}

@@ -610,7 +610,7 @@ export default async function Home() {
                         '"AppleMyungjo", "Nanum Myeongjo", Georgia, "Times New Roman", serif',
                       wordSpacing: "normal",
                       textDecorationLine: "underline",
-                      textDecorationColor: "#C29338",
+                      textDecorationColor: "var(--c-focus)",
                       textDecorationThickness: "3px",
                       textUnderlineOffset: ".17em",
                       textDecorationSkipInk: "none",
@@ -708,7 +708,7 @@ export default async function Home() {
                 **안쪽 사진 카드에도 같은 값을 준다.** 바깥에 overflow-hidden 을 걸면
                 넘어가는 카드가 잘려버려서, 각자 제 모서리를 갖게 했다.
               */}
-                <div className="relative aspect-[4/5] w-full rounded-2xl shadow-[14px_16px_0_rgba(5,19,16,.58)] md:rounded-3xl md:shadow-[19px_22px_0_rgba(5,19,16,.58)]">
+                <div className="relative aspect-[4/5] w-full rounded-2xl shadow-[14px_16px_0_rgba(28,43,38,.30)] md:rounded-3xl md:shadow-[19px_22px_0_rgba(28,43,38,.30)]">
                   {HERO_CARDS.map((card, index) => (
                     <figure
                       key={card.number}
@@ -853,7 +853,7 @@ export default async function Home() {
                     key={tip.day}
                     id={`ktc-tip-${tip.day}`}
                     aria-live="polite"
-                    className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-2xl border border-[var(--c-line-2)] md:rounded-3xl bg-[var(--c-surface)] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.6)] md:grid-cols-[.8fr_1.2fr]`}
+                    className={`ktc-tip ktc-tip-${tip.day} overflow-hidden rounded-2xl border border-[var(--c-line-2)] md:rounded-3xl bg-[var(--c-surface)] shadow-[0_24px_60px_-28px_rgba(28,43,38,0.22)] md:grid-cols-[.8fr_1.2fr]`}
                   >
                     <figcaption className="flex flex-col justify-between gap-8 bg-[var(--c-surface-2)] p-6 text-[var(--c-text)] sm:p-8">
                       <div>
@@ -905,7 +905,7 @@ export default async function Home() {
         </section>
 
         {/* ── how it works ────────────────────────────────── */}
-        <section className="border-t border-[var(--c-line-2)]">
+        <section className="ktc-hwi">
           <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
             <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
               {t({ ko: "진행 방식", en: "How it works" })}
@@ -935,7 +935,7 @@ export default async function Home() {
         </section>
 
         {/* ── 왜 우리인가 + 샘플 초안 ─────────────────────── */}
-        <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
+        <section className="ktc-hwi bg-[var(--c-surface)]">
           <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
             <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
               <span className="block md:inline">AI 는 아는 곳을 말하고,</span>{" "}
@@ -963,7 +963,7 @@ export default async function Home() {
               </div>
 
               <div className="rounded-2xl border border-[var(--c-line)] bg-[var(--c-deep)] p-6 text-[var(--c-text-on-deep)] sm:p-7 md:rounded-3xl">
-                <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent-soft)]">
+                <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent-on-deep)]">
                   {t({ ko: "우리가 적는 것", en: "What we write" })}
                 </p>
                 <p className="mt-4 break-keep leading-relaxed">
@@ -1003,7 +1003,7 @@ export default async function Home() {
         </section>
 
         {/* ── free vs paid ────────────────────────────────── */}
-        <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
+        <section className="ktc-hwi bg-[var(--c-surface)]">
           <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
             <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
               {t({
@@ -1147,7 +1147,7 @@ export default async function Home() {
         {/* ── pricing + contact ───────────────────────────── */}
         <section
           id="pricing"
-          className="scroll-mt-20 border-t border-[var(--c-line-2)]"
+          className="scroll-mt-20 ktc-hwi"
         >
           <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
             <div>
@@ -1260,7 +1260,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <footer className="border-t border-[var(--c-line-2)]">
+        <footer className="ktc-hwi">
           <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-text-3)] sm:flex-row sm:items-center sm:justify-between">
             {/* 상호는 어디서든 같은 서체로. 크기는 꼬리말 기준(text-xs)을 그대로 물려받는다 */}
             <span className="font-[family-name:var(--font-geist-sans)] font-semibold tracking-[-0.02em]">
