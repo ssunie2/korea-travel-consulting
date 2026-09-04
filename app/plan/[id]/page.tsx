@@ -5,6 +5,7 @@ import { supabaseServer } from "@/lib/supabase-server";
 import type { FreeItinerary, Plan } from "@/lib/types";
 import { t } from "@/lib/copy";
 import { placeLabel } from "@/lib/places";
+import { dayLabel, dateRange } from "@/lib/date";
 import CopyLinkButton from "@/components/CopyLinkButton";
 
 // 표제용 서체. 랜딩(app/page.tsx)과 같은 방식으로 이 화면에서만 불러온다.
@@ -17,41 +18,6 @@ const display = Instrument_Serif({
 
 // 주소를 열 때마다 DB에서 최신을 읽는다.
 export const dynamic = "force-dynamic";
-
-/**
- * 며칠째가 실제로 몇 월 며칠 무슨 요일인지.
- *
- * **AI 에게 시키지 않는다.** 출발일과 며칠째만 있으면 정확히 나오는 계산이고,
- * 맡기면 요일을 틀리게 쓴다. 요일이 중요한 이유는 **일요일에 문 닫는 곳이 많아서**다 —
- * 요일을 모르면 헛걸음한다.
- *
- * 시간대에 따라 하루가 밀리지 않도록 UTC 로만 센다.
- */
-function dayLabel(startDate: string, dayNumber: number) {
-  const d = new Date(`${startDate}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + dayNumber - 1);
-  const KO = ["일", "월", "화", "수", "목", "금", "토"];
-  return t({
-    ko: `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일 (${KO[d.getUTCDay()]})`,
-    en: d.toLocaleDateString("en-US", { month: "short", day: "numeric", weekday: "short", timeZone: "UTC" }),
-  });
-}
-
-function dateRange(startDate: string, days: number) {
-  const start = new Date(`${startDate}T00:00:00Z`);
-  const end = new Date(start);
-  end.setUTCDate(end.getUTCDate() + days - 1);
-  // 아래 dayLabel 과 같은 방식으로 직접 만든다. toLocaleDateString("ko-KR") 은
-  // "2026. 10. 4." 처럼 점을 찍어서 우리 화면의 다른 날짜 표기와 어긋난다.
-  return t({
-    ko: `${start.getUTCFullYear()}년 ${start.getUTCMonth() + 1}월 ${start.getUTCDate()}일 – ${end.getUTCMonth() + 1}월 ${end.getUTCDate()}일`,
-    en: (() => {
-      const fmt = (d: Date) =>
-        d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-      return `${fmt(start)} – ${fmt(end)}, ${start.getUTCFullYear()}`;
-    })(),
-  });
-}
 
 /**
  * 맛보기 팁 하나. **이 화면에서 제일 중요한 부분이다.**
@@ -132,6 +98,17 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
   */
   const tipDay = trip.days.find((d) => d.dayNumber === trip.sampleTip.dayNumber);
 
+  /**
+   * 도시가 실제로 **바뀌는** 여행인지.
+   *
+   * 손님 대부분은 서울만 온다. 그런데 지시문이 city 를 반드시 채우게 해서
+   * 서울 5일이면 다섯 날 모두 "서울" 이 찍힌다. 다섯 번 읽어도 새로 아는 게 없다.
+   * city 가 값을 하는 건 **그날 짐을 옮기는지** 를 알려줄 때뿐이다.
+   *
+   * 빈 값(옛 초안)은 세지 않는다 — 서울/빈칸이 섞였다고 두 도시인 건 아니다.
+   */
+  const multiCity = new Set(trip.days.map((d) => d.city).filter(Boolean)).size > 1;
+
   return (
     <div
       className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
@@ -175,13 +152,13 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
               </div>
               {/*
                 날짜·요일과 그날 머무는 도시. 제목 아래 한 줄로 붙인다.
-                도시는 **여러 날에 걸쳐 같으면 굳이 반복하지 않고**, 바뀌는 날에만 눈에 띄면 되지만
-                지금은 매일 적는다 — 빠뜨리는 것보다 낫고, 손님이 하루씩 떼어 봐도 어디인지 안다.
+                **도시를 도는 여행에서만 도시를 적는다** (multiCity). 서울만 가는 여행에
+                다섯 날 모두 "서울" 을 찍으면 읽을 게 하나 더 늘 뿐이다.
                 city 가 없는 옛 초안도 있어서 있을 때만 그린다.
               */}
               <p className="ml-[calc(0.75rem+1rem)] mt-1 font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.14em] text-[var(--c-text-3)]">
                 {dayLabel(plan.start_date, day.dayNumber)}
-                {day.city && (
+                {multiCity && day.city && (
                   <>
                     <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
                     <span className="text-[var(--c-accent-dim)]">{day.city}</span>
@@ -198,7 +175,14 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
                     */}
                     {a.travel && (
                       <p className="mb-2 flex items-center gap-2 font-[family-name:var(--font-geist-mono)] text-[0.65rem] tracking-[0.1em] text-[var(--c-text-4)]">
+                        {/*
+                          화살표는 눈으로만 읽는 기호라 낭독기에서 감춘다.
+                          대신 무엇에서 무엇까지인지를 글로 준다 — 감추기만 하면
+                          "지하철 25분. 오후 2시. 경복궁." 으로 읽혀서 25분이 어디서
+                          어디까지인지 알 수 없다. sr-only 는 눈에는 안 보이고 낭독기만 읽는다.
+                        */}
                         <span aria-hidden>↓</span>
+                        <span className="sr-only">앞 일정에서 이동, </span>
                         {a.travel}
                       </p>
                     )}
