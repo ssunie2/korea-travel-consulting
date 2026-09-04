@@ -168,12 +168,21 @@ export default function DayPattern({ day }: { day: number }) {
   return <Shape />;
 }
 
-/** 클로드 시안의 최종 배경. 문양과 좌표, 투명도를 그대로 옮긴 고정 레이어다. */
+/**
+ * 배경 문양. 좌표는 클로드 시안 그대로고 **색만 단청 안료로 바꿨다.**
+ *
+ * 전에는 넷 다 흰 선이었다. 한지 바탕으로 오면서 문양마다 다른 안료를 준다 —
+ * 양록·장단·삼청·황. 안료 이름과 값은 globals.css 한 곳에 있다.
+ *
+ * ⚠️ **8% 를 넘기지 않는다.** 한지 위에서는 문양이 바탕을 어둡게 만들어서
+ *    그 위 흐린 글자(--c-text-4)의 대비가 깎인다. 8% 에서 4.81:1 로 기준(4.5)을 넘고,
+ *    10% 부터는 미달한다. 짙은 바탕이던 시절과 방향이 반대라 그때 값을 그대로 쓰면 안 된다.
+ */
 export function BackgroundMotifs() {
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden text-white">
+    <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
       <svg
-        className="absolute inset-0 h-full w-full opacity-[.055]"
+        className="absolute inset-0 h-full w-full opacity-[.08]"
         preserveAspectRatio="xMidYMid slice"
         viewBox="0 0 100 100"
       >
@@ -190,13 +199,13 @@ export function BackgroundMotifs() {
           </symbol>
         </defs>
 
-        <use href="#ktc-bg-lotus" x="-180" y="-120" width="62" height="62" />
-        <use href="#ktc-bg-lotus" x="8" y="62" width="70" height="70" />
-        <use href="#ktc-bg-tortoise" x="-140" y="84" width="46" height="46" />
+        <use href="#ktc-bg-lotus" x="-180" y="-120" width="62" height="62" className="text-[var(--c-yangnok)]" />
+        <use href="#ktc-bg-lotus" x="8" y="62" width="70" height="70" className="text-[var(--c-accent)]" />
+        <use href="#ktc-bg-tortoise" x="-140" y="84" width="46" height="46" className="text-[var(--c-samcheong)]" />
       </svg>
 
       <svg
-        className="absolute -right-[9%] -top-[11%] w-[min(48vw,430px)] opacity-[.07] max-[760px]:-right-[22%] max-[760px]:-top-[6%] max-[760px]:w-[70vw]"
+        className="absolute -right-[9%] -top-[11%] w-[min(48vw,430px)] text-[var(--c-focus)] opacity-[.08] max-[760px]:-right-[22%] max-[760px]:-top-[6%] max-[760px]:w-[70vw]"
         viewBox="0 0 24 24"
       >
         <g fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round">

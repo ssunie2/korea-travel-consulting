@@ -63,7 +63,7 @@ function dateRange(startDate: string, days: number) {
 function ConciergeTip({ tip, className = "" }: { tip: FreeItinerary["sampleTip"]; className?: string }) {
   return (
       <figure className={`${className} rounded-2xl bg-[var(--c-deep)] p-7 text-[var(--c-text-on-deep)] shadow-[0_24px_60px_-24px_rgba(18,33,28,0.55)] sm:p-9`}>
-        <figcaption className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-accent-dim)]">
+        <figcaption className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.2em] text-[var(--c-dim-on-deep)]">
           {t({ ko: "컨시어지 팁 하나", en: "One concierge tip" })} · {tip.activityName}
         </figcaption>
         <p className="mt-4 font-[family-name:var(--font-display)] text-2xl leading-snug">
@@ -71,14 +71,14 @@ function ConciergeTip({ tip, className = "" }: { tip: FreeItinerary["sampleTip"]
         </p>
 
         <div className="mt-7 border-t border-[var(--c-line)] pt-5">
-          <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-accent)]">
+          <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-accent-on-deep)]">
             {t({ ko: "피하실 것", en: "What to avoid" })}
           </p>
           <p className="mt-2 leading-relaxed text-[var(--c-text-on-deep)]">{tip.pitfall}</p>
         </div>
 
         <div className="mt-6 border-t border-[var(--c-line)] pt-5">
-          <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-focus)]">
+          <p className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-focus-on-deep)]">
             {t({ ko: "여기 사는 사람이라면 이렇게 말합니다", en: "What someone here would tell you" })}
           </p>
           <p className="mt-2 leading-relaxed">{tip.insiderSecret}</p>

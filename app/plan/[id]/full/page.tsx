@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Instrument_Serif } from "next/font/google";
 import { supabaseServer } from "@/lib/supabase-server";
+import { t } from "@/lib/copy";
 import type { FullItinerary, Plan, PlaceRecommendation } from "@/lib/types";
 
 const display = Instrument_Serif({
@@ -51,14 +52,15 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
       className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
     >
       <header className="mx-auto flex max-w-3xl items-center justify-between px-6 py-6">
+        {/* py/-my: 보이는 크기는 그대로 두고 손가락으로 누를 범위만 44px 로 넓힌다 */}
         <Link
           href="/"
-          className="-my-2 py-2 font-[family-name:var(--font-display)] text-xl tracking-tight underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+          className="-my-2 py-2 font-[family-name:var(--font-geist-sans)] text-xl font-semibold tracking-[-0.02em] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
         >
-          Korea Travel Consulting
+          mohallae
         </Link>
         <span className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-widest text-[var(--c-accent)]">
-          Full plan
+          {t({ ko: "전체 일정", en: "Full plan" })}
         </span>
       </header>
 
@@ -70,16 +72,16 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
 
         {/* ── 예산 — 우리가 파는 것 중 하나. 위에 둔다 ── */}
         <section className="mt-12 rounded-2xl bg-[var(--c-surface)] p-7 sm:p-9">
-          <h2 className={mono}>Your money</h2>
+          <h2 className={mono}>{t({ ko: "비용 분해", en: "Your money" })}</h2>
           <p className="mt-3 text-lg leading-relaxed">{trip.costBreakdown.budgetFit}</p>
 
           <dl className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
             {[
-              ["Total", trip.costBreakdown.totalEstimate],
-              ["Stay", trip.costBreakdown.accommodation],
-              ["Food", trip.costBreakdown.dining],
-              ["Transport", trip.costBreakdown.transport],
-              ["Activities", trip.costBreakdown.activities],
+              [t({ ko: "총액", en: "Total" }), trip.costBreakdown.totalEstimate],
+              [t({ ko: "숙소", en: "Stay" }), trip.costBreakdown.accommodation],
+              [t({ ko: "식사", en: "Food" }), trip.costBreakdown.dining],
+              [t({ ko: "교통", en: "Transport" }), trip.costBreakdown.transport],
+              [t({ ko: "체험·입장", en: "Activities" }), trip.costBreakdown.activities],
             ].map(([k, v]) => (
               <div key={k}>
                 <dt className="font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[var(--c-text-3)]">
@@ -91,7 +93,7 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
           </dl>
 
           <h3 className="mt-8 font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-[var(--c-accent)]">
-            Same money, better trip
+            {t({ ko: "같은 돈으로 더 나은 여행", en: "Same money, better trip" })}
           </h3>
           <ul className="mt-3 space-y-2">
             {trip.costBreakdown.valueMoves.map((m, i) => (
@@ -142,22 +144,22 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
                     <div className="mt-4 rounded-xl bg-[var(--c-deep)] p-5 text-[var(--c-text-on-deep)]">
                       <p className="leading-relaxed">{a.tips.highlight}</p>
                       <p className="mt-3 border-t border-[var(--c-line)] pt-3 leading-relaxed text-[var(--c-text-on-deep)]">
-                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[var(--c-accent)]">
-                          Avoid
+                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[var(--c-accent-on-deep)]">
+                          {t({ ko: "피하실 것", en: "Avoid" })}
                         </span>
                         <br />
                         {a.tips.pitfall}
                       </p>
                       <p className="mt-3 border-t border-[var(--c-line)] pt-3 leading-relaxed">
-                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[var(--c-focus)]">
-                          Local knows
+                        <span className="font-[family-name:var(--font-geist-mono)] text-[0.6rem] uppercase tracking-widest text-[var(--c-focus-on-deep)]">
+                          {t({ ko: "여기 사는 사람은 이렇게", en: "Local knows" })}
                         </span>
                         <br />
                         {a.tips.insiderSecret}
                       </p>
                       {a.tips.reservationRequired && (
-                        <p className="mt-3 font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[var(--c-accent)]">
-                          Book ahead
+                        <p className="mt-3 font-[family-name:var(--font-geist-mono)] text-[0.65rem] uppercase tracking-widest text-[var(--c-accent-on-deep)]">
+                          {t({ ko: "미리 예약하세요", en: "Book ahead" })}
                         </p>
                       )}
                     </div>
@@ -167,7 +169,7 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
 
               {day.photoSpot && (
                 <p className="mt-6 leading-relaxed text-[var(--c-text-2)]">
-                  <span className={mono}>Photo · {day.photoSpot.name}</span>
+                  <span className={mono}>{t({ ko: "사진", en: "Photo" })} · {day.photoSpot.name}</span>
                   <br />
                   {day.photoSpot.bestTime} — {day.photoSpot.advice}
                 </p>
@@ -178,15 +180,15 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
 
         {/* ── 추천 ── */}
         <section className="mt-16 grid gap-10 border-t border-[var(--c-line-2)] pt-12 sm:grid-cols-3 sm:gap-8">
-          <Places title="Where to stay" items={trip.picks.stay} />
-          <Places title="Where to eat" items={trip.picks.dining} />
-          <Places title="Cafes" items={trip.picks.cafes} />
+          <Places title={t({ ko: "묵을 곳", en: "Where to stay" })} items={trip.picks.stay} />
+          <Places title={t({ ko: "먹을 곳", en: "Where to eat" })} items={trip.picks.dining} />
+          <Places title={t({ ko: "카페", en: "Cafes" })} items={trip.picks.cafes} />
         </section>
 
         {/* ── 날씨·짐 ── */}
         <section className="mt-14 grid gap-10 border-t border-[var(--c-line-2)] pt-12 sm:grid-cols-2">
           <div>
-            <h2 className={mono}>What to wear</h2>
+            <h2 className={mono}>{t({ ko: "입을 것", en: "What to wear" })}</h2>
             <p className="mt-3 leading-relaxed text-[var(--c-text-2)]">{trip.clothing.weatherSummary}</p>
             <ul className="mt-3 space-y-1">
               {trip.clothing.outfits.map((o, i) => (
@@ -198,11 +200,11 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
             <p className="mt-3 leading-relaxed text-[var(--c-text-2)]">{trip.clothing.advice}</p>
           </div>
           <div>
-            <h2 className={mono}>Pack this</h2>
+            <h2 className={mono}>{t({ ko: "챙길 것", en: "Pack this" })}</h2>
             <ul className="mt-3 space-y-1">
-              {trip.packingTips.map((t, i) => (
+              {trip.packingTips.map((item, i) => (
                 <li key={i} className="leading-relaxed">
-                  {t}
+                  {item}
                 </li>
               ))}
             </ul>

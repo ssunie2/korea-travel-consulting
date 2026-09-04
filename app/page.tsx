@@ -336,44 +336,49 @@ const HERO_CARDS = [
  *
  * 네 개를 고른 기준은 **여행의 모양이 서로 다른 것** 이다 —
  * 혼자/둘/가족, 한 도시/두 도시, 처음/다시. 손님이 자기와 비슷한 것을 찾을 수 있어야 한다.
+ *
+ * TODO(출시 전): **이 네 개는 한국어 초안이다.** LANG 을 "en" 으로 넘기면 카드 제목만
+ *   영어로 바뀌고 눌러서 들어간 초안은 한국어로 남는다 — 지금과 정반대로 어긋난다.
+ *   손님을 받기 전에 같은 네 가지 모양으로 **영어 초안을 새로 만들어 아이디를 갈아끼운다.**
+ *   (아래 en 제목은 그때까지 카드가 말이 되게 해 두는 임시 번역이다)
  */
 const SAMPLES = [
   {
-    id: "d13cee4d-3294-42c8-9d46-229878eec896",
+    id: "afe82bca-e5d1-49d1-b0fb-2517d3a698ce",
     who: t({ ko: "혼자 · 서울 3일", en: "Solo · 3 days in Seoul" }),
     title: t({
-      ko: "서울 익스프레스: 문화·맛·사진 명소",
-      en: "Seoul Express: Culture, Flavors & Photo Spots",
+      ko: "처음 만나는 서울: 3일간의 문화와 미식 여정",
+      en: "Seoul for the first time: three days of culture and food",
     }),
   },
   {
-    id: "775ead8b-7355-4045-8e07-d6ad05021374",
+    id: "bb69139f-db3e-47fc-94f7-f7779df74f49",
     who: t({
       ko: "둘이 · 서울과 부산 5일",
       en: "Two of you · 5 days, Seoul and Busan",
     }),
     title: t({
-      ko: "낭만적인 산과 바닷바람",
-      en: "Romantic Peaks & Coastal Breezes",
+      ko: "서울과 부산에서 맞이하는 로맨틱 5일간의 여정",
+      en: "Five romantic days across Seoul and Busan",
     }),
   },
   {
-    id: "c36decd3-4376-4856-ad48-20bf087c9d33",
+    id: "e45be288-0b7a-438a-9e02-176eafce1ee4",
     who: t({ ko: "아이와 함께 · 서울 4일", en: "With kids · 4 days in Seoul" }),
     title: t({
-      ko: "마법 같은 서울 가족 여행",
-      en: "Magical Seoul Family Adventure",
+      ko: "첫 서울 여행을 위한 여유로운 가족 힐링 4일",
+      en: "Four unhurried family days on a first trip to Seoul",
     }),
   },
   {
-    id: "4cb2b2b9-d016-4653-997e-5d07caa4b9c2",
+    id: "5c297ae8-61fe-4b98-aae1-ac6476e8cade",
     who: t({
       ko: "다시 온 여행 · 경주와 안동 4일",
       en: "Been before · 4 days, Gyeongju and Andong",
     }),
     title: t({
-      ko: "가을 문화유산과 숨은 골짜기",
-      en: "Autumn Heritage & Hidden Valleys",
+      ko: "경주와 안동, 숨은 옛 자취를 따라가는 4일간의 여정",
+      en: "Gyeongju and Andong: four days along the old quiet trails",
     }),
   },
 ];
@@ -635,7 +640,7 @@ export default async function Home() {
                         '"AppleMyungjo", "Nanum Myeongjo", Georgia, "Times New Roman", serif',
                       wordSpacing: "normal",
                       textDecorationLine: "underline",
-                      textDecorationColor: "#C29338",
+                      textDecorationColor: "var(--c-focus)",
                       textDecorationThickness: "3px",
                       textUnderlineOffset: ".17em",
                       textDecorationSkipInk: "none",
@@ -925,7 +930,7 @@ export default async function Home() {
         </section>
 
         {/* ── how it works ────────────────────────────────── */}
-        <section className="border-t border-[var(--c-line-2)]">
+        <section className="ktc-hwi">
           <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
             <h2 className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.2em] text-[var(--c-text-3)]">
               {t({ ko: "진행 방식", en: "How it works" })}
@@ -955,7 +960,7 @@ export default async function Home() {
         </section>
 
         {/* ── 왜 우리인가 + 샘플 초안 ─────────────────────── */}
-        <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
+        <section className="ktc-hwi bg-[var(--c-surface)]">
           <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
             <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
               <span className="block md:inline">AI 는 아는 곳을 말하고,</span>{" "}
@@ -983,7 +988,7 @@ export default async function Home() {
               </div>
 
               <div className="rounded-2xl border border-[var(--c-line)] bg-[var(--c-deep)] p-6 text-[var(--c-text-on-deep)] sm:p-7 md:rounded-3xl">
-                <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent-soft)]">
+                <p className="font-[family-name:var(--font-geist-mono)] text-xs uppercase tracking-[0.15em] text-[var(--c-accent-on-deep)]">
                   {t({ ko: "우리가 적는 것", en: "What we write" })}
                 </p>
                 <p className="mt-4 break-keep leading-relaxed">
@@ -1023,7 +1028,7 @@ export default async function Home() {
         </section>
 
         {/* ── free vs paid ────────────────────────────────── */}
-        <section className="border-t border-[var(--c-line-2)] bg-[var(--c-surface)]">
+        <section className="ktc-hwi bg-[var(--c-surface)]">
           <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
             <h2 className="break-keep font-[family-name:var(--font-display)] text-3xl leading-tight md:text-4xl">
               {t({
@@ -1167,7 +1172,7 @@ export default async function Home() {
         {/* ── pricing + contact ───────────────────────────── */}
         <section
           id="pricing"
-          className="scroll-mt-20 border-t border-[var(--c-line-2)]"
+          className="scroll-mt-20 ktc-hwi"
         >
           <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-20">
             <div>
@@ -1280,7 +1285,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <footer className="border-t border-[var(--c-line-2)]">
+        <footer className="ktc-hwi">
           <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-8 font-[family-name:var(--font-geist-mono)] text-xs text-[var(--c-text-3)] sm:flex-row sm:items-center sm:justify-between">
             {/* 상호는 어디서든 같은 서체로. 크기는 꼬리말 기준(text-xs)을 그대로 물려받는다 */}
             <span className="font-[family-name:var(--font-geist-sans)] font-semibold tracking-[-0.02em]">
