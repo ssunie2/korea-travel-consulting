@@ -132,6 +132,17 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
   */
   const tipDay = trip.days.find((d) => d.dayNumber === trip.sampleTip.dayNumber);
 
+  /**
+   * 도시가 실제로 **바뀌는** 여행인지.
+   *
+   * 손님 대부분은 서울만 온다. 그런데 지시문이 city 를 반드시 채우게 해서
+   * 서울 5일이면 다섯 날 모두 "서울" 이 찍힌다. 다섯 번 읽어도 새로 아는 게 없다.
+   * city 가 값을 하는 건 **그날 짐을 옮기는지** 를 알려줄 때뿐이다.
+   *
+   * 빈 값(옛 초안)은 세지 않는다 — 서울/빈칸이 섞였다고 두 도시인 건 아니다.
+   */
+  const multiCity = new Set(trip.days.map((d) => d.city).filter(Boolean)).size > 1;
+
   return (
     <div
       className={`${display.variable} flex-1 bg-[var(--c-bg)] text-[var(--c-text)] font-[family-name:var(--font-geist-sans)] selection:bg-[var(--c-accent)] selection:text-[var(--c-bg)]`}
@@ -175,13 +186,13 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
               </div>
               {/*
                 날짜·요일과 그날 머무는 도시. 제목 아래 한 줄로 붙인다.
-                도시는 **여러 날에 걸쳐 같으면 굳이 반복하지 않고**, 바뀌는 날에만 눈에 띄면 되지만
-                지금은 매일 적는다 — 빠뜨리는 것보다 낫고, 손님이 하루씩 떼어 봐도 어디인지 안다.
+                **도시를 도는 여행에서만 도시를 적는다** (multiCity). 서울만 가는 여행에
+                다섯 날 모두 "서울" 을 찍으면 읽을 게 하나 더 늘 뿐이다.
                 city 가 없는 옛 초안도 있어서 있을 때만 그린다.
               */}
               <p className="ml-[calc(0.75rem+1rem)] mt-1 font-[family-name:var(--font-geist-mono)] text-[0.7rem] uppercase tracking-[0.14em] text-[var(--c-text-3)]">
                 {dayLabel(plan.start_date, day.dayNumber)}
-                {day.city && (
+                {multiCity && day.city && (
                   <>
                     <span aria-hidden className="mx-2 text-[var(--c-text-4)]">·</span>
                     <span className="text-[var(--c-accent-dim)]">{day.city}</span>

@@ -86,7 +86,10 @@ function shape(input: PlanInput): string {
   if (input.visitedBefore) lines.push(`- Been to Korea before: ${input.visitedBefore} — first-timers get the landmarks, repeat visitors get lesser-known places.`)
   if (input.transport) lines.push(`- Getting around: ${input.transport} — build the route around this, not around what is closest on a map.`)
   if (input.stayArea) lines.push(`- Prefers to stay: ${input.stayArea} — the one place to stay must match this.`)
-  if (input.dayRhythm) lines.push(`- Day rhythm: ${input.dayRhythm} — set the first activity's time to match.`)
+  // 이 한 줄이 무료·유료 두 지시문의 유일한 dayRhythm 지시다. 무료 쪽에 같은 말이
+  // 한 번 더 있었는데(#53 🟡6), 두 벌을 두면 나중에 한쪽만 고쳐서 서로 다른 말을 하게 된다.
+  // 뒤쪽에만 있던 "나머지 일정은 장소 사정에 맞춘다" 는 뜻을 여기로 합쳤다.
+  if (input.dayRhythm) lines.push(`- Day rhythm: ${input.dayRhythm} — set the FIRST activity of each day to match. Let the rest follow what each place needs.`)
   if (input.occasion) lines.push(`- Occasion: ${input.occasion} — work one moment into the trip that fits it.`)
   if (input.avoid?.length) lines.push(`- AVOID: ${input.avoid.join(', ')} — do not put these in the plan.`)
   return lines.length ? lines.join('\n') + '\n' : ''
@@ -157,7 +160,6 @@ THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
 - Each day: a short theme + EXACTLY 3 activities (morning, afternoon, evening). One line each.
 - Vary the times across days. A market wakes early, a night view needs dusk, a temple closes at 17:00.
   Do NOT reuse the same three clock times every day — that reads as a template, not a plan.
-  ${input.dayRhythm ? `Their day rhythm is "${input.dayRhythm}" — set the FIRST activity to match, then let the rest follow what each place needs.` : ''}
 - Every activity except the first of each day needs "travel" — roughly how long it takes to get
   there from the previous stop, in the form "about 25 min by subway" or "10 min walk".
   Round to 5 minutes. This shows the route makes sense. The FIRST activity of each day gets "" (empty).
