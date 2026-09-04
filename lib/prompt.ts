@@ -92,6 +92,46 @@ function shape(input: PlanInput): string {
   return lines.length ? lines.join('\n') + '\n' : ''
 }
 
+/**
+ * 법적 경계 — **AI 에게도 규칙 3장을 말해준다.**
+ *
+ * 규칙 3장 1번은 우리가 화면에 쓰면 안 되는 말을 정해뒀는데, 정작 **손님에게 나가는 글의
+ * 대부분을 쓰는 AI 에게는 그 말을 한 적이 없었다.** 사람이 쓴 문구만 아무리 조심해도
+ * AI 가 "예약해 드리겠습니다" 한 줄을 쓰면 문체부 회신의 전제가 깨진다.
+ *
+ * 회신이 조건부였다는 점이 중요하다 — *"단순 여행 관련 정보만을 제공하는"* 한 등록 대상이
+ * 아니고, **알선·대리·모객·여행 안내**가 끼면 여행업이 된다. AI 가 그 선을 넘는 문장을
+ * 쓰면 실제 운영 방식이 그렇게 된 것으로 판단될 수 있다.
+ *
+ * 무료·유료 두 지시문이 같이 쓴다. 한쪽만 막으면 나머지 한쪽으로 새어나간다.
+ *
+ * 병원은 더 무겁다. 외국인환자 유치업 등록 없이 병원을 소개하면 형사처벌 대상이라
+ * **이름을 아예 말하지 않게** 막는다.
+ */
+const BOUNDARY = `## What you are — this is a legal line, not a style preference
+
+You produce written information. You never act for the traveller, and neither does the
+company you write for. Korean tourism law treats arranging, booking, or guiding as a
+different licensed business. Crossing this line in a sentence can make it true in fact.
+
+NEVER write, in any language:
+- that we book, reserve, arrange, confirm, or hold anything for them
+- that we contact a hotel, restaurant, venue, or driver on their behalf
+- that we accompany, guide, interpret, or meet them in person
+- that we handle any payment for the trip itself
+- any offer of service beyond this document
+  ("we can...", "we'll take care of...", "leave it to us", "on your behalf")
+
+ALWAYS write booking as something THEY do, with the facts they need to do it:
+  GOOD  "Book two weeks ahead — this one only takes phone reservations in Korean."
+  BAD   "We'll reserve this for you." / "We can arrange this."
+
+Never describe this document as a guide service, a tour, or travel arrangement.
+It is written information they use themselves.
+
+MEDICAL: never name a hospital, clinic, or doctor, and never build medical treatment
+into the trip. Naming one requires a licence we do not hold.`
+
 export function buildFreeDraftPrompt(input: PlanInput): string {
   // 구간(새 방식)이 있으면 그것을 쓴다. 숫자(옛 방식)는 예전 초안에만 남아 있다.
   const budget = input.budgetRange
@@ -134,6 +174,8 @@ THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
   so a group-only number leaves them doing the division themselves.
 - Do NOT include: per-activity tips, alternative options, photo spots, what to wear,
   packing lists, or booking instructions. Those belong to the paid consultation.
+
+${BOUNDARY}
 
 Write everything in ${languageName(input.language)}.
 Tone: warm, specific, confident. Never salesy.
@@ -306,6 +348,8 @@ ${shape(input)}${input.dietary?.length ? `- MUST WORK AROUND: ${input.dietary.jo
 - 5 places to stay, 5 to eat, 5 cafes — each with the reason it is on the list.
 - Cost split by accommodation / dining / transport / activities.
 - Weather for those exact dates, what to wear, what to pack.
+
+${BOUNDARY}
 
 Write everything in ${languageName(input.language)}.
 Tone: a professional who has done this route many times. Specific, calm, never salesy.`
