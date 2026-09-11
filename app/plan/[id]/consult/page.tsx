@@ -100,8 +100,8 @@ export default async function ConsultPage({
         {/* 규칙 6번: 사람이 상담하지 않는다. 사람이 답장한다는 약속을 두면 안 된다 */}
         <p className="mt-5 text-lg leading-relaxed text-[var(--c-text-2)]">
           {t({
-            ko: <>전체 일정은 <strong>₩150,000</strong> 입니다. 결제 링크와 일정을 이메일로 보내드립니다 — 처음부터 끝까지 만들어져 나오니 예약할 통화도, 기다릴 사람도 없습니다.</>,
-            en: <>Your full plan is <strong>₩150,000</strong>. We&apos;ll email you the link to pay and the plan itself — it&apos;s put together for you start to finish, so there&apos;s no call to book and nobody to wait on.</>,
+            ko: <>전체 일정은 <strong>$25</strong>입니다. 결제 링크와 일정을 이메일로 보내드립니다 — 처음부터 끝까지 만들어져 나오니 예약할 통화도, 기다릴 사람도 없습니다.</>,
+            en: <>Your full plan is <strong>$25</strong>. We&apos;ll email you the link to pay and the plan itself — it&apos;s put together for you start to finish, so there&apos;s no call to book and nobody to wait on.</>,
           })}
         </p>
         <p className="mt-8 leading-relaxed text-[var(--c-text-2)]">
@@ -129,8 +129,8 @@ export default async function ConsultPage({
       {/* 규칙 6번: 사람이 상담하지 않는다. 사람이 답장한다는 약속을 두면 안 된다 */}
       <p className="mt-3 leading-relaxed text-[var(--c-text-2)]">
         {t({
-          ko: <><strong>₩150,000</strong> — 여행이 며칠이든 값은 하나입니다. 이메일만 남겨주시면 링크를 보내드립니다.</>,
-          en: <><strong>₩150,000</strong> — one price, however long your trip is. Leave your email and we&apos;ll send you the link.</>,
+          ko: <><strong>$25</strong> — 여행이 며칠이든 값은 하나입니다. 이메일만 남겨주시면 링크를 보내드립니다.</>,
+          en: <><strong>$25</strong> — one price, however long your trip is. Leave your email and we&apos;ll send you the link.</>,
         })}
       </p>
       {/* 우리는 여행업자가 아니다. 예약은 손님이 직접 한다 — 이 선을 손님에게도 분명히 해둔다 */}
