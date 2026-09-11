@@ -194,11 +194,11 @@ const steps = [
     body: t({
       ko: [
         "일자별 개요와 컨시어지 팁 하나.",
-        "나머지가 어떨지 판단하실 수 있습니다.",
+        "그 자리에서 바로 받아보고, 전체 일정이 필요할지 판단하실 수 있습니다.",
       ],
       en: [
         "A day-by-day outline, plus one concierge tip",
-        "so you can judge the rest.",
+        "delivered right away, so you can decide if you need the full plan.",
       ],
     }),
   },
