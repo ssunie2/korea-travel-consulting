@@ -23,8 +23,8 @@ alter table public.plans
   -- 빼 달라는 것들 (사람 많은 곳, 계단, 긴 이동…)
   add column avoid          text[],
   -- 할랄·비건·알레르기·휠체어.
-  -- ⚠️ 건강·종교 정보다. AI 무료 등급에서는 학습에 쓰이고 사람이 볼 수 있다.
-  --    손님을 받기 전에 유료 등급으로 올려야 한다.
+  -- ⚠️ 건강·종교 정보다. 일정 작성에만 쓰며 GPT-6 Astra API 응답 저장은 끈다.
+  --    이름·연락처를 함께 보내지 않도록 서버 경계를 유지한다.
   add column dietary        text[];
 
 -- 옛 자유 입력 칸(dietary_notes, interests)은 지우지 않는다.

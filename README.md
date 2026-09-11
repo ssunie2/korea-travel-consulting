@@ -2,8 +2,8 @@
 
 해외 여행객이 한국에 오기 전에 컨설팅을 받는 웹사이트.
 
-- 스택: Next.js 16 + TypeScript + Tailwind CSS + Supabase
-- **팀 규칙은 [AGENTS.md](AGENTS.md)** — Claude·Codex 둘 다 이 파일을 읽는다. 작업 전에 한 번 읽고 시작할 것
+- 스택: Next.js 16 + TypeScript + Tailwind CSS + Supabase + OpenAI GPT-6 Astra
+- **팀 규칙은 [AGENTS.md](AGENTS.md)** — Codex가 이 파일을 읽는다. 작업 전에 한 번 읽고 시작할 것
 
 ## 처음 세팅
 
@@ -18,7 +18,8 @@ cp .env.example .env.local
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase 대시보드 > Project Settings > API |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 같은 화면 |
-| `GEMINI_API_KEY` | Google AI Studio (아직 없으면 비워둬도 실행은 됨) |
+| `OPENAI_API_KEY` | [OpenAI API 키 화면](https://platform.openai.com/api-keys) (없으면 사이트는 열리지만 초안 생성은 안 됨) |
+| `OPENAI_MODEL` | 기본값 `gpt-6-astra` 그대로 사용 |
 
 ```bash
 npm run dev

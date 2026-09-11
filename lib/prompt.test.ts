@@ -1,7 +1,7 @@
 // 실행: npm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildFreeDraftPrompt, buildFullPlanPrompt } from './prompt.ts'
+import { buildFreeDraftPrompt, buildFullPlanPrompt, freeItinerarySchema, fullItinerarySchema } from './prompt.ts'
 import type { PlanInput } from './types.ts'
 
 const input: PlanInput = {
@@ -32,3 +32,21 @@ for (const [이름, 지시문] of [
     assert.match(지시문, /MEDICAL/, '병원 이름 금지가 없다')
   })
 }
+
+/** Astra의 strict JSON 형식은 모든 객체의 항목을 required에 넣고, 여분 항목을 막아야 한다. */
+function assertStrictSchema(schema: unknown): void {
+  if (!schema || typeof schema !== 'object') return
+  const node = schema as { type?: string; properties?: Record<string, unknown>; required?: string[]; additionalProperties?: boolean; items?: unknown }
+
+  if (node.type === 'object') {
+    assert.equal(node.additionalProperties, false)
+    assert.deepEqual(new Set(node.required), new Set(Object.keys(node.properties ?? {})))
+    Object.values(node.properties ?? {}).forEach(assertStrictSchema)
+  }
+  if (node.type === 'array') assertStrictSchema(node.items)
+}
+
+test('Astra 출력 형식이 strict JSON 규칙을 지킨다', () => {
+  assertStrictSchema(freeItinerarySchema)
+  assertStrictSchema(fullItinerarySchema)
+})

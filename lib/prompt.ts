@@ -1,4 +1,3 @@
-import { Type } from '@google/genai'
 import type { PlanInput } from './types'
 
 /**
@@ -9,31 +8,34 @@ import type { PlanInput } from './types'
  * 무료 범위(1/3)가 부탁이 아니라 규칙이 된다.
  */
 export const freeItinerarySchema = {
-  type: Type.OBJECT,
+  type: 'object',
+  additionalProperties: false,
   properties: {
-    tripTitle: { type: Type.STRING },
-    summary: { type: Type.STRING },
+    tripTitle: { type: 'string' },
+    summary: { type: 'string' },
     days: {
-      type: Type.ARRAY,
+      type: 'array',
       items: {
-        type: Type.OBJECT,
+        type: 'object',
+        additionalProperties: false,
         properties: {
-          dayNumber: { type: Type.INTEGER },
-          theme: { type: Type.STRING },
+          dayNumber: { type: 'integer' },
+          theme: { type: 'string' },
           // 그날 머무는 도시. 여러 도시를 도는 여행에서 짐을 옮기는 날을 알려준다
-          city: { type: Type.STRING },
+          city: { type: 'string' },
           activities: {
-            type: Type.ARRAY,
+            type: 'array',
             minItems: 3,
             maxItems: 3, // 아침·오후·저녁. 늘리려면 무료로 얼마나 줄지부터 다시 정한다
             items: {
-              type: Type.OBJECT,
+              type: 'object',
+              additionalProperties: false,
               properties: {
-                time: { type: Type.STRING },
-                name: { type: Type.STRING },
-                note: { type: Type.STRING },
+                time: { type: 'string' },
+                name: { type: 'string' },
+                note: { type: 'string' },
                 // 앞 일정에서 여기까지 대략 얼마나 걸리는지. 그날 첫 일정은 빈 값
-                travel: { type: Type.STRING },
+                travel: { type: 'string' },
               },
               required: ['time', 'name', 'note', 'travel'],
             },
@@ -43,23 +45,25 @@ export const freeItinerarySchema = {
       },
     },
     sampleTip: {
-      type: Type.OBJECT,
+      type: 'object',
+      additionalProperties: false,
       properties: {
         // 몇 일째 이야기인지 — 그 날 아래에 붙여 보여준다
-        dayNumber: { type: Type.INTEGER },
-        activityName: { type: Type.STRING },
-        highlight: { type: Type.STRING },
-        pitfall: { type: Type.STRING },
-        insiderSecret: { type: Type.STRING },
+        dayNumber: { type: 'integer' },
+        activityName: { type: 'string' },
+        highlight: { type: 'string' },
+        pitfall: { type: 'string' },
+        insiderSecret: { type: 'string' },
       },
       required: ['dayNumber', 'activityName', 'highlight', 'pitfall', 'insiderSecret'],
     },
     picks: {
-      type: Type.OBJECT,
-      properties: { stay: { type: Type.STRING }, dining: { type: Type.STRING } },
+      type: 'object',
+      additionalProperties: false,
+      properties: { stay: { type: 'string' }, dining: { type: 'string' } },
       required: ['stay', 'dining'],
     },
-    totalEstimate: { type: Type.STRING },
+    totalEstimate: { type: 'string' },
   },
   required: ['tripTitle', 'summary', 'days', 'sampleTip', 'picks', 'totalEstimate'],
 }
@@ -194,101 +198,110 @@ Field notes:
 }
 
 const place = {
-  type: Type.OBJECT,
+  type: 'object',
+  additionalProperties: false,
   properties: {
-    name: { type: Type.STRING },
-    area: { type: Type.STRING },
-    priceLevel: { type: Type.STRING },
-    reason: { type: Type.STRING },
+    name: { type: 'string' },
+    area: { type: 'string' },
+    priceLevel: { type: 'string' },
+    reason: { type: 'string' },
   },
   required: ['name', 'area', 'priceLevel', 'reason'],
 }
 
-const fivePlaces = { type: Type.ARRAY, minItems: 5, maxItems: 5, items: place }
+const fivePlaces = { type: 'array', minItems: 5, maxItems: 5, items: place }
 
 /** 유료 결과의 모양. 여기 없는 항목은 AI가 만들어낼 수 없다 */
 export const fullItinerarySchema = {
-  type: Type.OBJECT,
+  type: 'object',
+  additionalProperties: false,
   properties: {
-    tripTitle: { type: Type.STRING },
-    summary: { type: Type.STRING },
+    tripTitle: { type: 'string' },
+    summary: { type: 'string' },
     days: {
-      type: Type.ARRAY,
+      type: 'array',
       items: {
-        type: Type.OBJECT,
+        type: 'object',
+        additionalProperties: false,
         properties: {
-          dayNumber: { type: Type.INTEGER },
-          theme: { type: Type.STRING },
-          area: { type: Type.STRING },
-          routeNote: { type: Type.STRING },
+          dayNumber: { type: 'integer' },
+          theme: { type: 'string' },
+          area: { type: 'string' },
+          routeNote: { type: 'string' },
           activities: {
-            type: Type.ARRAY,
+            type: 'array',
             minItems: 3,
             items: {
-              type: Type.OBJECT,
+              type: 'object',
+              additionalProperties: false,
               properties: {
-                time: { type: Type.STRING },
-                name: { type: Type.STRING },
-                description: { type: Type.STRING },
-                duration: { type: Type.STRING },
-                location: { type: Type.STRING },
-                estimatedCost: { type: Type.STRING },
-                gettingThere: { type: Type.STRING },
+                time: { type: 'string' },
+                name: { type: 'string' },
+                description: { type: 'string' },
+                duration: { type: 'string' },
+                location: { type: 'string' },
+                estimatedCost: { type: 'string' },
+                gettingThere: { type: 'string' },
                 tips: {
-                  type: Type.OBJECT,
+                  type: 'object',
+                  additionalProperties: false,
                   properties: {
-                    highlight: { type: Type.STRING },
-                    pitfall: { type: Type.STRING },
-                    insiderSecret: { type: Type.STRING },
-                    reservationRequired: { type: Type.BOOLEAN },
+                    highlight: { type: 'string' },
+                    pitfall: { type: 'string' },
+                    insiderSecret: { type: 'string' },
+                    reservationRequired: { type: 'boolean' },
                   },
                   required: ['highlight', 'pitfall', 'insiderSecret', 'reservationRequired'],
                 },
               },
-              required: ['time', 'name', 'description', 'gettingThere', 'tips'],
+              required: ['time', 'name', 'description', 'duration', 'location', 'estimatedCost', 'gettingThere', 'tips'],
             },
           },
           photoSpot: {
-            type: Type.OBJECT,
+            type: 'object',
+            additionalProperties: false,
             properties: {
-              name: { type: Type.STRING },
-              bestTime: { type: Type.STRING },
-              advice: { type: Type.STRING },
+              name: { type: 'string' },
+              bestTime: { type: 'string' },
+              advice: { type: 'string' },
             },
             required: ['name', 'bestTime', 'advice'],
           },
         },
-        required: ['dayNumber', 'theme', 'area', 'routeNote', 'activities'],
+        required: ['dayNumber', 'theme', 'area', 'routeNote', 'activities', 'photoSpot'],
       },
     },
     picks: {
-      type: Type.OBJECT,
+      type: 'object',
+      additionalProperties: false,
       properties: { stay: fivePlaces, dining: fivePlaces, cafes: fivePlaces },
       required: ['stay', 'dining', 'cafes'],
     },
     costBreakdown: {
-      type: Type.OBJECT,
+      type: 'object',
+      additionalProperties: false,
       properties: {
-        totalEstimate: { type: Type.STRING },
-        accommodation: { type: Type.STRING },
-        dining: { type: Type.STRING },
-        transport: { type: Type.STRING },
-        activities: { type: Type.STRING },
-        budgetFit: { type: Type.STRING },
-        valueMoves: { type: Type.ARRAY, minItems: 3, maxItems: 5, items: { type: Type.STRING } },
+        totalEstimate: { type: 'string' },
+        accommodation: { type: 'string' },
+        dining: { type: 'string' },
+        transport: { type: 'string' },
+        activities: { type: 'string' },
+        budgetFit: { type: 'string' },
+        valueMoves: { type: 'array', minItems: 3, maxItems: 5, items: { type: 'string' } },
       },
       required: ['totalEstimate', 'accommodation', 'dining', 'transport', 'activities', 'budgetFit', 'valueMoves'],
     },
     clothing: {
-      type: Type.OBJECT,
+      type: 'object',
+      additionalProperties: false,
       properties: {
-        weatherSummary: { type: Type.STRING },
-        outfits: { type: Type.ARRAY, items: { type: Type.STRING } },
-        advice: { type: Type.STRING },
+        weatherSummary: { type: 'string' },
+        outfits: { type: 'array', items: { type: 'string' } },
+        advice: { type: 'string' },
       },
       required: ['weatherSummary', 'outfits', 'advice'],
     },
-    packingTips: { type: Type.ARRAY, items: { type: Type.STRING } },
+    packingTips: { type: 'array', items: { type: 'string' } },
   },
   required: ['tripTitle', 'summary', 'days', 'picks', 'costBreakdown', 'clothing', 'packingTips'],
 }

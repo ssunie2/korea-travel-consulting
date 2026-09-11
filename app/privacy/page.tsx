@@ -12,7 +12,7 @@ const display = Instrument_Serif({
 // TODO(출시 전): 사업자등록이 끝나면 상호·대표자·사업자등록번호·주소를 채운다.
 // TODO(출시 전): CONTACT 를 실제 이메일로 바꾼다. 지금은 placeholder라 문의가 도착하지 않는다.
 const CONTACT = "hello@example.com";
-const UPDATED = "12 August 2026";
+const UPDATED = "11 September 2026";
 
 export const metadata = {
   title: t({ ko: "개인정보 처리방침 — mohallae", en: "Privacy Policy — mohallae" }),
@@ -81,7 +81,7 @@ const processors = [
     where: t({ ko: "대한민국 서울 (서버 기능)", en: "Seoul, South Korea (server functions)" }),
   },
   {
-    name: "Google (Gemini API)",
+    name: "OpenAI (GPT-6 Astra API)",
     role: t({ ko: "보내주신 여행 정보로 초안 일정을 작성", en: "Writes your draft itinerary from the trip details you submit" }),
     where: t({ ko: "국외", en: "Outside Korea" }),
   },
@@ -167,13 +167,13 @@ export default function PrivacyPolicy() {
                 ko: [
                   "선택 항목입니다. 비워두셔도 초안은 나옵니다.",
                   "적으신다는 것은 그 내용을 반영해 달라는 뜻이고, 저희가 보관하는 이유도 그것뿐입니다.",
-                  "초안이 그 조건을 피해 가도록 구글 Gemini API 로 보냅니다. 그 외에는 아무 데도 가지 않습니다.",
+                  "초안이 그 조건을 피해 가도록 OpenAI의 GPT-6 Astra API로 보냅니다. API 응답 저장 기능은 끕니다.",
                   "일정을 쓰는 것 말고 다른 용도로는 절대 쓰지 않습니다.",
                 ],
                 en: [
                   "It is optional. You can leave it empty and still get a draft.",
                   "By filling it in, you are asking us to use it — that is the only reason we hold it.",
-                  "It is sent to Google's Gemini API so your draft can work around it. Nothing else receives it.",
+                  "It is sent to OpenAI's GPT-6 Astra API so your draft can work around it. API response storage is disabled.",
                   "It is never used for anything other than writing your itinerary.",
                 ],
               }),
@@ -228,7 +228,7 @@ export default function PrivacyPolicy() {
             </table>
           </div>
           <p className="mt-5 leading-relaxed text-[var(--c-text-2)]">
-            {t({ ko: "구글이 초안을 쓰는 동안 여행 정보가 한국 밖으로 나갑니다. 이름·이메일·메신저 아이디는 구글로 보내지 않습니다 — 서울에 있는 저희 데이터베이스에만 저장됩니다.", en: "Your trip details leave Korea when Google writes your draft. Your name, email and messenger ID are never sent to Google — they are only stored in our database in Seoul." })}</p>
+            {t({ ko: "OpenAI의 GPT-6 Astra가 초안을 쓰는 동안 여행 정보가 한국 밖으로 나갑니다. 이름·이메일·메신저 아이디는 OpenAI로 보내지 않습니다 — 서울에 있는 저희 데이터베이스에만 저장됩니다.", en: "Your trip details leave Korea when OpenAI's GPT-6 Astra writes your draft. Your name, email and messenger ID are never sent to OpenAI — they are only stored in our database in Seoul." })}</p>
         </section>
 
         {/* 4 */}
