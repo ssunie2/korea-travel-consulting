@@ -8,6 +8,7 @@ import { LANG, t } from "@/lib/copy";
 import { DESTINATIONS } from "@/lib/places";
 import DateRangePicker, { nightsBetween } from "@/components/DateRangePicker";
 import Select from "@/components/Select";
+import { ORIGINS, FIRST_DAYS, LAST_DAYS, STAY_BOOKED, BUDGET_SCOPES, STAY_BOOKED_YES } from "@/lib/options";
 
 // 표제용 서체. 랜딩·결과 화면과 같은 방식으로 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -103,50 +104,6 @@ const BUDGETS = [
   { v: "250,000–350,000 KRW (about $185–260) for the whole trip", ko: "25–35만원 (약 $185–260)" },
   { v: "350,000–500,000 KRW (about $260–370) for the whole trip", ko: "35–50만원 (약 $260–370)" },
   { v: "Over 500,000 KRW (about $370) for the whole trip", ko: "50만원 이상 (약 $370)" },
-];
-/**
- * 어디서 오시는지. **도시가 아니라 시차 방향만 묻는다** — 우리에게 필요한 건
- * "첫날 오후에 무너지는가", "새벽 네 시에 깨는가" 지 정확한 출발지가 아니다.
- * 유럽에서 오면 첫날 저녁이 버겁고, 북미 서부에서 오면 새벽에 깬다.
- */
-const ORIGINS = [
-  { v: "East Asia — little or no jet lag", ko: "동아시아 — 일본·중국·대만 등" },
-  { v: "Southeast or South Asia", ko: "동남아·남아시아" },
-  { v: "Europe or the Middle East", ko: "유럽·중동" },
-  { v: "North America", ko: "북미" },
-  { v: "Oceania", ko: "오세아니아" },
-];
-/**
- * 첫날·마지막날에 **실제로 쓸 수 있는 시간.**
- *
- * 항공편 시각을 직접 묻지 않는다 — 아직 표를 안 샀을 수 있고, 우리에게 필요한 건
- * 정확한 시각이 아니라 **그날 몇 시간을 쓸 수 있나** 다.
- * 이걸 안 물으면 나흘 여행의 **이틀이 통째로 추측**이 된다.
- */
-const FIRST_DAYS = [
-  { v: "From the morning — a full first day", ko: "아침부터 — 첫날을 온전히 써요" },
-  { v: "From around midday", ko: "점심쯤부터" },
-  { v: "From the evening", ko: "저녁부터" },
-  { v: "Arriving late at night — the first day is basically gone", ko: "밤늦게 도착 — 첫날은 거의 못 써요" },
-];
-const LAST_DAYS = [
-  { v: "Leaving early in the morning — the last day is basically gone", ko: "아침 일찍 떠나요 — 마지막날은 거의 못 써요" },
-  { v: "Leaving around midday", ko: "점심쯤 떠나요" },
-  { v: "Leaving in the evening", ko: "저녁에 떠나요" },
-  { v: "Staying until late — a full last day", ko: "밤늦게까지 — 마지막날을 온전히 써요" },
-];
-/** 숙소를 이미 잡았는지. 잡았으면 **동선의 기점이 확정**된다 */
-const STAY_BOOKED = [
-  { v: "Already booked", ko: "이미 잡았어요" },
-  { v: "Not booked yet", ko: "아직이요 — 추천해 주세요" },
-];
-/**
- * 예산에 항공권이 들어 있는지. **이걸 모르면 같은 금액이 세 배로 벌어진다** —
- * 25–35만원이 항공권 포함이면 한국에서 쓸 돈이 거의 없고, 미포함이면 넉넉하다.
- */
-const BUDGET_SCOPES = [
-  { v: "Flights are included in that budget", ko: "항공권 포함이에요" },
-  { v: "Flights not included — that is spending money inside Korea", ko: "항공권 빼고, 한국에서 쓸 돈이에요" },
 ];
 const CURRENCIES = ["KRW", "USD", "EUR", "JPY"];
 const LANGUAGES = [
@@ -616,7 +573,7 @@ export default function PlanForm() {
                 placeholder={t({ ko: "고르세요", en: "Choose one" })}
                 onChange={setStayBooked}
               />
-              {stayBooked === "Already booked" && (
+              {stayBooked === STAY_BOOKED_YES && (
                 <label className="mt-3 block">
                   <span className={label}>{t({ ko: "어디에 잡으셨나요?", en: "Where is it?" })}</span>
                   <input
@@ -634,7 +591,7 @@ export default function PlanForm() {
               이미 잡은 사람에게 '도심이 좋으세요, 조용한 데가 좋으세요' 를 묻는 건
               의미가 없다. 그때는 이 칸을 감춘다.
             */}
-            {stayBooked !== "Already booked" && (
+            {stayBooked !== STAY_BOOKED_YES && (
               <Select
                 label={t({ ko: "숙소는 어디쯤이 좋으세요?", en: "Where would you rather stay?" })}
                 name="stayArea"

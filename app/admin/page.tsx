@@ -3,6 +3,7 @@ import { supabaseServer } from '@/lib/supabase-server'
 import { generateJson } from '@/lib/ai'
 import { buildFullPlanPrompt, fullItinerarySchema } from '@/lib/prompt'
 import type { ConsultationStatus, FullItinerary, Plan } from '@/lib/types'
+import { planInputFromRow } from '@/lib/plan-input'
 
 // 유료 일정 생성에 시간이 걸린다. 무료(12.7초)보다 내용이 많아 더 걸린다.
 export const maxDuration = 300
@@ -51,27 +52,10 @@ async function generateFullPlan(formData: FormData) {
   if (error || !data) return
 
   const plan = data as Plan
+  // 옛날엔 여기서 칸을 하나씩 손으로 옮겨 적었고, 폼에 칸이 늘었을 때 여기를 안 고쳐서
+  // **유료 일정에만 새 답이 빠졌다.** 이제 옮기는 자리는 lib/plan-input.ts 한 곳뿐이다.
   const full = await generateJson<FullItinerary>(
-    buildFullPlanPrompt({
-      destinations: plan.destinations,
-      startDate: plan.start_date,
-      durationDays: plan.duration_days,
-      travelers: plan.travelers,
-      budgetRange: plan.budget_range ?? undefined,
-      budgetPerPerson: plan.budget_per_person ?? undefined,
-      budgetCurrency: plan.budget_currency,
-      styles: plan.styles,
-      audience: plan.audience ?? undefined,
-      pace: plan.pace ?? undefined,
-      visitedBefore: plan.visited_before ?? undefined,
-      transport: plan.transport ?? undefined,
-      stayArea: plan.stay_area ?? undefined,
-      dayRhythm: plan.day_rhythm ?? undefined,
-      occasion: plan.occasion ?? undefined,
-      avoid: plan.avoid ?? undefined,
-      dietary: plan.dietary ?? undefined,
-      language: plan.language,
-    }),
+    buildFullPlanPrompt(planInputFromRow(plan)),
     fullItinerarySchema
   )
 

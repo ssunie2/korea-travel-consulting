@@ -212,6 +212,18 @@ export type Plan = {
   stay_area: string | null
   day_rhythm: string | null
   occasion: string | null
+  /**
+   * 이슈 #75 로 늘린 칸들. **`PlanInput` 에 칸을 더하면 여기도 같이 더해야 한다** —
+   * 안 그러면 유료 일정이 무료 초안보다 손님을 덜 아는 상태로 만들어진다.
+   * 실제로 한 번 그랬다. 옮기는 자리는 `lib/plan-input.ts` 한 곳뿐이다.
+   */
+  origin: string | null
+  first_day: string | null
+  last_day: string | null
+  budget_scope: string | null
+  stay_booked: string | null
+  stay_place: string | null
+  kids_ages: string | null
   avoid: string[] | null
   dietary: string[] | null
   /** 옛 자유 입력 칸. 객관식(dietary)으로 바뀌기 전에 들어온 값이 남아 있다 */

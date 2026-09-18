@@ -1,5 +1,6 @@
 import { Type } from '@google/genai'
 import type { PlanInput } from './types'
+import { STAY_BOOKED_YES } from './options.ts'
 
 /**
  * 결과의 모양을 API에게 강제한다. 글로 "이 형식으로 줘"라고 부탁만 하면
@@ -94,13 +95,18 @@ function shape(input: PlanInput): string {
   // 없는 시간에 일정을 채운다 — 나흘 여행의 이틀이 통째로 추측이 된다.
   if (input.firstDay)
     lines.push(
-      `- Day 1 starts: ${input.firstDay} — plan ONLY the hours they actually have. ` +
-        `If they land at night, day 1 is one short, close-by thing near where they sleep — not a full day.`,
+      `- Day 1 starts: ${input.firstDay} — day 1 still gets its full set of entries, but every one of them ` +
+        `must fall inside the hours they actually have. Getting in from the airport, checking in and settling ` +
+        `each count as an entry. If they land at night, day 1 is the transfer, the check-in, and ONE thing ` +
+        `within walking distance of where they sleep — never three sights across the city. ` +
+        `Never place anything before they have landed.`,
     )
   if (input.lastDay)
     lines.push(
-      `- Last day: ${input.lastDay} — leave room to get to the airport. ` +
-        `If they fly out in the morning, do not put anything on the last day beyond breakfast near the hotel.`,
+      `- Last day: ${input.lastDay} — the last day also keeps its full set of entries, but they must leave ` +
+        `room to reach the airport. Packing, checking out and the airport transfer each count as an entry. ` +
+        `If they fly out in the morning, the last day is breakfast near where they slept, checkout, and the ` +
+        `transfer itself — not sightseeing.`,
     )
 
   // 도시가 아니라 시차 방향이다. 유럽에서 오면 첫날 저녁이 버겁고,
@@ -121,14 +127,24 @@ function shape(input: PlanInput): string {
 
   // 숙소를 이미 잡았으면 동선의 기점이 확정된다.
   // 잡았는데 다른 곳을 추천하면 그 초안은 통째로 쓸모없다.
-  if (input.stayBooked)
+  // **예약 여부로 가른다.** 전에는 숙소 이름이 있는지로 갈라서, '이미 잡았다' 고
+  // 답하고 이름을 안 적으면 "새 숙소를 추천하라" 는 정반대 지시가 나갔다 (Codex 리뷰).
+  if (input.stayBooked === STAY_BOOKED_YES) {
     lines.push(
       input.stayPlace
         ? `- They ALREADY booked a place to stay: ${input.stayPlace}. ` +
-            `Build every day to start and end there. Do NOT recommend a different place to stay — ` +
-            `they cannot use it. Where a place to stay is asked for, name this one back to them.`
-        : `- Place to stay: ${input.stayBooked} — recommend one and build the route around it.`,
+            `On the days they are in that city, build the day to start and end there. ` +
+            `Do NOT recommend a different place to stay for those nights — they cannot use it. ` +
+            `Where a place to stay is asked for, name this one back to them. ` +
+            `If the trip moves to another city they will need somewhere there too — say so plainly ` +
+            `and recommend one for those nights only.`
+        : `- They ALREADY booked a place to stay but did not say where. ` +
+            `Do NOT name a specific place to stay and do NOT anchor the route to one — you would be guessing. ` +
+            `Instead keep each day's stops close to each other so the plan works from wherever they are staying.`,
     )
+  } else if (input.stayBooked) {
+    lines.push(`- They have NOT booked a place to stay yet — recommend one and build the route around it.`)
+  }
 
   // 두 살과 열세 살은 완전히 다른 일정이다.
   if (input.kidsAges)
