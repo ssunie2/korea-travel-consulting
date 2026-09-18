@@ -31,6 +31,7 @@ const collected = [
         "한국 어디를 가시는지, 출발일, 기간, 인원",
         "1인 예산과 통화, 여행 스타일, 동행, 관심사",
         "적어주신 경우에 한해 식이·접근성 메모",
+        "함께 가시는 아이의 나이 — 적어주신 경우에 한해. 이름·연락처는 받지 않습니다",
         "초안을 받으실 언어",
         "생성된 초안 자체",
       ],
@@ -38,6 +39,7 @@ const collected = [
         "Where in Korea you want to go, your start date, how many days, how many travellers",
         "Budget per person and currency, travel styles, who you're travelling with, interests",
         "Dietary or accessibility notes, if you give them",
+        "The ages of children travelling with you, if you give them \u2014 never their names or contact details",
         "The language you want the draft written in",
         "The draft itself, once it is generated",
       ],
@@ -324,7 +326,7 @@ export default function PrivacyPolicy() {
             {t({ ko: "7. 아동", en: "7. Children" })}
           </h2>
           <p className="mt-4 leading-relaxed text-[var(--c-text-2)]">
-            {t({ ko: "이 서비스는 성인을 위한 것입니다. 만 14세 미만의 정보를 알면서 수집하지 않습니다. 아동이 정보를 보냈다고 생각되시면 메일 주시면 지우겠습니다.", en: "This service is for adults. We do not knowingly collect details from anyone under 14. If you believe a child has sent us their details, email us and we will delete them." })}</p>
+            {t({ ko: "이 서비스는 성인을 위한 것입니다. 만 14세 미만 본인으로부터 직접 정보를 받지 않습니다. 다만 함께 가시는 아이가 있으면, 일정을 아이에게 맞추기 위해 나이를 적어주실 수 있습니다 — 이 값은 성인 신청자가 적어주시는 것이고, 이름이나 연락처는 받지 않습니다. 아동이 직접 정보를 보냈다고 생각되시면 메일 주시면 지우겠습니다.", en: "This service is for adults. We do not collect details directly from anyone under 14. If children are travelling with you, you may tell us their ages so the plan can suit them — you give us that, not the child, and we never ask for a child\u2019s name or contact details. If you believe a child has sent us their own details, email us and we will delete them." })}</p>
         </section>
 
         {/* 8 */}

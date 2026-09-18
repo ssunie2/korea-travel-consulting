@@ -1,5 +1,6 @@
 import { Type } from '@google/genai'
 import type { PlanInput } from './types'
+import { STAY_BOOKED_YES } from './options.ts'
 
 /**
  * 결과의 모양을 API에게 강제한다. 글로 "이 형식으로 줘"라고 부탁만 하면
@@ -86,6 +87,71 @@ function shape(input: PlanInput): string {
   if (input.visitedBefore) lines.push(`- Been to Korea before: ${input.visitedBefore} — first-timers get the landmarks, repeat visitors get lesser-known places.`)
   if (input.transport) lines.push(`- Getting around: ${input.transport} — build the route around this, not around what is closest on a map.`)
   if (input.stayArea) lines.push(`- Prefers to stay: ${input.stayArea} — the one place to stay must match this.`)
+
+  // ── 이슈 #75 — 일정의 짜임을 가장 크게 바꾸는 답들 ──
+  // 값만 던지지 않는다. **그 답이 일정에서 무엇을 바꿔야 하는지**까지 적는다.
+
+  // 첫날·마지막날은 온전한 하루가 아닌 경우가 대부분이다. 이게 없으면 AI 가
+  // 없는 시간에 일정을 채운다 — 나흘 여행의 이틀이 통째로 추측이 된다.
+  if (input.firstDay)
+    lines.push(
+      `- Day 1 starts: ${input.firstDay} — day 1 still gets its full set of entries, but every one of them ` +
+        `must fall inside the hours they actually have. Getting in from the airport, checking in and settling ` +
+        `each count as an entry. If they land at night, day 1 is the transfer, the check-in, and ONE thing ` +
+        `within walking distance of where they sleep — never three sights across the city. ` +
+        `Never place anything before they have landed.`,
+    )
+  if (input.lastDay)
+    lines.push(
+      `- Last day: ${input.lastDay} — the last day also keeps its full set of entries, but they must leave ` +
+        `room to reach the airport. Packing, checking out and the airport transfer each count as an entry. ` +
+        `If they fly out in the morning, the last day is breakfast near where they slept, checkout, and the ` +
+        `transfer itself — not sightseeing.`,
+    )
+
+  // 도시가 아니라 시차 방향이다. 유럽에서 오면 첫날 저녁이 버겁고,
+  // 북미에서 오면 새벽에 깬다 — 그 시간에 뭘 할 수 있는지가 진짜 정보다.
+  if (input.origin)
+    lines.push(
+      `- Flying in from: ${input.origin} — account for jet lag on day 1 and day 2. ` +
+        `Coming from Europe or the Middle East they fade in the late afternoon, so put the demanding thing early. ` +
+        `Coming from North America they wake around 4am, so name something worth doing at dawn. ` +
+        `Coming from East Asia there is no jet lag — do not mention it at all.`,
+    )
+
+  // 같은 금액이 세 배로 벌어지는 자리다.
+  if (input.budgetScope)
+    lines.push(
+      `- What the budget covers: ${input.budgetScope} — if flights are included, their real spending money inside Korea is far smaller than the number looks, so lean cheaper on every recommendation.`,
+    )
+
+  // 숙소를 이미 잡았으면 동선의 기점이 확정된다.
+  // 잡았는데 다른 곳을 추천하면 그 초안은 통째로 쓸모없다.
+  // **예약 여부로 가른다.** 전에는 숙소 이름이 있는지로 갈라서, '이미 잡았다' 고
+  // 답하고 이름을 안 적으면 "새 숙소를 추천하라" 는 정반대 지시가 나갔다 (Codex 리뷰).
+  if (input.stayBooked === STAY_BOOKED_YES) {
+    lines.push(
+      input.stayPlace
+        ? `- They ALREADY booked a place to stay: ${input.stayPlace}. ` +
+            `On the days they are in that city, build the day to start and end there. ` +
+            `Do NOT recommend a different place to stay for those nights — they cannot use it. ` +
+            `Where a place to stay is asked for, name this one back to them. ` +
+            `If the trip moves to another city they will need somewhere there too — say so plainly ` +
+            `and recommend one for those nights only.`
+        : `- They ALREADY booked a place to stay but did not say where. ` +
+            `Do NOT name a specific place to stay and do NOT anchor the route to one — you would be guessing. ` +
+            `Instead keep each day's stops close to each other so the plan works from wherever they are staying.`,
+    )
+  } else if (input.stayBooked) {
+    lines.push(`- They have NOT booked a place to stay yet — recommend one and build the route around it.`)
+  }
+
+  // 두 살과 열세 살은 완전히 다른 일정이다.
+  if (input.kidsAges)
+    lines.push(
+      `- Travelling with children aged ${input.kidsAges} — every stop must work for that age. ` +
+        `Check walking distance, nap times, whether a stroller fits, and whether the food is something they will actually eat.`,
+    )
   // 이 한 줄이 무료·유료 두 지시문의 유일한 dayRhythm 지시다. 무료 쪽에 같은 말이
   // 한 번 더 있었는데(#53 🟡6), 두 벌을 두면 나중에 한쪽만 고쳐서 서로 다른 말을 하게 된다.
   // 뒤쪽에만 있던 "나머지 일정은 장소 사정에 맞춘다" 는 뜻을 여기로 합쳤다.

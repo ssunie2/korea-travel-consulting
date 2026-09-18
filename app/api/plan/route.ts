@@ -63,6 +63,13 @@ export async function POST(req: Request) {
       visited_before: input.visitedBefore ?? null,
       transport: input.transport ?? null,
       stay_area: input.stayArea ?? null,
+      origin: input.origin ?? null,
+      first_day: input.firstDay ?? null,
+      last_day: input.lastDay ?? null,
+      budget_scope: input.budgetScope ?? null,
+      stay_booked: input.stayBooked ?? null,
+      stay_place: input.stayPlace ?? null,
+      kids_ages: input.kidsAges ?? null,
       day_rhythm: input.dayRhythm ?? null,
       occasion: input.occasion ?? null,
       // 빈 배열은 null 로 넣는다. 나중에 "답을 안 했다" 와 "아무것도 안 골랐다" 를 구분할 수 있다.
