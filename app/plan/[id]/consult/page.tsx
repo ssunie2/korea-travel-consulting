@@ -4,6 +4,8 @@ import { Instrument_Serif } from "next/font/google";
 import { supabaseServer } from "@/lib/supabase-server";
 import type { Plan } from "@/lib/types";
 import { t } from "@/lib/copy";
+import { sendEmail, layout, ADMIN_EMAIL } from "@/lib/email";
+import { siteUrl } from "@/lib/site";
 
 const display = Instrument_Serif({
   weight: "400",
@@ -24,6 +26,11 @@ const field =
  * 서버 액션으로 처리해서 **자바스크립트가 안 돌아도 신청이 들어온다.**
  * 여기가 돈이 시작되는 지점이라 브라우저 사정으로 새면 안 된다.
  */
+/** 손님이 적은 글을 HTML 에 넣기 전에 막는다. 안 하면 `<` 하나로 메일이 깨진다 */
+function esc(v: string): string {
+  return v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 async function submit(formData: FormData) {
   "use server";
 
@@ -50,6 +57,47 @@ async function submit(formData: FormData) {
     console.error("saving consultation failed:", error);
     redirect(`/plan/${planId}/consult?error=2`);
   }
+
+  /**
+   * 메일을 보낸다. **실패해도 손님을 막지 않는다** — 신청은 이미 DB 에 들어갔고
+   * 관리자 화면에서 볼 수 있다. 메일은 더 빨리 알기 위한 것이지 기록이 아니다.
+   */
+  const planUrl = `${siteUrl()}/plan/${planId}`;
+
+  // ① 우리에게 — 이게 없으면 신청이 들어와도 관리자 화면을 직접 열어봐야만 안다
+  if (ADMIN_EMAIL) {
+    await sendEmail({
+      to: ADMIN_EMAIL,
+      replyTo: email,
+      subject: `[모할래] 전체 일정 신청 — ${name}`,
+      html: layout(`<p style="margin:0 0 20px"><strong>전체 일정 신청이 들어왔습니다.</strong></p>
+<table style="border-collapse:collapse;width:100%;font-size:15px">
+<tr><td style="padding:6px 12px 6px 0;color:#7a8a86;white-space:nowrap">이름</td><td style="padding:6px 0">${esc(name)}</td></tr>
+<tr><td style="padding:6px 12px 6px 0;color:#7a8a86">이메일</td><td style="padding:6px 0"><a href="mailto:${esc(email)}">${esc(email)}</a></td></tr>
+${messenger ? `<tr><td style="padding:6px 12px 6px 0;color:#7a8a86">메신저</td><td style="padding:6px 0">${esc(messenger)}</td></tr>` : ""}
+${message ? `<tr><td style="padding:6px 12px 6px 0;color:#7a8a86;vertical-align:top">남긴 말</td><td style="padding:6px 0">${esc(message)}</td></tr>` : ""}
+</table>
+<p style="margin:24px 0 0"><a href="${planUrl}" style="color:#1a2e2a">이 손님이 본 초안 보기</a> · <a href="${siteUrl()}/admin" style="color:#1a2e2a">관리자 화면</a></p>`),
+    });
+  }
+
+  // ② 손님에게 — 신청이 들어갔다는 확인. 안 보내면 손님은 눌렀는지도 확신하지 못한다
+  await sendEmail({
+    to: email,
+    subject: t({ ko: "[모할래] 신청을 받았습니다", en: "[mohallae] We got your request" }),
+    html: layout(
+      t({
+        ko: `<p style="margin:0 0 20px">${esc(name)} 님, 전체 일정 신청을 받았습니다.</p>
+<p style="margin:0 0 20px">전체 일정은 <strong>$25</strong>입니다. 결제 링크와 함께 일정을 이 주소로 보내드립니다.</p>
+<p style="margin:0 0 20px"><a href="${planUrl}" style="color:#1a2e2a">받으셨던 무료 초안 다시 보기</a></p>
+<p style="margin:0;color:#7a8a86;font-size:14px">이 메일에 그대로 답장하셔도 됩니다.</p>`,
+        en: `<p style="margin:0 0 20px">${esc(name)}, we\u2019ve got your request for the full plan.</p>
+<p style="margin:0 0 20px">The full plan is <strong>$25</strong>. We\u2019ll send it to this address together with a payment link.</p>
+<p style="margin:0 0 20px"><a href="${planUrl}" style="color:#1a2e2a">See your free draft again</a></p>
+<p style="margin:0;color:#7a8a86;font-size:14px">You can reply straight to this email.</p>`,
+      }),
+    ),
+  });
 
   redirect(`/plan/${planId}/consult?sent=1`);
 }
