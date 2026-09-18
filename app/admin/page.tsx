@@ -6,6 +6,7 @@ import type { ConsultationStatus, FullItinerary, Plan } from '@/lib/types'
 import { planInputFromRow } from '@/lib/plan-input'
 import { sendEmail, layout } from '@/lib/email'
 import { siteUrl } from '@/lib/site'
+import { randomBytes } from 'node:crypto'
 
 // 유료 일정 생성에 시간이 걸린다. 무료(12.7초)보다 내용이 많아 더 걸린다.
 export const maxDuration = 300
@@ -70,7 +71,17 @@ async function generateFullPlan(formData: FormData) {
     return
   }
 
-  const { error: saveError } = await db.from('plans').update({ full_itinerary: full }).eq('id', planId)
+  /**
+   * 문서와 함께 **열쇠**를 만들어 둔다. 이 값이 주소에 같이 있어야만 열린다.
+   * 24바이트 난수라 맞춰서 여는 것은 사실상 불가능하다.
+   * base64url 이라 주소에 그대로 들어간다 (`+` `/` `=` 가 안 나온다).
+   */
+  const key = randomBytes(24).toString('base64url')
+
+  const { error: saveError } = await db
+    .from('plans')
+    .update({ full_itinerary: full, full_access_key: key })
+    .eq('id', planId)
   if (saveError) {
     // 만들긴 했는데 저장이 안 됐다. 메일을 보내면 손님이 빈 화면을 본다 — 여기서 멈춘다.
     console.error('saving full plan failed:', planId, saveError)
@@ -86,7 +97,7 @@ async function generateFullPlan(formData: FormData) {
   const to = String(formData.get('to') ?? '').trim()
   const name = String(formData.get('name') ?? '').trim()
   if (to) {
-    const url = `${siteUrl()}/plan/${planId}/full`
+    const url = `${siteUrl()}/plan/${planId}/full?k=${key}`
     await sendEmail({
       to,
       subject: '[모할래] 전체 일정이 준비됐습니다',
@@ -116,8 +127,12 @@ export default async function AdminPage() {
   ])
 
   // 어떤 초안이 이미 유료 일정까지 만들어졌는지. 버튼을 두 번 눌러 요금이 두 번 나가는 걸 막는다.
-  const { data: ready } = await db.from('plans').select('id').not('full_itinerary', 'is', null)
-  const fullPlanReady = new Set((ready ?? []).map((p) => p.id))
+  // 열쇠도 같이 가져온다 — 링크에 붙이지 않으면 우리도 못 연다.
+  const { data: ready } = await db
+    .from('plans')
+    .select('id, full_access_key')
+    .not('full_itinerary', 'is', null)
+  const fullPlanKey = new Map((ready ?? []).map((p) => [p.id, p.full_access_key as string | null]))
 
   return (
     <main className="mx-auto max-w-5xl p-6 font-sans">
@@ -153,8 +168,11 @@ export default async function AdminPage() {
                   </a>
                 )}
 
-                {c.plan_id && (fullPlanReady.has(c.plan_id) ? (
-                  <a href={`/plan/${c.plan_id}/full`} className="text-sm font-semibold text-green-700 underline dark:text-green-500">
+                {c.plan_id && (fullPlanKey.has(c.plan_id) ? (
+                  <a
+                    href={`/plan/${c.plan_id}/full${fullPlanKey.get(c.plan_id) ? `?k=${fullPlanKey.get(c.plan_id)}` : ''}`}
+                    className="text-sm font-semibold text-green-700 underline dark:text-green-500"
+                  >
                     전체 일정 보기 (손님에게 보낼 링크)
                   </a>
                 ) : (

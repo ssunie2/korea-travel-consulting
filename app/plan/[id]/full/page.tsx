@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { timingSafeEqual } from "node:crypto";
 import { Instrument_Serif } from "next/font/google";
 import { supabaseServer } from "@/lib/supabase-server";
 import { t } from "@/lib/copy";
@@ -35,8 +36,29 @@ function Places({ title, items }: { title: string; items: PlaceRecommendation[] 
   );
 }
 
-export default async function FullPlanPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+/**
+ * 주소에 실린 열쇠가 맞는지 본다.
+ *
+ * **길이가 다르면 `timingSafeEqual` 이 예외를 던지므로** 먼저 막는다.
+ * 굳이 시간이 일정한 비교를 쓰는 이유 — 값이 비밀이기 때문이다. 24바이트 난수라
+ * 시간을 재서 맞추는 공격이 현실적이지는 않지만, 비밀을 비교하는 자리의 기본이다.
+ */
+function keyMatches(stored: string | null, given: string | undefined): boolean {
+  if (!stored || !given) return false;
+  const a = Buffer.from(stored);
+  const b = Buffer.from(given);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
+
+export default async function FullPlanPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ k?: string }>;
+}) {
+  const [{ id }, { k }] = await Promise.all([params, searchParams]);
 
   const { data, error } = await supabaseServer().from("plans").select("*").eq("id", id).maybeSingle();
   if (error || !data) notFound();
@@ -44,6 +66,17 @@ export default async function FullPlanPage({ params }: { params: Promise<{ id: s
   const plan = data as Plan & { full_itinerary: FullItinerary | null };
   // 아직 만들지 않은 초안의 유료 주소는 존재하지 않는 것으로 취급한다.
   if (!plan.full_itinerary) notFound();
+
+  /**
+   * **열쇠가 맞지 않으면 없는 것으로 취급한다.**
+   *
+   * 무료 초안 주소를 아는 사람이 뒤에 `/full` 만 붙여 $25 짜리 문서를 보던 구멍을 막는다.
+   * 특히 랜딩에 걸린 샘플 초안 네 개는 아이디가 공개 저장소에 적혀 있다.
+   *
+   * "없음"(404)으로 답하는 이유 — "열쇠가 틀렸다"고 알려주면 **그 주소에 문서가 있다는 사실**
+   * 자체가 새어 나간다. 있는지 없는지도 알려주지 않는 편이 낫다.
+   */
+  if (!keyMatches(plan.full_access_key, k)) notFound();
 
   const trip = plan.full_itinerary;
 
