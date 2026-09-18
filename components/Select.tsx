@@ -29,6 +29,7 @@ export default function Select({
   defaultValue = "",
   placeholder,
   className = "",
+  onChange,
 }: {
   name: string;
   /**
@@ -48,6 +49,16 @@ export default function Select({
   /** 아무것도 안 골랐을 때 보이는 글. 이것도 고를 수 있는 항목이 된다 */
   placeholder: string;
   className?: string;
+  /**
+   * 고른 값이 바뀔 때 알려준다. **답에 따라 다른 칸을 보여줘야 할 때만** 쓴다 —
+   * 예를 들어 '아이와 함께' 를 고르면 아이 나이 칸이 나타난다.
+   * 안 넘기면 지금까지처럼 폼이 FormData 로만 읽는다.
+   *
+   * ⚠️ **매 렌더마다 새로 만들어지지 않는 함수를 넘긴다.** `useState` 가 주는
+   * `setX` 는 그대로 넘겨도 되고, 직접 만든 함수라면 `useCallback` 으로 감싼다.
+   * 인라인 화살표 함수를 넘기면 값이 안 바뀌어도 매번 다시 불린다.
+   */
+  onChange?: (value: string) => void;
 }) {
   const [value, setValue] = useState(defaultValue);
   const [otherText, setOtherText] = useState("");
@@ -81,6 +92,12 @@ export default function Select({
   const current = all.find((o) => o.value === value) ?? all[0];
   // 서버로 나가는 값. '기타' 를 골랐으면 적은 글이 답이다.
   const submitted = value === OTHER ? otherText.trim() : value;
+
+  // 밖에서 이 값을 보고 다른 칸을 여닫을 수 있게 알려준다.
+  // `submitted` 를 보내므로 '기타' 에 적은 글도 그대로 따라온다.
+  useEffect(() => {
+    onChange?.(submitted);
+  }, [submitted, onChange]);
 
   // 밖을 누르면 닫는다. 안 하면 목록이 켜진 채로 남아 다른 칸을 가린다.
   useEffect(() => {

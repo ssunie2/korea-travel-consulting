@@ -74,3 +74,34 @@ test('빈 문자열은 답으로 치지 않는다', () => {
   const r = validatePlanInput({ ...good, dietary: ['할랄', '   ', ''] })
   assert.deepEqual(r.ok && r.value.dietary, ['할랄'])
 })
+
+/**
+ * 이슈 #75 로 늘린 칸들. 전부 보기에서 고르는 값이지만,
+ * **폼을 거치지 않고 서버로 직접 보내는 요청**은 보기를 안 거친다.
+ */
+test('#75 로 늘린 칸도 길이를 자른다', () => {
+  const huge = 'A'.repeat(9999)
+  const r = validatePlanInput({
+    ...good,
+    origin: huge, firstDay: huge, lastDay: huge,
+    budgetScope: huge, stayBooked: huge, stayPlace: huge, kidsAges: huge,
+  })
+  assert.ok(r.ok)
+  assert.equal(r.value.origin?.length, 60)
+  assert.equal(r.value.firstDay?.length, 80)
+  assert.equal(r.value.lastDay?.length, 80)
+  assert.equal(r.value.budgetScope?.length, 80)
+  assert.equal(r.value.stayBooked?.length, 40)
+  assert.equal(r.value.stayPlace?.length, 40)
+  assert.equal(r.value.kidsAges?.length, 40)
+})
+
+test('#75 로 늘린 칸은 안 보내도 된다', () => {
+  const r = validatePlanInput(good)
+  assert.ok(r.ok)
+  // 답하지 않은 칸은 AI 에게 아예 전하지 않는다 — 'not specified' 를 보내면
+  // AI 가 그 빈칸을 지어내 채운다 (lib/prompt.ts 의 shape())
+  assert.equal(r.value.origin, undefined)
+  assert.equal(r.value.stayPlace, undefined)
+  assert.equal(r.value.kidsAges, undefined)
+})

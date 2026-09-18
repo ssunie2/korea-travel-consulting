@@ -84,6 +84,15 @@ export function validatePlanInput(raw: unknown): { ok: true; value: PlanInput } 
       visitedBefore: text(d.visitedBefore, 40),
       transport: text(d.transport, 40),
       stayArea: text(d.stayArea, 40),
+      // 이슈 #75 — 일정의 짜임을 바꾸는 답들. 보기에서 고른 값이라 짧지만
+      // 폼을 거치지 않고 서버로 직접 보내는 요청이 있으므로 여기서도 자른다.
+      origin: text(d.origin, 60),
+      firstDay: text(d.firstDay, 80),
+      lastDay: text(d.lastDay, 80),
+      budgetScope: text(d.budgetScope, 80),
+      stayBooked: text(d.stayBooked, 40),
+      stayPlace: text(d.stayPlace, 40),
+      kidsAges: text(d.kidsAges, 40),
       dayRhythm: text(d.dayRhythm, 40),
       occasion: text(d.occasion, 40),
       avoid: list(d.avoid, 8),

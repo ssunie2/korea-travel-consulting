@@ -104,6 +104,50 @@ const BUDGETS = [
   { v: "350,000–500,000 KRW (about $260–370) for the whole trip", ko: "35–50만원 (약 $260–370)" },
   { v: "Over 500,000 KRW (about $370) for the whole trip", ko: "50만원 이상 (약 $370)" },
 ];
+/**
+ * 어디서 오시는지. **도시가 아니라 시차 방향만 묻는다** — 우리에게 필요한 건
+ * "첫날 오후에 무너지는가", "새벽 네 시에 깨는가" 지 정확한 출발지가 아니다.
+ * 유럽에서 오면 첫날 저녁이 버겁고, 북미 서부에서 오면 새벽에 깬다.
+ */
+const ORIGINS = [
+  { v: "East Asia — little or no jet lag", ko: "동아시아 — 일본·중국·대만 등" },
+  { v: "Southeast or South Asia", ko: "동남아·남아시아" },
+  { v: "Europe or the Middle East", ko: "유럽·중동" },
+  { v: "North America", ko: "북미" },
+  { v: "Oceania", ko: "오세아니아" },
+];
+/**
+ * 첫날·마지막날에 **실제로 쓸 수 있는 시간.**
+ *
+ * 항공편 시각을 직접 묻지 않는다 — 아직 표를 안 샀을 수 있고, 우리에게 필요한 건
+ * 정확한 시각이 아니라 **그날 몇 시간을 쓸 수 있나** 다.
+ * 이걸 안 물으면 나흘 여행의 **이틀이 통째로 추측**이 된다.
+ */
+const FIRST_DAYS = [
+  { v: "From the morning — a full first day", ko: "아침부터 — 첫날을 온전히 써요" },
+  { v: "From around midday", ko: "점심쯤부터" },
+  { v: "From the evening", ko: "저녁부터" },
+  { v: "Arriving late at night — the first day is basically gone", ko: "밤늦게 도착 — 첫날은 거의 못 써요" },
+];
+const LAST_DAYS = [
+  { v: "Leaving early in the morning — the last day is basically gone", ko: "아침 일찍 떠나요 — 마지막날은 거의 못 써요" },
+  { v: "Leaving around midday", ko: "점심쯤 떠나요" },
+  { v: "Leaving in the evening", ko: "저녁에 떠나요" },
+  { v: "Staying until late — a full last day", ko: "밤늦게까지 — 마지막날을 온전히 써요" },
+];
+/** 숙소를 이미 잡았는지. 잡았으면 **동선의 기점이 확정**된다 */
+const STAY_BOOKED = [
+  { v: "Already booked", ko: "이미 잡았어요" },
+  { v: "Not booked yet", ko: "아직이요 — 추천해 주세요" },
+];
+/**
+ * 예산에 항공권이 들어 있는지. **이걸 모르면 같은 금액이 세 배로 벌어진다** —
+ * 25–35만원이 항공권 포함이면 한국에서 쓸 돈이 거의 없고, 미포함이면 넉넉하다.
+ */
+const BUDGET_SCOPES = [
+  { v: "Flights are included in that budget", ko: "항공권 포함이에요" },
+  { v: "Flights not included — that is spending money inside Korea", ko: "항공권 빼고, 한국에서 쓸 돈이에요" },
+];
 const CURRENCIES = ["KRW", "USD", "EUR", "JPY"];
 const LANGUAGES = [
   { code: "en", label: "English" },
@@ -145,6 +189,14 @@ export default function PlanForm() {
   const [avoidOtherOn, setAvoidOtherOn] = useState(false);
   const [otherAvoid, setOtherAvoid] = useState("");
   const [styles, setStyles] = useState<string[]>([]);
+  /**
+   * 아래 둘은 **답에 따라 다른 칸을 열기 위해서만** 들고 있다.
+   * 폼 값 자체는 여느 칸과 똑같이 FormData 로 읽는다.
+   */
+  // '아이와 함께' 를 골랐을 때만 나이를 묻는다 — 두 살과 열세 살은 완전히 다른 일정이다
+  const [audience, setAudience] = useState("");
+  // '이미 잡았어요' 를 골랐을 때만 어디인지 묻고, 그때는 '어디쯤이 좋으세요' 를 감춘다
+  const [stayBooked, setStayBooked] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -224,6 +276,14 @@ export default function PlanForm() {
           visitedBefore: f.get("visitedBefore") || undefined,
           transport: f.get("transport") || undefined,
           stayArea: f.get("stayArea") || undefined,
+          // 아래 여섯은 일정의 짜임을 크게 바꾸는 값들이다 (이슈 #75)
+          origin: f.get("origin") || undefined,
+          firstDay: f.get("firstDay") || undefined,
+          lastDay: f.get("lastDay") || undefined,
+          budgetScope: f.get("budgetScope") || undefined,
+          stayBooked: f.get("stayBooked") || undefined,
+          stayPlace: f.get("stayPlace") || undefined,
+          kidsAges: f.get("kidsAges") || undefined,
           dayRhythm: f.get("dayRhythm") || undefined,
           occasion: f.get("occasion") || undefined,
           dietary: dietTyped ? [...dietary, dietTyped] : dietary,
@@ -365,11 +425,39 @@ export default function PlanForm() {
             </div>
           </fieldset>
 
+          {/*
+            **첫날과 마지막날은 온전한 하루가 아닌 경우가 대부분이다.**
+            나흘 여행이라도 밤에 도착해 아침에 떠나면 실제로 쓰는 건 이틀뿐이다.
+            이걸 모르면 AI 가 없는 시간에 일정을 채운다.
+          */}
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Select
+              label={t({ ko: "첫날 언제부터 움직이세요?", en: "When can you start on day one?" })}
+              name="firstDay"
+              options={FIRST_DAYS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+              placeholder={t({ ko: "고르세요", en: "Choose one" })}
+            />
+            <Select
+              label={t({ ko: "마지막날 언제까지 계세요?", en: "How long do you have on the last day?" })}
+              name="lastDay"
+              options={LAST_DAYS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+              placeholder={t({ ko: "고르세요", en: "Choose one" })}
+            />
+          </div>
+
           <div className="grid gap-6 sm:grid-cols-2">
             <label className="block">
               <span className={label}>{t({ ko: "인원 *", en: "Travelers *" })}</span>
               <input type="number" name="travelers" required min={1} max={20} defaultValue={2} className={field} />
             </label>
+            {/* 시차용. 도시가 아니라 방향만 묻는다 */}
+            <Select
+              label={t({ ko: "어디서 오시나요?", en: "Where are you flying from?" })}
+              name="origin"
+              options={ORIGINS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+              placeholder={t({ ko: "고르세요", en: "Choose one" })}
+              allowOther
+            />
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
@@ -389,6 +477,19 @@ export default function PlanForm() {
               name="budgetCurrency"
               defaultValue="USD"
               options={CURRENCIES.map((c) => ({ value: c, label: c }))}
+              placeholder={t({ ko: "고르세요", en: "Choose one" })}
+            />
+          </div>
+
+          {/*
+            **같은 금액이 세 배로 벌어지는 자리다.** 25–35만원이 항공권 포함이면
+            한국에서 쓸 돈이 거의 없고, 미포함이면 넉넉하다. 안 물으면 AI 가 찍는다.
+          */}
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Select
+              label={t({ ko: "그 예산에 항공권도 들어 있나요?", en: "Does that budget include flights?" })}
+              name="budgetScope"
+              options={BUDGET_SCOPES.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
               placeholder={t({ ko: "고르세요", en: "Choose one" })}
             />
           </div>
@@ -445,12 +546,31 @@ export default function PlanForm() {
             )}
           </fieldset>
 
-          <Select
+          <div>
+            <Select
               label={t({ ko: "누구와 가시나요", en: "Who\u2019s coming" })}
               name="audience"
               options={AUDIENCES.map((a) => ({ value: a.v, label: t({ ko: a.ko, en: a.v }) }))}
               placeholder={t({ ko: "고르세요", en: "Choose one" })}
+              onChange={setAudience}
             />
+            {/*
+              **두 살과 열세 살은 완전히 다른 일정이다.** '아이와 함께' 를 고른
+              사람에게만 묻는다 — 나머지 손님에게는 이 칸이 아예 안 보인다.
+            */}
+            {audience === "Family with kids" && (
+              <label className="mt-3 block">
+                <span className={label}>{t({ ko: "아이가 몇 살인가요?", en: "How old are the kids?" })}</span>
+                <input
+                  type="text"
+                  name="kidsAges"
+                  maxLength={40}
+                  className={field}
+                  placeholder={t({ ko: "예: 4살, 9살", en: "e.g. 4 and 9" })}
+                />
+              </label>
+            )}
+          </div>
 
           {/*
             여기부터는 **일정의 짜임을 정하는 답들**이다. 한 개만 고르는 것은 목록 상자로,
@@ -483,12 +603,45 @@ export default function PlanForm() {
                 placeholder={t({ ko: "고르세요", en: "Choose one" })}
               />
 
-            <Select
+            {/*
+              **숙소를 이미 잡았는지가 동선의 기점을 정한다.** 잡았으면 매일 거기서
+              나가 거기로 돌아오고, 안 잡았으면 우리가 추천한다.
+              잡았는데 우리가 딴 데를 추천하면 그 초안은 통째로 쓸모없다.
+            */}
+            <div>
+              <Select
+                label={t({ ko: "숙소는 정하셨나요?", en: "Have you booked a place to stay?" })}
+                name="stayBooked"
+                options={STAY_BOOKED.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
+                placeholder={t({ ko: "고르세요", en: "Choose one" })}
+                onChange={setStayBooked}
+              />
+              {stayBooked === "Already booked" && (
+                <label className="mt-3 block">
+                  <span className={label}>{t({ ko: "어디에 잡으셨나요?", en: "Where is it?" })}</span>
+                  <input
+                    type="text"
+                    name="stayPlace"
+                    maxLength={40}
+                    className={field}
+                    placeholder={t({ ko: "동네나 숙소 이름 — 예: 홍대, 명동", en: "Area or hotel name — e.g. Hongdae, Myeongdong" })}
+                  />
+                </label>
+              )}
+            </div>
+
+            {/*
+              이미 잡은 사람에게 '도심이 좋으세요, 조용한 데가 좋으세요' 를 묻는 건
+              의미가 없다. 그때는 이 칸을 감춘다.
+            */}
+            {stayBooked !== "Already booked" && (
+              <Select
                 label={t({ ko: "숙소는 어디쯤이 좋으세요?", en: "Where would you rather stay?" })}
                 name="stayArea"
                 options={STAY_AREAS.map((o) => ({ value: o.v, label: t({ ko: o.ko, en: o.v }) }))}
                 placeholder={t({ ko: "고르세요", en: "Choose one" })}
               />
+            )}
 
             <Select
                 label={t({ ko: "하루를 언제 시작하세요?", en: "When do you start your day?" })}
