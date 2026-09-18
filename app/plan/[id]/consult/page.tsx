@@ -180,12 +180,30 @@ export default async function ConsultPage({
         </button>
 
         <p className="mt-4 text-sm leading-relaxed text-[var(--c-text-3)]">
+          {/*
+            **돈이 시작되는 지점이라 세 문서를 여기서 보여준다.**
+            통신판매는 이용약관과 환불 규정을 사기 전에 볼 수 있게 두는 것이 표시 의무다.
+          */}
           {t({ ko: "보내시면", en: "By sending this you agree to our" })}{" "}
           <Link
             href="/privacy"
             className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
           >
             {t({ ko: "개인정보 처리방침", en: "privacy policy" })}
+          </Link>
+          {t({ ko: " · ", en: ", " })}
+          <Link
+            href="/terms"
+            className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+          >
+            {t({ ko: "이용약관", en: "terms" })}
+          </Link>
+          {t({ ko: " · ", en: " and " })}
+          <Link
+            href="/refund"
+            className="underline underline-offset-4 hover:text-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+          >
+            {t({ ko: "취소·환불 규정", en: "refund policy" })}
           </Link>
           {t({ ko: "에 동의하시는 것으로 봅니다. 남기신 정보는 이 여행 건에만 씁니다.", en: ". We only use your details to reply about this trip." })}
         </p>

@@ -1336,6 +1336,19 @@ export default async function Home() {
                 >
                   {t({ ko: "개인정보 처리방침", en: "Privacy" })}
                 </Link>
+                {/* 통신판매는 이 둘을 손님이 볼 수 있게 두는 것이 표시 의무다 */}
+                <Link
+                  href="/terms"
+                  className="underline underline-offset-4 hover:text-[var(--c-text)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+                >
+                  {t({ ko: "이용약관", en: "Terms" })}
+                </Link>
+                <Link
+                  href="/refund"
+                  className="underline underline-offset-4 hover:text-[var(--c-text)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--c-focus)]"
+                >
+                  {t({ ko: "취소·환불", en: "Refunds" })}
+                </Link>
               </span>
             </div>
           </div>
