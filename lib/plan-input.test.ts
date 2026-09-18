@@ -12,7 +12,7 @@ import type { Plan } from './types.ts'
  */
 
 /** 답이 아니라 관리용이라 AI 에게 안 넘기는 칸 */
-const NOT_ANSWERS = new Set(['id', 'created_at', 'itinerary', 'dietary_notes', 'interests'])
+const NOT_ANSWERS = new Set(['id', 'created_at', 'itinerary', 'dietary_notes', 'interests', 'full_access_key'])
 
 /** `stay_place` → `stayPlace` */
 const camel = (k: string) => k.replace(/_([a-z])/g, (_, c) => c.toUpperCase())
@@ -31,6 +31,8 @@ const row: Plan = {
   avoid: ['Crowded places'], dietary: ['Halal'],
   dietary_notes: null, interests: null,
   language: 'ko', itinerary: null,
+  // 답이 아니라 유료 문서를 여는 열쇠다 (NOT_ANSWERS 참고)
+  full_access_key: null,
 }
 
 test('DB 의 답이 AI 입력으로 하나도 안 새고 넘어간다', () => {

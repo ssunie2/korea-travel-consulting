@@ -231,6 +231,14 @@ export type Plan = {
   interests: string | null
   language: string
   itinerary: FreeItinerary | null
+  /**
+   * 유료 전체 일정을 여는 열쇠. **주소에 이 값이 같이 있어야만** 문서가 열린다.
+   * 전체 일정을 만들 때 채운다. 아직 안 만든 초안은 `null` 이다.
+   *
+   * 회원가입이 없는 서비스라 이 방식을 쓴다 — 무료 초안은 주소만 알면 열리는 것이
+   * 의도지만(그 링크가 회원가입을 대신한다), **돈을 낸 문서까지 그러면 안 된다.**
+   */
+  full_access_key: string | null
 }
 
 export type ConsultationStatus = 'received' | 'in_progress' | 'done' | 'cancelled'
