@@ -19,7 +19,7 @@
 }
 .brand { font-size: 28px; font-weight: 650; letter-spacing: -1.2px; }
 .beta { color: var(--c-text-3); font-size: 12px; display: flex; align-items: center; gap: 10px; }
-.beta > span { border: 1px solid var(--c-line); padding: 3px 7px; color: var(--c-accent-soft); }
+.beta > span { visibility: hidden; border: 1px solid var(--c-line); padding: 3px 7px; color: var(--c-accent-soft); }
 .main { width: min(1200px, calc(100% - 96px)); margin: 38px auto 60px; flex: 1; }
 .topline { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
 .kicker { font-size: 12px; letter-spacing: .06em; color: var(--c-text-3); }
