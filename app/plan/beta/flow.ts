@@ -124,52 +124,119 @@ export const PACES: Choice[] = [
   { id: "full", title: "한 장면이라도 더", description: "발견하는 즐거움으로 채울래요" },
 ];
 
-export type Step = "city" | "experience" | "detail" | "company" | "children" | "pace" | "summary";
-export type Answers = Partial<Record<Exclude<Step, "summary">, string>>;
+export const BUDGETS: Choice[] = [
+  { id: "under150", title: "15만원 미만", description: "꼭 하고 싶은 것 중심으로" },
+  { id: "150to250", title: "15–25만원", description: "작은 즐거움을 하나씩" },
+  { id: "250to350", title: "25–35만원", description: "마음에 드는 경험을 골라서" },
+  { id: "350to500", title: "35–50만원", description: "먹거리도, 즐길 거리도" },
+  { id: "over500", title: "50만원 이상", description: "좋아하는 경험에 여유 있게" },
+  { id: "undecided", title: "아직 정하지 않았어요", description: "취향부터 알아가는 중이에요" },
+];
+
+type Question = "city" | "experience" | "detail" | "company" | "children" | "pace" | "dates" | "travelers" | "budget" | "summary";
+export type Step = Exclude<Question, "experience" | "detail"> | `experience:${string}` | `detail:${string}:${string}`;
+export type Answers = Partial<Record<Step, string[]>>;
 export type FlowState = { step: Step; answers: Answers };
 export const INITIAL_STATE: FlowState = { step: "city", answers: {} };
 
-export function selectedTrip(answers: Answers) {
-  const city = CITIES.find((item) => item.id === answers.city);
-  const experience = city?.experiences.find((item) => item.id === answers.experience);
-  return {
-    city, experience,
-    detail: experience?.details.find((item) => item.id === answers.detail),
-    company: COMPANIONS.find((item) => item.id === answers.company),
-    children: CHILDREN.find((item) => item.id === answers.children),
-    pace: PACES.find((item) => item.id === answers.pace),
-  };
+export function selectedCities(answers: Answers) {
+  return (answers.city ?? []).flatMap((id) => CITIES.filter((city) => city.id === id));
+}
+
+export function stepContext(state: FlowState) {
+  const [kind, cityId, experienceId] = state.step.split(":");
+  const city = CITIES.find((item) => item.id === cityId) ?? selectedCities(state.answers)[0];
+  const experience = city?.experiences.find((item) => item.id === experienceId);
+  return { kind: kind as Question, city, experience };
+}
+
+export function isMultiple(step: Step) {
+  return step === "city" || step.startsWith("experience:") || step.startsWith("detail:");
 }
 
 export function stepOrder(answers: Answers): Step[] {
-  return ["city", "experience", "detail", "company", ...(answers.company === "children" ? ["children" as const] : []), "pace", "summary"];
+  const steps: Step[] = ["city"];
+  for (const city of selectedCities(answers)) {
+    steps.push(`experience:${city.id}`);
+    for (const experience of city.experiences) {
+      if (answers[`experience:${city.id}`]?.includes(experience.id)) steps.push(`detail:${city.id}:${experience.id}`);
+    }
+  }
+  return [...steps, "company", ...(answers.company?.[0] === "children" ? ["children" as const] : []), "pace", "dates", "travelers", "budget", "summary"];
 }
 
 export function choicesFor(state: FlowState): Choice[] {
-  const { city, experience } = selectedTrip(state.answers);
-  switch (state.step) {
+  const { kind, city, experience } = stepContext(state);
+  switch (kind) {
     case "city": return CITIES;
     case "experience": return city?.experiences ?? [];
     case "detail": return experience?.details ?? [];
     case "company": return COMPANIONS;
     case "children": return CHILDREN;
     case "pace": return PACES;
+    case "budget": return BUDGETS;
     default: return [];
   }
 }
 
-export function flowReducer(state: FlowState, action: { type: "choose"; value: string } | { type: "back" } | { type: "reset" }): FlowState {
+export function localToday() {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+export function stepError(state: FlowState, today = localToday()): string | null {
+  const values = state.answers[state.step] ?? [];
+  if (state.step === "summary") return null;
+  if (state.step === "dates") {
+    const [start, end] = values;
+    if (!start || !end) return "가는 날과 오는 날을 모두 골라주세요.";
+    const valid = [start, end].every((value) => /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value);
+    if (!valid) return "달력에 있는 날짜를 골라주세요.";
+    if (start < today) return "가는 날은 오늘 이후로 골라주세요.";
+    if (end < start) return "오는 날은 가는 날과 같거나 뒤여야 해요.";
+    if ((Date.parse(end) - Date.parse(start)) / 86400000 >= 30) return "여행 기간은 최대 30일까지 골라주세요.";
+    return null;
+  }
+  if (state.step === "travelers") {
+    const count = Number(values[0]);
+    if (!values[0] || !Number.isInteger(count) || count < 1 || count > 20) return "인원은 1명부터 20명까지 적어주세요.";
+    if (state.answers.company?.[0] === "solo" && count !== 1) return "혼자 여행을 골랐어요. 인원은 1명으로 적거나 동행 선택을 바꿔주세요.";
+    if (state.answers.company?.[0] !== "solo" && count < 2) return "함께하는 여행은 본인을 포함해 2명 이상으로 적어주세요.";
+    return null;
+  }
+  return values.length && values.every((id) => choicesFor(state).some((choice) => choice.id === id)) ? null : "마음에 드는 항목을 하나 이상 골라주세요.";
+}
+
+type Action = { type: "choose"; value: string } | { type: "input"; values: string[] } | { type: "next"; from: Step } | { type: "back" } | { type: "reset" };
+
+export function flowReducer(state: FlowState, action: Action): FlowState {
   if (action.type === "reset") return INITIAL_STATE;
   const order = stepOrder(state.answers);
   const index = order.indexOf(state.step);
   if (action.type === "back") return { ...state, step: order[Math.max(0, index - 1)] };
+  if (action.type === "next") {
+    // 이전 화면에서 발생한 중복 클릭으로 다음 질문까지 건너뛰지 않는다.
+    if (action.from !== state.step || stepError(state) || state.step === "summary") return state;
+    return { ...state, step: order[index + 1] };
+  }
+  if (action.type === "input") {
+    if (state.step !== "dates" && state.step !== "travelers") return state;
+    return { ...state, answers: { ...state.answers, [state.step]: action.values } };
+  }
   if (!choicesFor(state).some((choice) => choice.id === action.value)) return state;
 
-  // 앞쪽 답을 바꾸면 뒤쪽 답은 지운다. 다른 도시의 취향이 요약에 섞이지 않는다.
-  const answers: Answers = {};
-  for (const key of order.slice(0, index)) {
-    if (key !== "summary" && state.answers[key]) answers[key] = state.answers[key];
+  const current = state.answers[state.step] ?? [];
+  const values = isMultiple(state.step) ? (current.includes(action.value) ? current.filter((id) => id !== action.value) : [...current, action.value]) : [action.value];
+  const answers: Answers = { ...state.answers, [state.step]: values };
+  if (state.step === "company" && current[0] !== action.value) {
+    delete answers.travelers;
+    if (action.value === "solo") answers.travelers = ["1"];
+    if (action.value === "couple") answers.travelers = ["2"];
   }
-  if (state.step !== "summary") answers[state.step] = action.value;
-  return { step: stepOrder(answers)[index + 1], answers };
+  // 없어진 도시·활동의 답만 제거한다. 여전히 유효한 다른 답은 보존한다.
+  const activeSteps = stepOrder(answers);
+  for (const key of Object.keys(answers) as Step[]) {
+    if (!activeSteps.includes(key)) delete answers[key];
+  }
+  return { ...state, answers };
 }
