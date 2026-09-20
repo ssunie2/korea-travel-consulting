@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { t } from "@/lib/copy";
+import { todayKey } from "@/lib/date";
 
 /**
  * 가는 날·오는 날을 달력에서 고른다.
@@ -23,7 +24,7 @@ function monthInfo(year: number, month: number) {
   return { startWeekday: first.getUTCDay(), days };
 }
 
-/** 'YYYY-MM-DD'. 시간대에 따라 하루가 밀리지 않도록 UTC 로만 계산한다 */
+/** 'YYYY-MM-DD'. 받은 숫자를 그대로 붙인다 — 달력 칸은 monthInfo 가 UTC 로 만든다 */
 function key(year: number, month: number, day: number) {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
@@ -119,7 +120,8 @@ export default function DateRangePicker({
   /** 일정은 최대 30일까지 만든다. 30일 = 29박 */
   maxNights?: number;
 }) {
-  const todayKey = new Date().toISOString().slice(0, 10);
+  // 손님이 보는 달력의 오늘. 세계표준시로 세면 하루 어긋난다 (이슈 #83)
+  const today = todayKey();
   const [open, setOpen] = useState(false);
   /**
    * 지금 어느 칸을 고르는 중인지. **이게 없으면 눌러도 아무 표시가 없어서**
@@ -129,7 +131,7 @@ export default function DateRangePicker({
   const [picking, setPicking] = useState<"start" | "end">("start");
   // 왼쪽에 보이는 달. 고른 날이 있으면 그 달부터 연다.
   const [cursor, setCursor] = useState(() => {
-    const base = start ? new Date(`${start}T00:00:00Z`) : new Date();
+    const base = new Date(`${start ?? todayKey()}T00:00:00Z`);
     return { year: base.getUTCFullYear(), month: base.getUTCMonth() };
   });
 
@@ -137,7 +139,7 @@ export default function DateRangePicker({
 
   function pick(dayKey: string) {
     // 지나간 날은 못 고른다
-    if (dayKey < todayKey) return;
+    if (dayKey < today) return;
 
     // '가는 날' 을 고르는 중 → 가는 날을 놓고 곧바로 '오는 날' 차례로 넘긴다.
     // 넘겨 주지 않으면 손님이 오는 날 칸을 따로 눌러야 하는데, 그걸 모른다.
@@ -244,7 +246,7 @@ export default function DateRangePicker({
           </div>
 
           <div className="flex gap-8">
-            <Month year={cursor.year} month={cursor.month} start={start} end={end} todayKey={todayKey} onPick={pick} />
+            <Month year={cursor.year} month={cursor.month} start={start} end={end} todayKey={today} onPick={pick} />
             {/* 둘째 달은 PC 에서만. 폰에서는 칸이 좁아져 누르기 어렵다 */}
             <div className="hidden flex-1 md:block">
               <Month
@@ -252,7 +254,7 @@ export default function DateRangePicker({
                 month={(cursor.month + 1) % 12}
                 start={start}
                 end={end}
-                todayKey={todayKey}
+                todayKey={today}
                 onPick={pick}
               />
             </div>

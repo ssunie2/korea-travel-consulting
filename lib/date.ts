@@ -44,3 +44,19 @@ export function dateRange(startDate: string, days: number) {
     })(),
   })
 }
+
+/**
+ * 오늘이 며칠인지, **손님이 보는 달력 기준으로.**
+ *
+ * 위 두 함수와 달리 이것만 현지 시간대로 센다. 세는 대상이 다르기 때문이다.
+ * 여행 날짜(`2026-10-04`)는 어느 나라에서 보든 같은 10월 4일이라 UTC 로 세는 게 맞다.
+ * 하지만 "오늘"은 **손님 손목시계 기준**이다.
+ *
+ * UTC 로 세면 이렇게 어긋난다 (이슈 #83).
+ * - 뉴욕에서 20일 저녁 8시 → UTC 는 이미 21일 → 손님 달력의 **오늘이 회색으로 막힌다**
+ * - 서울에서 21일 새벽 2시 → UTC 는 아직 20일 → **어제가 열린다**
+ */
+export function todayKey(now = new Date()) {
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`
+}
