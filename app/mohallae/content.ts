@@ -49,6 +49,11 @@ export const commonPlan: Pair<string> = { ko: "흔한 계획", en: "Common plan"
 
 /**
  * 고쳐 쓰기 띠. **흔한 계획 → 현지인 팁.** 기존 TIPS 4개의 순서와 내용 그대로, 한 줄 길이로 줄였다.
+ *
+ * 사실 확인 (2026-10-06): 남산 버스 번호만 고쳤다. 기존 문구의 01·02·05번은 예전 번호이고,
+ * 지금 N서울타워까지 가는 녹색순환버스는 01A·01B번이다 (서울의 공원 남산공원 안내).
+ * 남산은 2005년부터 일반 승용차와 택시가 못 올라간다 — 그래서 '택시' 계획을 고치는 팁에 택시를 넣었다.
+ * 북촌 관람 시간(레드존 10~17시, 2025년 3월부터 과태료)과 경복궁 화요일 휴관은 그대로 맞다.
  * `place` 는 화면 낭독기가 문장 앞에 읽는다.
  */
 export const corrections: { place: Pair<string>; plan: Pair<string>; tip: Pair<string> }[] = [
@@ -92,8 +97,8 @@ export const corrections: { place: Pair<string>; plan: Pair<string>; tip: Pair<s
       en: "Take a taxi to the tower entrance.",
     },
     tip: {
-      ko: "남산은 자가용이 못 올라갑니다. 케이블카나 01·02·05번 버스를 타세요.",
-      en: "No private cars up Namsan\u00A0— take the cable car or bus 01, 02, 05.",
+      ko: "택시도 자가용도 못 올라갑니다. 케이블카나 01A·01B번 버스를 타세요.",
+      en: "No taxis or cars up Namsan\u00A0— take the cable car or bus 01A/01B.",
     },
   },
 ];
@@ -179,8 +184,8 @@ export const draftDay = {
   ] as { time: string; place: Pair<string>; image: "bukchon" | "gwangjang" | "namsan"; fix?: number }[],
   // 패널 안의 팁은 띠보다 자리가 넉넉해서 원래 팁에 더 가깝게 쓴다.
   longTip: {
-    ko: "남산은 자가용이 못 올라갑니다. 명동에서 케이블카를 타거나 01·02·05번 버스를 타세요.",
-    en: "Private cars can't drive up Namsan. Take the cable car from Myeongdong, or bus 01, 02 or 05.",
+    ko: "남산은 택시와 자가용이 못 올라갑니다. 명동에서 케이블카를 타거나 01A·01B번 버스를 타세요.",
+    en: "Taxis and private cars can't drive up Namsan. Take the cable car from Myeongdong, or bus 01A or 01B.",
   },
 };
 
