@@ -1,0 +1,322 @@
+/*
+  새 랜딩(/mohallae) 전용 스타일. CSS Module 이라 이 화면 밖으로 새지 않는다.
+  배치·글자 크기 대부분은 각 파일의 Tailwind 이름표에 있고, 여기에는
+  ① 색 이름(토큰) ② 사진 위 어둡게 깔기 ③ 고쳐 쓰기 움직임 처럼 이름표로 쓰기 어려운 것만 둔다.
+
+  색 규칙 (시안 ②의 방향 계약):
+  - 흰 바탕, 거의 검정 글자, 산세리프 하나.
+  - **선명한 빨강은 줄 긋기와 LOCAL TIP 에만.** 다른 곳에 쓰지 않는다.
+*/
+
+.page {
+  --m-ink: #0e1428;        /* 본문·제목 — 흰 바탕 18:1 */
+  --m-ink-2: #4b5161;      /* 보조 글 — 7.9:1 */
+  --m-ink-3: #6b7080;      /* 시간·작은 설명 — 4.9:1 */
+  --m-line: #e6e8ee;
+  --m-band: #f4f6f9;       /* 회색 띠 섹션 바탕 */
+  --m-red: #e0242a;        /* 팁 글자 — 흰 바탕 4.7:1 */
+  --m-strike: #f82a27;     /* 줄 — 선이라 3:1 이면 된다 (3.9:1) */
+  --m-gray-struck: #5f5c62;/* 지운 계획 — 6.6:1 */
+  --m-radius: 20px;
+  --m-shadow: 0 1px 2px rgb(14 20 40 / 0.06), 0 10px 30px -14px rgb(14 20 40 / 0.28);
+
+  min-height: 100%;
+  background: #fff;
+  color: var(--m-ink);
+  font-family: var(--font-figtree), "Apple SD Gothic Neo", Pretendard, "Noto Sans KR", "Noto Sans CJK KR", "Malgun Gothic", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.page ::selection { background: var(--m-ink); color: #fff; }
+
+/* 가로 폭 — 시안에서 내용은 화면 폭 1344 일 때 90~1255 사이에 있다 */
+.wrap {
+  width: min(100% - 2 * clamp(20px, 6.7vw, 160px), 1600px);
+  margin-inline: auto;
+}
+
+/* ── 첫 화면 ───────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: max(480px, 70.5svh);
+  color: #fff;
+  background: #2b2622; /* 사진이 뜨기 전 */
+}
+.heroImg { z-index: -2; object-fit: cover; object-position: 62% 45%; }
+@media (min-width: 768px) { .heroImg { object-position: center 40%; } }
+
+/* 사진 위 흰 글자가 읽히도록 **글자가 있는 곳만** 어둡게 깐다 (접근성: 내비 4.5:1, 제목 3:1).
+   맨 위 띠 = 내비, 가운데 타원 = 제목·띠·버튼, 맨 아래 = 사진이 흰 바탕으로 끝나는 자리.
+   나머지 하늘과 골목은 시안처럼 밝게 둔다. */
+.heroScrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgb(10 12 24 / 0.62) 0%, rgb(10 12 24 / 0.52) 9%, rgb(10 12 24 / 0) 20%),
+    radial-gradient(44% 34% at 50% 40%, rgb(10 12 24 / 0.36), rgb(10 12 24 / 0) 100%),
+    linear-gradient(0deg, rgb(10 12 24 / 0.32) 0%, rgb(10 12 24 / 0) 30%);
+}
+.headline { text-shadow: 0 2px 28px rgb(10 12 24 / 0.28); }
+.heroNav { text-shadow: 0 1px 12px rgb(10 12 24 / 0.35); }
+.heroNote { text-shadow: 0 1px 10px rgb(10 12 24 / 0.45); }
+
+/* ── 고쳐 쓰기 띠 ───────────────────────────────────
+   한 바퀴 24초 = 팁 4개 × 6초. 팁 i 는 i × 6초 늦게 같은 움직임을 탄다.
+   한 팁의 6초(= 한 바퀴의 25%) 안에서:
+     0–2%   흔한 계획이 나타난다
+     3–8%   빨간 줄이 왼쪽에서 오른쪽으로 그어진다 (1.2초)
+     8–11%  화살표, 이어서 팁이 들어온다
+     11–23% 머문다 (약 3초)
+     23–25% 사라지고 다음 팁에게 자리를 준다
+   움직임 줄이기 설정이면 아래 기본값(첫 팁을 고쳐 쓴 상태)만 남는다.
+   자바스크립트를 쓰지 않는다 — 서버가 그린 그대로 돌고, 스크립트가 늦어도 멈춰 있지 않다. */
+
+.strip {
+  position: relative;
+  width: min(676px, 100%);
+  border-radius: 9999px;
+  background: #fff;
+  color: var(--m-ink);
+  box-shadow: 0 12px 34px -16px rgb(10 12 24 / 0.55);
+  padding: 9px 20px 9px 32px;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  outline: none;
+  text-align: left;
+}
+.strip:focus-visible { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--m-ink), 0 12px 34px -16px rgb(10 12 24 / 0.55); }
+.stripTrack { display: grid; }
+.stripItem {
+  grid-area: 1 / 1;
+  display: grid;
+  /* 시안: 지운 계획 304px · 화살표 26px · 팁 243px (화면 폭 1344 기준). 계획은 한 줄, 팁은 두 줄 */
+  grid-template-columns: minmax(0, 1.25fr) 26px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 21px;
+  opacity: 0;
+  visibility: hidden;
+}
+@media (min-width: 700px) {
+  .stripItem { grid-template-columns: 304px 26px minmax(0, 1fr); column-gap: 21px; }
+  .stripTipBox { margin-left: 1px; }
+}
+@media (min-width: 700px) and (max-width: 1023px) {
+  .stripItem { grid-template-columns: 284px 26px minmax(0, 1fr); }
+  .stripPlan { font-size: 14.5px; }
+  .stripTip { font-size: 14px; }
+}
+/* PC 에서는 띠도 화면 폭에 비례한다 (시안: 1344 폭에서 676 = 50.3vw). 계획:팁 = 49:39 */
+@media (min-width: 1024px) {
+  .strip { width: clamp(680px, 50.3vw, 780px); }
+  .stripItem { grid-template-columns: minmax(300px, 49fr) 26px minmax(0, 39fr); }
+}
+.stripItem:first-child { opacity: 1; visibility: visible; }
+.stripPlan { margin: 0; color: var(--m-gray-struck); font-size: 15px; line-height: 1.35; font-weight: 500; }
+.struck {
+  background-image: linear-gradient(var(--m-strike), var(--m-strike));
+  background-repeat: no-repeat;
+  background-position: 0 56%;
+  background-size: 100% 2px;
+  -webkit-box-decoration-break: slice;
+  box-decoration-break: slice;
+}
+.stripArrow { width: 26px; height: 18px; color: var(--m-strike); }
+.tipLabel {
+  margin: 0 0 2px;
+  color: var(--m-red);
+  font-size: 10px; /* 시안은 ≈9px — 읽기 쉽게 10px 을 바닥으로 둔다 */
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+/* 한글에는 영문 대문자용 자간을 주지 않는다 */
+.tipLabel:lang(ko), .tipBadge:lang(ko) { letter-spacing: 0; }
+.stripTip { margin: 0; color: var(--m-red); font-size: 14.5px; line-height: 1.32; font-weight: 600; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .stripItem,
+  .stripItem:first-child {
+    visibility: visible;
+    animation: strip-item 24s calc(var(--i) * 6s) infinite both;
+  }
+  .stripItem .struck { animation: strip-strike 24s calc(var(--i) * 6s) infinite both; }
+  .stripItem .stripArrow { animation: strip-arrow 24s calc(var(--i) * 6s) infinite both; }
+  .stripItem .stripTipBox { animation: strip-tip 24s calc(var(--i) * 6s) infinite both; }
+
+  /* 멈춤: 마우스를 올리거나, 탭 키·터치로 띠에 초점이 가면 (WCAG 2.2.2) */
+  .strip:hover :is(.stripItem, .struck, .stripArrow, .stripTipBox),
+  .strip:focus-within :is(.stripItem, .struck, .stripArrow, .stripTipBox) {
+    animation-play-state: paused;
+  }
+}
+@keyframes strip-item {
+  0% { opacity: 0; }
+  2%, 23% { opacity: 1; }
+  25%, 100% { opacity: 0; }
+}
+@keyframes strip-strike {
+  0%, 3% { background-size: 0% 2px; }
+  8%, 100% { background-size: 100% 2px; }
+}
+@keyframes strip-arrow {
+  0%, 8% { opacity: 0; transform: translateX(-6px); }
+  10%, 100% { opacity: 1; transform: none; }
+}
+@keyframes strip-tip {
+  0%, 9% { opacity: 0; transform: translateX(-8px); }
+  11.5%, 100% { opacity: 1; transform: none; }
+}
+
+/* 휴대폰: 위(지운 계획) / 아래(팁) 두 줄로 쌓는다 (기획서 10장) */
+@media (max-width: 639px) {
+  .strip { border-radius: 22px; padding: 14px 18px 16px; }
+  .stripItem { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
+  .stripArrow { display: none; }
+  .stripPlan, .stripTip { font-size: 15px; }
+}
+
+/* ── 샘플 카드 ───────────────────────────────────── */
+
+.card {
+  position: relative; /* 안의 화면 낭독기용 글(sr-only)이 옆으로 넘치는 카드 줄 밖으로 새지 않게 */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(14 20 40 / 0.07), 0 8px 22px -12px rgb(14 20 40 / 0.3);
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s;
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgb(14 20 40 / 0.07), 0 16px 30px -14px rgb(14 20 40 / 0.35); }
+.card:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
+.cardPhoto { position: relative; aspect-ratio: 30 / 11; background: var(--m-band); }
+
+/* 폰: 옆으로 넘기는 줄. 다음 카드가 살짝 보여서 넘길 수 있다는 걸 알린다 */
+.cardRow {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(78%, 300px);
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: clamp(20px, 6.7vw, 90px);
+  padding: 6px clamp(20px, 6.7vw, 90px) 18px;
+  margin-inline: calc(-1 * clamp(20px, 6.7vw, 90px));
+  scrollbar-width: none;
+}
+.cardRow::-webkit-scrollbar { display: none; }
+.cardRow > * { scroll-snap-align: start; }
+@media (min-width: 640px) {
+  .cardRow {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-columns: auto;
+    overflow: visible;
+    padding: 6px 0 18px;
+    margin-inline: 0;
+    gap: 20px;
+  }
+}
+@media (min-width: 1024px) { .cardRow { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(18px, 1.56vw, 28px); } }
+
+/* ── 초안 속 하루 (시안 ③) ──────────────────────── */
+
+.panel {
+  border-radius: var(--m-radius);
+  background: #fff;
+  box-shadow: var(--m-shadow);
+}
+.timeline { position: relative; --thumb: 64px; --gap: 14px; }
+@media (min-width: 640px) { .timeline { --thumb: 112px; --gap: 22px; } }
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--thumb) + var(--gap) + 3.5px);
+  top: 14px;
+  bottom: 14px;
+  width: 1px;
+  background: var(--m-line);
+}
+.dot { width: 8px; height: 8px; border-radius: 9999px; background: var(--m-ink-3); box-shadow: 0 0 0 4px #fff; }
+/* 현지 팁 묶음. 시안 ③처럼 지운 계획 쪽을 가리키는 빨간 중괄호({)가 앞에 붙는다. */
+.bracket { position: relative; padding-left: 24px; }
+.brace {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 14px;
+  height: calc(100% - 4px);
+  color: var(--m-strike);
+  overflow: visible;
+}
+@media (min-width: 640px) {
+  .bracket { padding-left: 28px; }
+  .brace { width: 16px; }
+}
+/* 시안 ③의 빨간 'LOCAL TIP' 딱지. 흰 글자 / 빨강 4.7:1 */
+.tipBadge {
+  display: inline-block;
+  margin: 0;
+  padding: 3px 7px 2px;
+  border-radius: 6px;
+  background: var(--m-red);
+  color: #fff;
+  font-size: 10.5px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* 패널이 화면에 들어올 때 한 번만 줄을 긋는다. 기본값은 고쳐 쓴 상태 —
+   스크립트(PlayOnView)가 '아직 안 보임' 을 확인했을 때만 처음 상태로 되돌려 둔다. */
+[data-motion="armed"] .panelStrike { background-size: 0% 2px; }
+[data-motion="armed"] .panelTip { opacity: 0; transform: translateX(-10px); }
+[data-motion="play"] .panelStrike { animation: panel-strike 0.9s 0.25s cubic-bezier(0.6, 0, 0.3, 1) both; }
+[data-motion="play"] .panelTip { animation: panel-tip 0.5s 1.05s ease-out both; }
+@keyframes panel-strike { from { background-size: 0% 2px; } to { background-size: 100% 2px; } }
+@keyframes panel-tip { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+
+/* ── 버튼 ────────────────────────────────────────── */
+/* Tailwind 이름표(hidden, sm:inline-flex …)가 이기도록 components 층에 둔다.
+   층에 넣지 않은 CSS 는 Tailwind 의 utilities 층보다 항상 이겨서, 폰에서 숨긴 버튼이 보였다. */
+@layer components {
+  .pillLight, .pillDark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s;
+  }
+  .pillLight { background: #fff; color: var(--m-ink); }
+  .pillLight:hover { background: #eef0f4; }
+  .pillDark { background: var(--m-ink); color: #fff; }
+  .pillDark:hover { background: #262d45; }
+  .pillLight:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .pillDark:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
+  .pillLight:active, .pillDark:active { transform: scale(0.98); }
+  .pillHero { font-weight: 700; }
+}
+
+.navLink { border-radius: 6px; }
+.navLink:hover { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+.navLink:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+
+.textLink { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); }
+.textLink:hover { text-decoration-color: currentColor; }
+.textLink:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; border-radius: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .pillLight, .pillDark { transition: none; }
+  .card:hover { transform: none; }
+}
