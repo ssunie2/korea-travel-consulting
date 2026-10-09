@@ -7,8 +7,8 @@ import type { FreeItinerary } from "@/lib/types";
 import base from "../../mohallae.module.css";
 import styles from "./plan.module.css";
 import { draftCopy } from "./copy";
-import { placeName, tripDates } from "./format";
-import { langFrom } from "../../content";
+import { keepNumberWithWord, placeName, tripDates } from "./format";
+import { langFrom, samples } from "../../content";
 import TopBar from "./_components/TopBar";
 import DayColumn from "./_components/DayColumn";
 import LocalTip from "./_components/LocalTip";
@@ -61,11 +61,15 @@ export default async function DraftPage({ params, searchParams }: PageProps<"/mo
 
   const trip = draft.itinerary;
 
+  // 랜딩의 샘플 카드로 들어온 남의 초안인지. 그렇다면 '무료 초안'·링크 보관·$25 버튼 대신
+  // '샘플 초안' 표시와 '무료 초안 받기'(내 여행으로)를 보여 준다 — 남의 여행으로 신청이 들어가지 않게.
+  const isSample = samples.items.some((s) => s.id === draft.id);
+
   // AI 생성이 실패한 채 저장된 경우. 빈 화면 대신 다시 해 볼 길을 준다 (예전 화면과 같은 글).
   if (!trip) {
     return (
       <div lang={lang} className={`${base.page} flex flex-1 flex-col`}>
-        <TopBar lang={lang} planId={draft.id} />
+        <TopBar lang={lang} planId={draft.id} isSample={isSample} />
         <main className={`${styles.wrap} ${styles.failed}`}>
           <h1>{draftCopy.failedTitle[lang]}</h1>
           <p>{draftCopy.failedBody[lang]}</p>
@@ -99,7 +103,7 @@ export default async function DraftPage({ params, searchParams }: PageProps<"/mo
 
   return (
     <div lang={lang} className={`${base.page} flex flex-1 flex-col`}>
-      <TopBar lang={lang} planId={draft.id} />
+      <TopBar lang={lang} planId={draft.id} isSample={isSample} />
 
       <main className="flex flex-1 flex-col">
         <div className={styles.wrap}>
@@ -118,7 +122,7 @@ export default async function DraftPage({ params, searchParams }: PageProps<"/mo
                   </span>
                 ))}
               </p>
-              <h1 className={styles.title}>{trip.tripTitle}</h1>
+              <h1 className={styles.title}>{keepNumberWithWord(trip.tripTitle)}</h1>
             </div>
             <p className={styles.summary}>{trip.summary}</p>
           </div>
@@ -142,7 +146,7 @@ export default async function DraftPage({ params, searchParams }: PageProps<"/mo
           )}
         </div>
 
-        <ClosingBand planId={draft.id} trip={trip} lang={lang} />
+        <ClosingBand planId={draft.id} trip={trip} lang={lang} isSample={isSample} />
       </main>
     </div>
   );

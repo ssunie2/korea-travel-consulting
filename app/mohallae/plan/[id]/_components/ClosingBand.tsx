@@ -3,7 +3,7 @@ import type { FreeItinerary } from "@/lib/types";
 import base from "../../../mohallae.module.css";
 import styles from "../plan.module.css";
 import { draftCopy } from "../copy";
-import type { Lang } from "../../../content";
+import { nav, type Lang } from "../../../content";
 import CopyLink from "./CopyLink";
 
 /**
@@ -16,10 +16,12 @@ export default function ClosingBand({
   planId,
   trip,
   lang,
+  isSample = false,
 }: {
   planId: string;
   trip: FreeItinerary;
   lang: Lang;
+  isSample?: boolean;
 }) {
   const facts = [
     { label: draftCopy.stay[lang], value: trip.picks.stay },
@@ -45,16 +47,25 @@ export default function ClosingBand({
 
         <div className={styles.actions}>
           <p className={styles.oneTip}>{draftCopy.oneTip[lang]}</p>
-          <div className={styles.buttons}>
-            <Link href={`/plan/${planId}/consult`} className={`${base.pillDark} ${styles.cta}`}>
-              {draftCopy.fullPlan[lang]}
-              <span aria-hidden="true" className="mx-2">
-                ·
-              </span>
-              {draftCopy.price}
-            </Link>
-            <CopyLink lang={lang} />
-          </div>
+          {isSample ? (
+            // 샘플은 남의 여행이다: 이 초안으로 신청하지 않고, 내 여행으로 무료 초안을 받으러 간다 (랜딩과 같은 글)
+            <div className={styles.buttons}>
+              <Link href="/plan" className={`${base.pillDark} ${styles.cta}`}>
+                {nav.cta[lang]}
+              </Link>
+            </div>
+          ) : (
+            <div className={styles.buttons}>
+              <Link href={`/plan/${planId}/consult`} className={`${base.pillDark} ${styles.cta}`}>
+                {draftCopy.fullPlan[lang]}
+                <span aria-hidden="true" className="mx-2">
+                  ·
+                </span>
+                {draftCopy.price}
+              </Link>
+              <CopyLink lang={lang} />
+            </div>
+          )}
         </div>
       </div>
     </section>

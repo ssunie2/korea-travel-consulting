@@ -30,7 +30,7 @@ export default function LocalTip({
           d="M15 1.5C9.5 1.5 8.5 4.5 8.5 10V28C8.5 33 6.5 36 1 36C6.5 36 8.5 39 8.5 44V62C8.5 67.5 9.5 70.5 15 70.5"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.5"
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
         />

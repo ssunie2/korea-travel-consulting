@@ -45,7 +45,8 @@
   color: var(--m-ink-3);
 }
 .freeDraft:lang(ko) { letter-spacing: 0.04em; font-size: 12.5px; }
-@media (max-width: 479px) { .topbarRight { gap: 18px; } .freeDraft { display: none; } }
+@media (max-width: 479px) { .topbarRight { gap: 18px; } }
+@media (max-width: 379px) { .wordmark { font-size: 28px; } }
 
 /* ── 머리: 왼쪽 날짜·제목, 오른쪽 요약 ─────────────────
    오른쪽 칸은 내용 폭의 30% (1344 폭에서 877 부터). 아래 띠의 버튼 묶음과 같은 세로줄에 선다. */
@@ -111,11 +112,11 @@
 .dayHeading { margin: 0; }
 
 /* 일정: 점 하나에 한 정거장. 선은 점에서 다음 점까지만 긋는다 (마지막 점 아래로 새지 않게) */
-/* 한 줄에 놓인 기둥들은 키가 같다. 짧은 날은 남는 높이를 정거장 사이와 위아래에 나눠 기둥 가운데쯤에
-   고르게 놓는다 (시안 그대로). 이동 시간 글은 두 정거장 사이 가운데에 온다.
-   위아래 여백(::before/::after)은 정거장 사이 몫의 절반만 받는다. */
+/* 한 줄에 놓인 기둥들은 키가 같다. 첫 정거장은 어느 날이든 주제 바로 아래 같은 높이에 두고(한 장의 표로 읽히게),
+   짧은 날은 남는 높이를 정거장 사이에 나눈다. 이동 시간 글은 두 정거장 사이 가운데에 온다.
+   맨 아래 여백(::after)은 정거장 사이 몫의 절반만 받는다. */
 .stops { flex: 1 0 auto; display: flex; flex-direction: column; margin: 19px 0 0; padding: 0; list-style: none; }
-.stops::before, .stops::after { content: ""; flex: 0.5 0 0; }
+.stops::after { content: ""; flex: 0.5 0 0; }
 .stop { position: relative; padding: 0 0 9px 30px; }
 .stop:not(:last-child) { flex: 1 0 auto; display: flex; flex-direction: column; }
 .stop:last-child { padding-bottom: 0; }
@@ -128,6 +129,7 @@
   height: 8px;
   border-radius: 9999px;
   background: var(--m-ink);
+  box-shadow: 0 0 0 4px #fff; /* 선이 점에 닿지 않고 점 둘레에서 끊긴다 (시안) */
 }
 .stop:not(:last-child)::before {
   content: "";
@@ -153,7 +155,7 @@
   top: 1px;
   width: 12px;
   height: calc(100% - 2px);
-  color: var(--m-strike);
+  color: var(--m-red); /* 딱지·빨간 줄과 같은 빨강 하나 (랜딩은 줄 그은 글을 가리켜서 줄 색을 쓴다) */
   overflow: visible;
 }
 .badge {
@@ -175,6 +177,12 @@
 .tipText { margin: 4px 0 0; font-size: 12.5px; line-height: 1.2; color: var(--m-ink-3); }
 .tipText b { font-weight: 600; color: var(--m-ink); }
 .tipPlace { margin: 0 0 6px; font-size: 13px; color: var(--m-ink-3); }
+
+/* 팁이 처음 화면에 들어올 때 한 번만 옆에서 들어온다 (PlayOnView 가 data-motion 을 켠다).
+   기본값은 다 보이는 상태 — 스크립트가 없거나 움직임 줄이기 설정이면 처음부터 보인다 */
+[data-motion="armed"] .tipEnter { opacity: 0; transform: translateX(-10px); }
+[data-motion="play"] .tipEnter { animation: tip-enter 0.55s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes tip-enter { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
 
 /* 걸릴 날을 못 찾은 팁(옛 초안·엉뚱한 날짜)은 기둥들 아래에 따로 한 번 */
 .looseTip { margin: 22px 0 0; max-width: 720px; }
@@ -218,6 +226,11 @@
 }
 .copy:hover { background: var(--m-ink); color: #fff; }
 .copy:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
+/* 폰: 버튼 둘을 같은 폭으로 쌓고 손가락 크기(44px)로 키운다 */
+@media (max-width: 479px) {
+  .buttons { flex-direction: column; align-items: stretch; }
+  .cta, .copy { width: 100%; height: 44px; }
+}
 /* "이 링크를 보관하세요" — 늘 보인다. 버튼 줄에서 폭을 다 차지해 버튼 아래 줄로 내려간다 */
 .keepLink { flex-basis: 100%; margin: -3px 0 0; font-size: 12.5px; line-height: 1.35; color: var(--m-ink-3); }
 

@@ -9,6 +9,8 @@ import type { Pair } from "../../content";
  */
 export const draftCopy = {
   freeDraft: { ko: "무료 초안", en: "Free draft" },
+  // 랜딩의 샘플 카드로 들어온 초안. 남의 여행이라 '무료 초안'·링크 보관·$25 버튼을 보이지 않는다
+  sampleDraft: { ko: "샘플 초안", en: "Sample draft" },
   langLabel: { ko: "언어", en: "Language" },
   home: { ko: "mohallae 첫 화면", en: "mohallae home" },
   dayNumber: { ko: (n: number) => `${n}일차`, en: (n: number) => `Day ${n}` },

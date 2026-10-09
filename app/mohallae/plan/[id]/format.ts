@@ -62,3 +62,11 @@ export function placeName(lang: Lang, value: string) {
   const hit = DESTINATIONS.find((d) => d.v === value);
   return hit ? (lang === "ko" ? hit.ko : hit.v) : value;
 }
+
+/**
+ * 숫자 바로 뒤의 띄어쓰기를 줄바꿈 없는 띄어쓰기로 바꾼다 — "3 / days" 처럼 숫자만 윗줄에 남지 않게.
+ * AI 가 쓴 제목·주제 어디에나 쓸 수 있다. 한국어 "3일간" 처럼 붙어 있으면 바뀌는 것이 없다.
+ */
+export function keepNumberWithWord(text: string) {
+  return text.replace(/(\d)\s+(?=\S)/g, "$1\u00a0");
+}
