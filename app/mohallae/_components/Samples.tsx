@@ -18,7 +18,7 @@ const STOP_PHOTOS = { bukchon, gwangjang, namsan };
 
 /**
  * 두 번째 섹션 — "초안은 이렇게 생겼습니다".
- * 위: 실제 샘플 초안 4개 (시안 ② 아래쪽). 누르면 그 초안이 그대로 열린다.
+ * 위: 실제 샘플 초안 4개 (시안 ② 아래쪽). 누르면 그 초안이 **새 결과 화면**(/mohallae/plan/[id])으로 열린다.
  * 아래: 초안 속 하루 예시 (시안 ③의 패널) — 한 정거장의 흔한 계획에 줄이 그어지고 현지 팁이 붙는다.
  */
 export default function Samples({ lang }: { lang: Lang }) {
@@ -35,7 +35,7 @@ export default function Samples({ lang }: { lang: Lang }) {
         <ul className={`${styles.cardRow} mt-[10px]`}>
           {samples.items.map((s, i) => (
             <li key={s.id}>
-              <Link href={`/plan/${s.id}`} className={styles.card}>
+              <Link href={`/mohallae/plan/${s.id}${lang === "en" ? "?lang=en" : ""}`} className={styles.card}>
                 <div className={styles.cardPhoto}>
                   <Image
                     src={CARD_PHOTOS[i]}
