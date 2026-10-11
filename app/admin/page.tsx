@@ -1,7 +1,9 @@
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { supabaseServer } from '@/lib/supabase-server'
 import { generateJson } from '@/lib/ai'
 import { buildFullPlanPrompt, fullItinerarySchema } from '@/lib/prompt'
+import { checkFullPlan } from '@/lib/check-full-plan'
 import type { ConsultationStatus, FullItinerary, Plan } from '@/lib/types'
 
 // 유료 일정 생성에 시간이 걸린다. 무료(12.7초)보다 내용이 많아 더 걸린다.
@@ -41,6 +43,10 @@ async function updateStatus(formData: FormData) {
  * **결제를 확인한 뒤 우리가 직접 누른다.** 손님이 보는 화면에는 이 버튼이 없다 —
  * 공개된 곳에 두면 아무나 눌러서 AI 요금이 그대로 나간다.
  * 토스 계약(#23)이 끝나면 이 자리를 결제 승인 신호로 바꾸면 된다.
+ *
+ * 손님이 본 **무료 초안을 같이 넘겨서**, 유료 일정이 그 초안의 자세한 버전이 되게 한다 (써니 요청 2026-10-11).
+ * 만든 뒤 약속(날 수, 모든 정거장의 팁, 초안의 장소)을 지켰는지 확인하고, 못 지켰으면 **저장하지 않는다** —
+ * 저장하는 순간 아래에 '손님에게 보낼 링크'가 생기기 때문이다. 한 번 더 만들어 보고, 그래도 안 되면 이유를 화면에 띄운다.
  */
 async function generateFullPlan(formData: FormData) {
   'use server'
@@ -51,8 +57,10 @@ async function generateFullPlan(formData: FormData) {
   if (error || !data) return
 
   const plan = data as Plan
-  const full = await generateJson<FullItinerary>(
-    buildFullPlanPrompt({
+  const draft = plan.itinerary // 만들다 실패한 초안이면 null — 그때는 예전처럼 폼 값만으로 만든다
+  const dayCount = plan.duration_days
+  const prompt = buildFullPlanPrompt(
+    {
       destinations: plan.destinations,
       startDate: plan.start_date,
       durationDays: plan.duration_days,
@@ -71,20 +79,42 @@ async function generateFullPlan(formData: FormData) {
       avoid: plan.avoid ?? undefined,
       dietary: plan.dietary ?? undefined,
       language: plan.language,
-    }),
-    fullItinerarySchema
+    },
+    draft
   )
 
-  await db.from('plans').update({ full_itinerary: full }).eq('id', planId)
-  revalidatePath('/admin')
+  let problems: string[] = []
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const full = await generateJson<FullItinerary>(prompt, fullItinerarySchema(dayCount))
+    problems = checkFullPlan(full, dayCount, draft)
+    if (problems.length === 0) {
+      const { error: saveError } = await db.from('plans').update({ full_itinerary: full }).eq('id', planId)
+      if (saveError) console.error('유료 일정 저장 실패:', planId, saveError.message)
+      revalidatePath('/admin')
+      return
+    }
+    console.warn(`유료 일정 검사에 걸림 (${attempt}번째):`, planId, problems)
+  }
+
+  // 두 번 다 걸렸다. 저장하지 않았으니 버튼이 그대로 있다 — 이유를 그 신청 옆에 보여 준다
+  redirect(`/admin?failed=${planId}&why=${encodeURIComponent(problems.slice(0, 3).join(' · '))}`)
 }
 
 function when(iso: string) {
   return new Date(iso).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' })
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
   const db = supabaseServer()
+
+  // 전체 일정을 만들다 검사에 걸린 신청 (generateFullPlan 이 주소에 실어 보낸다)
+  const query = await searchParams
+  const failedPlan = typeof query.failed === 'string' ? query.failed : null
+  const failedWhy = typeof query.why === 'string' ? query.why : ''
 
   const [consultations, inquiries] = await Promise.all([
     db
@@ -173,6 +203,14 @@ export default async function AdminPage() {
                   </button>
                 </form>
               </div>
+
+              {c.plan_id && c.plan_id === failedPlan && !fullPlanReady.has(c.plan_id) && (
+                <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-400">
+                  전체 일정을 두 번 만들었지만 검사에 걸려 저장하지 않았습니다 — 손님에게 보낼 링크도 만들지 않았습니다.
+                  <br />
+                  이유: {failedWhy}. 버튼을 다시 눌러 보세요.
+                </p>
+              )}
             </li>
           ))}
         </ul>
