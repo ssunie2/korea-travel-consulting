@@ -84,11 +84,14 @@ export default async function DraftPage({ params, searchParams }: PageProps<"/mo
   }
 
   /*
-    팁이 걸린 날을 먼저 찾아 둔다 (예전 화면의 규칙 그대로): 그날 기둥 안에 한 번, 못 찾으면 기둥들 아래에 한 번.
-    AI 가 4일 여행에 dayNumber: 5 를 주거나 숫자 대신 글자 "3" 을 줘도 팁이 사라지지 않는다.
+    팁이 걸린 날을 먼저 찾아 둔다: 그날 기둥 안에 한 번, 못 찾으면 기둥들 아래에 한 번.
+    날짜 번호(dayNumber)로 찾고, 번호가 없거나 틀리면(옛 초안, 4일 여행에 dayNumber: 5) 팁이 말하는 장소가 있는 날로 찾는다 —
+    다른 날들은 팁 자리가 가려져 있으니, 진짜 팁이 그 장소의 날을 두고 맨 아래로 빠지면 어색하다.
     찾아낸 날 자체를 비교하므로 dayNumber 가 겹쳐도 두 번 그려지지 않는다. 정거장이 없는 날에는 걸지 않는다.
   */
-  const tipDay = trip.days.find((d) => d.dayNumber === trip.sampleTip.dayNumber && d.activities.length > 0);
+  const tipDay =
+    trip.days.find((d) => d.dayNumber === trip.sampleTip.dayNumber && d.activities.length > 0) ??
+    trip.days.find((d) => d.activities.some((a) => a.name === trip.sampleTip.activityName));
 
   // 도시가 실제로 바뀌는 여행에서만 날마다 도시를 적는다 (빈 값은 세지 않는다)
   const multiCity = new Set(trip.days.map((d) => d.city).filter(Boolean)).size > 1;
@@ -129,6 +132,8 @@ export default async function DraftPage({ params, searchParams }: PageProps<"/mo
                 showCity={multiCity}
                 lang={lang}
                 tip={day === tipDay ? trip.sampleTip : undefined}
+                // 팁이 없는 날은 팁 자리를 모자이크로 가려 보여 준다 (써니 요청 2026-10-11)
+                locked={day !== tipDay}
               />
             ))}
           </ol>

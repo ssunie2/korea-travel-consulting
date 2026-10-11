@@ -11,6 +11,8 @@ import styles from "../plan.module.css";
  * - 자리는 처음부터 잡아 둔다(투명할 뿐). 나타날 때 아래 글이 밀려 움직이지 않는다.
  * - 팁이 화면 높이의 62% 선(가운데보다 조금 아래)을 넘어 올라오면 나타난다. 처음부터 그 위에 있으면(PC 에서 1일차 팁) 일정을 먼저
  *   보도록 0.7초 뒤에 나타난다. 이미 지나쳐 위에 있으면 바로 보인다 — 어떤 경우에도 숨은 채로 남지 않는다.
+ * - 페이지 끝 가까이에 있어 62% 선까지 올라올 수 없는 팁(기둥 맨 아래의 가려 둔 팁, 짧은 여행)은
+ *   **끝까지 내렸을 때 화면 안에 있으면** 나타난다. 이 규칙이 없으면 넓은 화면에서 영영 숨어 있었다.
  * - 스크립트가 없거나 '움직임 줄이기' 설정이면 처음부터 다 보인다. 화면 낭독기는 늘 읽는다(투명도만 바뀐다).
  * - 숨김은 CSS 가 첫 화면부터 건다(깜빡임 방지). 여기서는 언제 나타날지만 정한다: data-reveal = armed → play.
  */
@@ -22,10 +24,16 @@ export default function TipReveal({ children }: { children: ReactNode }) {
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const line = () => window.innerHeight * 0.62;
-    const top = el.getBoundingClientRect().top;
+    // 나타날 때가 됐는지: 62% 선을 넘었거나, 더 내릴 수 없는데 화면 안에 들어와 있거나
+    const due = () => {
+      const top = el.getBoundingClientRect().top;
+      if (top < window.innerHeight * 0.62) return true;
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+      return atBottom && top < window.innerHeight - 40;
+    };
+
     el.dataset.reveal = "armed";
-    if (top < 0) {
+    if (el.getBoundingClientRect().top < 0) {
       el.dataset.reveal = "play"; // 이미 지나친 자리(뒤로 가기 등)는 바로 보여 준다
       return;
     }
@@ -37,10 +45,10 @@ export default function TipReveal({ children }: { children: ReactNode }) {
       window.removeEventListener("resize", check);
     };
     function check() {
-      if (el!.getBoundingClientRect().top < line()) play();
+      if (due()) play();
     }
 
-    if (top < line()) {
+    if (due()) {
       timer = window.setTimeout(play, 700);
     } else {
       window.addEventListener("scroll", check, { passive: true });

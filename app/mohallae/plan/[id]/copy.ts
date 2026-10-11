@@ -23,6 +23,10 @@ export const draftCopy = {
   toNext: { ko: "다음 일정까지 이동, ", en: "To the next stop, " },
   avoid: { ko: "피하실 것", en: "What to avoid" },
   insider: { ko: "여기 사는 사람이라면 이렇게 말합니다", en: "What someone here would tell you" },
+  // 팁이 없는 날의 모자이크 아래 한 줄 (써니 요청 2026-10-11). 무료 초안의 팁은 하나뿐이라(랜딩 가격표 '팁 하나')
+  // 나머지 날은 팁 자리만 가려서 보여 준다. 유료 전체 일정은 모든 정거장에 팁이 붙으니 '이 날의 팁'은 늘 맞는 말이다.
+  // 장소 이름은 넣지 않는다 — 유료 일정은 같은 입력으로 새로 만들어서 정거장이 조금 다를 수 있다.
+  lockedTip: { ko: "이 날의 현지 팁은 전체 일정에서 볼 수 있습니다", en: "This day’s local tips are in the full plan" },
   stay: { ko: "묵을 곳", en: "Where to stay" },
   eat: { ko: "먹을 곳", en: "Where to eat" },
   total: { ko: "예상 총액", en: "Estimated total" },

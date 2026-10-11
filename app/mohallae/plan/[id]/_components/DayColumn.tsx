@@ -4,6 +4,7 @@ import { draftCopy } from "../copy";
 import { dayDate } from "../format";
 import type { Lang } from "../../../content";
 import LocalTip from "./LocalTip";
+import LockedTip from "./LockedTip";
 import TipReveal from "./TipReveal";
 import { keepNumberWithWord } from "../format";
 
@@ -17,6 +18,7 @@ type Day = FreeItinerary["days"][number];
  * - 이동 시간(`travel`)은 그 정거장까지 오는 길이라, **앞 정거장 아래**에 적어 두 점 사이에 오게 한다.
  *   그날 첫 정거장에는 없다(앞이 없다). 옛 초안에는 아예 없어서 있을 때만 그린다.
  * - 팁(`tipAt`)은 이름이 같은 정거장 바로 아래 붙인다. 이름이 안 맞으면 그날 마지막 정거장 아래.
+ * - 팁이 없는 날(`locked`)은 기둥 맨 아래에 가려 둔 팁 자리를 둔다 (LockedTip 설명 참고).
  */
 export default function DayColumn({
   day,
@@ -24,12 +26,14 @@ export default function DayColumn({
   showCity,
   lang,
   tip,
+  locked = false,
 }: {
   day: Day;
   startDate: string;
   showCity: boolean;
   lang: Lang;
   tip?: FreeItinerary["sampleTip"];
+  locked?: boolean;
 }) {
   const acts = day.activities;
   const named = tip ? acts.findIndex((a) => a.name === tip.activityName) : -1;
@@ -82,6 +86,12 @@ export default function DayColumn({
           );
         })}
       </ol>
+
+      {locked && !tip && acts.length > 0 && (
+        <TipReveal>
+          <LockedTip seed={day.dayNumber} lang={lang} className={`${styles.tipReveal} ${styles.lockedSpot}`} />
+        </TipReveal>
+      )}
     </li>
   );
 }
