@@ -14,6 +14,7 @@ import DayColumn from "./_components/DayColumn";
 import LocalTip from "./_components/LocalTip";
 import ClosingBand from "./_components/ClosingBand";
 import TipReveal from "./_components/TipReveal";
+import Facts from "./_components/Facts";
 
 /**
  * 새 결과 화면 — 무료 초안 (이슈 #86, 승인 시안 result-comp-3 "날짜별 기둥").
@@ -96,11 +97,13 @@ export default async function DraftPage({ params, searchParams }: PageProps<"/mo
   const count = trip.days.length;
   const cols = count === 1 ? "1" : count === 2 || count === 4 ? "2" : "3";
 
-  const meta = [
-    tripDates(lang, draft.start_date, draft.duration_days),
-    draftCopy.travelers[lang](draft.travelers),
-    draft.destinations.map((d) => placeName(lang, d)).join(", "),
-  ].filter(Boolean);
+  // 여행 날짜·인원·여행지 — 제목 위에 붙여 쓰지 않고 제목 아래 사실 줄로 따로 (써니 요청 2026-10-11)
+  const places = draft.destinations.map((d) => placeName(lang, d)).join(", ");
+  const tripFacts = [
+    { label: draftCopy.datesLabel[lang], value: tripDates(lang, draft.start_date, draft.duration_days) },
+    { label: draftCopy.travelersLabel[lang], value: lang === "ko" ? `${draft.travelers}명` : String(draft.travelers) },
+    ...(places ? [{ label: draftCopy.placesLabel[lang], value: places }] : []),
+  ];
 
   return (
     <div lang={lang} className={`${base.page} flex flex-1 flex-col`}>
@@ -110,23 +113,12 @@ export default async function DraftPage({ params, searchParams }: PageProps<"/mo
         <div className={styles.wrap}>
           <div className={styles.head}>
             <div className={styles.headMain}>
-              <p className={styles.meta}>
-                {meta.map((part, i) => (
-                  <span key={i}>
-                    {i > 0 && (
-                      <span aria-hidden="true" className={styles.sep}>
-                        ·
-                      </span>
-                    )}
-                    {i > 0 && <span className="sr-only">, </span>}
-                    {part}
-                  </span>
-                ))}
-              </p>
               <h1 className={styles.title}>{keepNumberWithWord(trip.tripTitle)}</h1>
             </div>
             <p className={styles.summary}>{trip.summary}</p>
           </div>
+
+          <Facts items={tripFacts} lang={lang} className={styles.tripFacts} />
 
           <ol className={styles.days} data-cols={cols}>
             {trip.days.map((day, i) => (

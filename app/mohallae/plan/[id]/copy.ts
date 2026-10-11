@@ -14,7 +14,10 @@ export const draftCopy = {
   langLabel: { ko: "언어", en: "Language" },
   home: { ko: "mohallae 첫 화면", en: "mohallae home" },
   dayNumber: { ko: (n: number) => `${n}일차`, en: (n: number) => `Day ${n}` },
-  travelers: { ko: (n: number) => `${n}명`, en: (n: number) => (n === 1 ? "1 traveler" : `${n} travelers`) },
+  // 제목 아래 사실 줄의 이름표 (써니 요청 2026-10-11)
+  datesLabel: { ko: "여행 날짜", en: "Dates" },
+  travelersLabel: { ko: "인원", en: "Travelers" },
+  placesLabel: { ko: "여행지", en: "Destination" },
   daysHeading: { ko: "날짜별 일정", en: "Day by day" },
   // 낭독기용. 다음 일정까지 얼마나 걸리는지가 무엇에서 무엇까지인지 말해 준다 (예전 화면과 같은 이유)
   toNext: { ko: "다음 일정까지 이동, ", en: "To the next stop, " },

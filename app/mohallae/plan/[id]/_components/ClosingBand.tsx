@@ -5,6 +5,7 @@ import styles from "../plan.module.css";
 import { draftCopy } from "../copy";
 import { nav, type Lang } from "../../../content";
 import CopyLink from "./CopyLink";
+import Facts from "./Facts";
 
 /**
  * 닫는 띠 (시안 ③ 맨 아래). 왼쪽은 숙소·식당·예산, 오른쪽은 "팁 하나를 보셨습니다" 와 버튼 둘.
@@ -32,18 +33,7 @@ export default function ClosingBand({
   return (
     <section className={styles.band} aria-label={draftCopy.fullPlan[lang]}>
       <div className={`${styles.wrap} ${styles.bandInner}`}>
-        <dl className={styles.facts}>
-          {facts.map((f) => (
-            <div key={f.label} className={styles.fact}>
-              {/* 영어는 시안처럼 쌍점을 붙이고, 한국어 이름표에는 붙이지 않는다 (예전 화면과 같다) */}
-              <dt className={styles.factLabel}>
-                {f.label}
-                {lang === "en" && ":"}
-              </dt>
-              <dd className={styles.factValue}>{f.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <Facts items={facts} lang={lang} />
 
         <div className={styles.actions}>
           <p className={styles.oneTip}>{draftCopy.oneTip[lang]}</p>
