@@ -4,6 +4,7 @@ import { Instrument_Serif } from "next/font/google";
 import { supabaseServer } from "@/lib/supabase-server";
 import type { Plan } from "@/lib/types";
 import { t } from "@/lib/copy";
+import { PAID_ORDERS_OPEN } from "@/lib/orders";
 
 const display = Instrument_Serif({
   weight: "400",
@@ -28,6 +29,10 @@ async function submit(formData: FormData) {
   "use server";
 
   const planId = String(formData.get("planId"));
+
+  // 신청을 닫아 둔 동안은 화면을 거치지 않고 직접 보내 온 신청도 저장하지 않는다 (lib/orders.ts)
+  if (!PAID_ORDERS_OPEN) redirect(`/plan/${planId}/consult`);
+
   const name = String(formData.get("name") ?? "").trim().slice(0, 80);
   const email = String(formData.get("email") ?? "").trim().slice(0, 200);
   const messenger = String(formData.get("messenger") ?? "").trim().slice(0, 80);
@@ -90,6 +95,30 @@ export default async function ConsultPage({
       <main className="mx-auto max-w-2xl px-6 pb-24">{children}</main>
     </div>
   );
+
+  // 신청을 닫아 둔 동안 (써니 결정 2026-10-11, lib/orders.ts). 폼 대신 안내만 둔다
+  if (!PAID_ORDERS_OPEN) {
+    return shell(
+      <>
+        <h1 className="font-[family-name:var(--font-display)] text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight">
+          {t({ ko: "전체 일정은 준비 중입니다.", en: "The full plan isn’t open yet." })}
+        </h1>
+        <p className="mt-5 text-lg leading-relaxed text-[var(--c-text-2)]">
+          {t({
+            ko: "지금은 신청을 받지 않습니다. 준비가 끝나면 이 화면에서 신청하실 수 있습니다.",
+            en: "We’re not taking orders for it right now. Once it’s ready, you can get it right here.",
+          })}
+        </p>
+        <p className="mt-8 leading-relaxed text-[var(--c-text-2)]">
+          {t({ ko: "무료 초안은 그대로 있습니다 —", en: "Your free draft stays where it is —" })}{" "}
+          <Link href={`/plan/${plan.id}`} className="underline underline-offset-4 hover:text-[var(--c-accent)]">
+            {t({ ko: "이 링크를 보관하세요", en: "keep this link" })}
+          </Link>
+          .
+        </p>
+      </>
+    );
+  }
 
   if (sent) {
     return shell(
