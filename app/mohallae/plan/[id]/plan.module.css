@@ -68,7 +68,8 @@
   letter-spacing: -0.02em;
   text-wrap: balance;
 }
-.summary { margin: 0; font-size: 14.5px; line-height: 22px; letter-spacing: -0.005em; color: var(--m-ink-3); max-width: 60ch; }
+/* 써니 요청 (2026-10-11): 스크롤이 늘어도 좋으니 줄과 줄, 문장과 문장 사이를 넉넉히. 한글은 영문보다 줄 간격이 더 필요하다 */
+.summary { margin: 0; font-size: 15px; line-height: 1.7; letter-spacing: -0.005em; color: var(--m-ink-3); max-width: 60ch; }
 /* 머리줄·날짜 줄의 가운뎃점. 시안처럼 양옆을 넉넉히 띄운다 */
 .sep { margin-inline: 7px; }
 
@@ -95,13 +96,13 @@
   border-radius: 16px;
   background: #fff;
   box-shadow: var(--m-shadow);
-  padding: 14px 24px 9px;
+  padding: 22px 26px 26px;
 }
 .dayLabel { display: block; font-size: 14px; line-height: 20px; font-weight: 400; color: var(--m-ink-3); }
 .dayLabel b { font-weight: 600; color: var(--m-ink); }
 .dayTheme {
   display: block;
-  margin-top: 3px;
+  margin-top: 6px;
   font-size: 24.5px; /* 시안 대문자 19.7px. 폭이 넓은 Figtree 라 시안처럼 한 줄에 들도록 24.5px */
   line-height: 1.24;
   font-weight: 700;
@@ -115,16 +116,16 @@
 /* 한 줄에 놓인 기둥들은 키가 같다. 첫 정거장은 어느 날이든 주제 바로 아래 같은 높이에 두고(한 장의 표로 읽히게),
    짧은 날은 남는 높이를 정거장 사이에 나눈다. 이동 시간 글은 두 정거장 사이 가운데에 온다.
    맨 아래 여백(::after)은 정거장 사이 몫의 절반만 받는다. */
-.stops { flex: 1 0 auto; display: flex; flex-direction: column; margin: 19px 0 0; padding: 0; list-style: none; }
+.stops { flex: 1 0 auto; display: flex; flex-direction: column; margin: 26px 0 0; padding: 0; list-style: none; }
 .stops::after { content: ""; flex: 0.5 0 0; }
-.stop { position: relative; padding: 0 0 9px 30px; }
+.stop { position: relative; padding: 0 0 24px 30px; }
 .stop:not(:last-child) { flex: 1 0 auto; display: flex; flex-direction: column; }
 .stop:last-child { padding-bottom: 0; }
 .stop::after {
   content: "";
   position: absolute;
   left: 0;
-  top: 3px;
+  top: 6px;
   width: 8px;
   height: 8px;
   border-radius: 9999px;
@@ -135,20 +136,20 @@
   content: "";
   position: absolute;
   left: 3.5px;
-  top: 7px;
-  bottom: -7px;
+  top: 10px;
+  bottom: -10px;
   width: 1px;
   background: #d5d9e1;
 }
-.time { margin: 0; font-size: 13px; line-height: 14px; color: var(--m-ink-3); font-variant-numeric: tabular-nums; }
-.name { margin: 0; font-size: 16px; line-height: 20px; font-weight: 600; letter-spacing: -0.005em; }
-.note { margin: 0; font-size: 14px; line-height: 1.4; color: var(--m-ink-3); }
-.travel { margin-block: auto; padding-top: 9px; font-size: 13px; line-height: 18px; color: var(--m-ink-3); }
+.time { margin: 0; font-size: 13px; line-height: 20px; color: var(--m-ink-3); font-variant-numeric: tabular-nums; }
+.name { margin: 3px 0 0; font-size: 17px; line-height: 1.4; font-weight: 600; letter-spacing: -0.005em; }
+.note { margin: 6px 0 0; font-size: 15px; line-height: 1.7; color: var(--m-ink-3); }
+.travel { margin-block: auto; padding-top: 18px; font-size: 13.5px; line-height: 20px; color: var(--m-ink-3); }
 
 /* ── 현지 팁 ─────────────────────────────────────────
    랜딩 패널과 같은 표시: 빨간 중괄호 + 빨간 딱지 + 빨간 한 줄. 아래 두 줄은 남색 이름표 + 회색 글.
    그 날의 그 정거장 바로 아래 붙는다. */
-.tip { position: relative; margin: 6px 0 0 -12px; padding-left: 24px; }
+.tip { position: relative; margin: 16px 0 0 -12px; padding-left: 24px; }
 .brace {
   position: absolute;
   left: 0;
@@ -172,9 +173,9 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.badge:lang(ko) { letter-spacing: 0.02em; font-size: 10.5px; }
-.tipLine { margin: 3px 0 0; font-size: 13px; line-height: 1.2; font-weight: 600; letter-spacing: -0.02em; color: var(--m-red); }
-.tipText { margin: 4px 0 0; font-size: 12.5px; line-height: 1.2; color: var(--m-ink-3); }
+.badge:lang(ko) { letter-spacing: 0.02em; font-size: 11px; line-height: 14px; padding: 3px 9px 2px; }
+.tipLine { margin: 9px 0 0; font-size: 15px; line-height: 1.5; font-weight: 600; letter-spacing: -0.01em; color: var(--m-red); }
+.tipText { margin: 10px 0 0; font-size: 14px; line-height: 1.7; color: var(--m-ink-3); }
 .tipText b { font-weight: 600; color: var(--m-ink); }
 .tipPlace { margin: 0 0 6px; font-size: 13px; color: var(--m-ink-3); }
 
