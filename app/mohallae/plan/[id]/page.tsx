@@ -13,6 +13,7 @@ import TopBar from "./_components/TopBar";
 import DayColumn from "./_components/DayColumn";
 import LocalTip from "./_components/LocalTip";
 import ClosingBand from "./_components/ClosingBand";
+import TipReveal from "./_components/TipReveal";
 
 /**
  * 새 결과 화면 — 무료 초안 (이슈 #86, 승인 시안 result-comp-3 "날짜별 기둥").
@@ -142,7 +143,14 @@ export default async function DraftPage({ params, searchParams }: PageProps<"/mo
 
           {/* 걸릴 날을 못 찾은 팁 — 옛 초안, 그리고 엉뚱한 날짜 */}
           {!tipDay && (
-            <LocalTip tip={trip.sampleTip} lang={lang} place={trip.sampleTip.activityName} className={styles.looseTip} />
+            <TipReveal>
+              <LocalTip
+                tip={trip.sampleTip}
+                lang={lang}
+                place={trip.sampleTip.activityName}
+                className={`${styles.looseTip} ${styles.tipReveal}`}
+              />
+            </TipReveal>
           )}
         </div>
 

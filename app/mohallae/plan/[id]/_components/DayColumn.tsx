@@ -4,7 +4,7 @@ import { draftCopy } from "../copy";
 import { dayDate } from "../format";
 import type { Lang } from "../../../content";
 import LocalTip from "./LocalTip";
-import PlayOnView from "../../../_components/PlayOnView";
+import TipReveal from "./TipReveal";
 import { keepNumberWithWord } from "../format";
 
 type Day = FreeItinerary["days"][number];
@@ -67,10 +67,10 @@ export default function DayColumn({
               <h3 className={styles.name}>{a.name}</h3>
               {a.note && <p className={styles.note}>{a.note}</p>}
               {tip && i === tipAt && (
-                // 처음 보일 때 한 번만 옆에서 들어온다. 이미 화면에 있거나 움직임 줄이기 설정이면 그대로 보인다
-                <PlayOnView>
-                  <LocalTip tip={tip} lang={lang} className={styles.tipEnter} />
-                </PlayOnView>
+                // 처음엔 비어 있다가 스크롤로 이 자리에 오면 써지듯 나타난다 (써니 요청)
+                <TipReveal>
+                  <LocalTip tip={tip} lang={lang} className={styles.tipReveal} />
+                </TipReveal>
               )}
               {next?.travel && (
                 <p className={styles.travel}>

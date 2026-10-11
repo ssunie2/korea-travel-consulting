@@ -179,11 +179,30 @@
 .tipText b { font-weight: 600; color: var(--m-ink); }
 .tipPlace { margin: 0 0 6px; font-size: 13px; color: var(--m-ink-3); }
 
-/* 팁이 처음 화면에 들어올 때 한 번만 옆에서 들어온다 (PlayOnView 가 data-motion 을 켠다).
-   기본값은 다 보이는 상태 — 스크립트가 없거나 움직임 줄이기 설정이면 처음부터 보인다 */
-[data-motion="armed"] .tipEnter { opacity: 0; transform: translateX(-10px); }
-[data-motion="play"] .tipEnter { animation: tip-enter 0.55s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
-@keyframes tip-enter { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+/* 팁이 써지듯 나타나기 (TipReveal 이 data-reveal="play" 를 켠다. 써니 요청 2026-10-11)
+   중괄호가 위에서 아래로 그려지고 → 딱지가 뜨고 → 빨간 한 줄이 왼쪽부터 써지고 → 두 문단이 차례로 올라온다.
+   - 숨기는 건 '스크립트가 도는 브라우저'에서만 (scripting: enabled). 첫 화면이 그려질 때부터 숨겨서
+     보였다가 사라졌다가 다시 나타나는 깜빡임이 없다. 스크립트가 없으면 처음부터 다 보인다.
+   - '움직임 줄이기' 설정이면 숨기지도 움직이지도 않는다.
+   - 안전장치: 스크립트가 끝내 붙지 않으면(data-reveal 이 안 생기면) 8초 뒤 그냥 보인다. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .tipWrap:not([data-reveal="play"]) .tipReveal .brace { clip-path: inset(0 0 100% 0); }
+  .tipWrap:not([data-reveal="play"]) .tipReveal :is(.badge, .tipPlace) { opacity: 0; transform: scale(0.85); }
+  .tipWrap:not([data-reveal="play"]) .tipReveal .tipLine { clip-path: inset(0 100% 0 0); }
+  .tipWrap:not([data-reveal="play"]) .tipReveal .tipText { opacity: 0; transform: translateY(8px); }
+  .tipWrap:not([data-reveal]) .tipReveal :is(.brace, .badge, .tipPlace, .tipLine, .tipText) { animation: tip-show 0.3s 8s both; }
+
+  .tipWrap[data-reveal="play"] .tipReveal .brace { animation: tip-brace 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .tipWrap[data-reveal="play"] .tipReveal :is(.badge, .tipPlace) { animation: tip-pop 0.4s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: left center; }
+  .tipWrap[data-reveal="play"] .tipReveal .tipLine { animation: tip-write 0.7s 0.5s cubic-bezier(0.65, 0, 0.35, 1) both; }
+  .tipWrap[data-reveal="play"] .tipReveal .tipText { animation: tip-up 0.55s 1.05s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .tipWrap[data-reveal="play"] .tipReveal .tipText:last-of-type { animation-delay: 1.25s; }
+}
+@keyframes tip-brace { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes tip-pop { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
+@keyframes tip-write { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes tip-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes tip-show { to { opacity: 1; transform: none; clip-path: inset(0 0 0 0); } }
 
 /* 걸릴 날을 못 찾은 팁(옛 초안·엉뚱한 날짜)은 기둥들 아래에 따로 한 번 */
 .looseTip { margin: 22px 0 0; max-width: 720px; }
