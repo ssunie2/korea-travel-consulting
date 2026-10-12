@@ -33,7 +33,12 @@ export const flowCopy = {
   closeOther: tx("닫기", "Close"),
 
   // 질문 — 도시 이름이 들어가는 것은 함수
-  where: { q: tx("어디로 가세요?", "Where are you going?"), help: tx("여러 곳을 골라도 좋아요. 목록에 없으면 직접 적어 주세요.", "Pick as many as you like. Not listed? Type it.") },
+  where: {
+    q: tx("어디로 가세요?", "Where are you going?"),
+    help: tx("여러 곳을 골라도 좋아요. 목록에 없으면 직접 적어 주세요.", "Pick as many as you like. Not listed? Type it."),
+    // 도시를 서울 하나만 열어 둔 동안 (flow.ts OPEN_PLACES)
+    helpOne: tx("지금은 서울 여행 초안을 만들 수 있어요.", "For now, we make drafts for trips to Seoul."),
+  },
   todo: {
     q: { ko: (city: string) => `${city}에서는 뭘 해볼까요?`, en: (city: string) => `What do you want to do in ${city}?` },
     help: tx("끌리는 것을 다 골라 주세요 — 날짜에 맞춰 골라 담아 초안을 씁니다.", "Pick everything that pulls you in — the draft fits them to your days."),

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DESTINATIONS } from "@/lib/places";
 import { langFrom } from "../content";
+import { OPEN_PLACES } from "./flow";
 import PlanFlow from "./_flow/PlanFlow";
 
 /**
@@ -15,5 +16,6 @@ export const metadata: Metadata = {
 
 export default async function PlanPage({ searchParams }: PageProps<"/mohallae/plan">) {
   const lang = langFrom((await searchParams).lang);
-  return <PlanFlow initialLang={lang} destinations={DESTINATIONS} />;
+  // 일단 서울만 고를 수 있다 (flow.ts OPEN_PLACES)
+  return <PlanFlow initialLang={lang} destinations={DESTINATIONS.filter((d) => OPEN_PLACES.includes(d.v))} />;
 }

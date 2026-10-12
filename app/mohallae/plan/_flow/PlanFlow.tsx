@@ -9,7 +9,7 @@ import CorrectionStrip from "../../_components/CorrectionStrip";
 import Calendar from "./Calendar";
 import Postcard from "./Postcard";
 import {
-  CURATED, CURRENCIES, INITIAL_STATE, LANGUAGES, OPTIONAL, OTHER_STEPS,
+  CURATED, CURRENCIES, INITIAL_STATE, LANGUAGES, OPEN_PLACES, OPTIONAL, OTHER_PLACE, OTHER_STEPS,
   autoAdvance, choicesFor, defaultCurrency, flowReducer, isMultiple, nights, panelPhotos, pickedPlaces, stepError, stepOrder, toPlanRequest,
   type Answers, type Choice, type Destination, type Lang, type Step, type Text,
 } from "../flow";
@@ -260,6 +260,7 @@ function question(step: Step, answers: Answers, lang: Lang, placeName: (v: strin
 }
 
 function helper(step: Step, lang: Lang): string {
+  if (step === "where" && OPEN_PLACES.length === 1 && !OTHER_PLACE) return c.where.helpOne[lang];
   if (step.startsWith("do:")) return c.todo.help[lang];
   if (step === "interests") return c.interests.help[lang];
   if (step === "diet") return c.diet.help[lang];
@@ -320,7 +321,9 @@ function Body({ step, answers, lang, destinations, dispatch, onPick }: {
   const photos = options.some((o) => o.image) && step !== "where";
   const compact = step === "where" || step === "interests" || step === "avoid" || step === "diet";
   const otherKey = `${step}:other` as keyof Answers;
-  const otherOpen = (OTHER_STEPS as readonly string[]).includes(step) && answers[otherKey] !== undefined;
+  // '그 외 — 직접 적기' 칸. 도시는 서울만 열어 둔 동안 숨긴다 (flow.ts OTHER_PLACE)
+  const otherAllowed = (OTHER_STEPS as readonly string[]).includes(step) && (step !== "where" || OTHER_PLACE);
+  const otherOpen = otherAllowed && answers[otherKey] !== undefined;
   const multiple = isMultiple(step);
 
   return (
@@ -367,7 +370,7 @@ function Body({ step, answers, lang, destinations, dispatch, onPick }: {
             </li>
           );
         })}
-        {(OTHER_STEPS as readonly string[]).includes(step) && (
+        {otherAllowed && (
           <li>
             <button
               type="button"

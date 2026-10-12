@@ -188,6 +188,14 @@ export const CURATED: Record<string, Curated> = {
   },
 };
 
+/**
+ * 지금 고를 수 있는 도시 — 일단 서울만 (써니 2026-10-13).
+ * 다른 14개 도시의 보기와 사진(CURATED, public/mohallae/do·postcards)은 그대로 두었다 — 다시 열 때는 여기에 이름만 더한다.
+ * OTHER_PLACE: '그 외 — 직접 적기'를 보여 줄지. 서울만 열어 둔 동안은 숨긴다
+ */
+export const OPEN_PLACES: string[] = ["Seoul"];
+export const OTHER_PLACE = false;
+
 /* ── 지금 폼(app/plan/page.tsx)과 같은 보기·같은 영어 값 ─────────────────── */
 
 const choice = (id: string, value: string, ko: string, en: string, dko?: string, den?: string): Choice => ({
@@ -324,10 +332,10 @@ export function pickedPlaces(answers: Answers): string[] {
 /**
  * 오른쪽 판 엽서에서 번갈아 보여 줄 사진. 도시를 여럿 고르면 도시마다 한 장씩 번갈아
  * (서울1 → 부산1 → 서울2 → 부산2 …) — 한 도시 사진만 이어지지 않게. 사진이 없는 곳(직접 적은 곳)은 건너뛴다.
- * 아직 아무 데도 고르지 않았으면 도시마다 첫 장씩 돌려 보여 준다 — 빈 엽서는 어색하다 (써니 2026-10-12)
+ * 아직 아무 데도 고르지 않았으면 지금 고를 수 있는 도시(OPEN_PLACES)의 사진을 돌려 보여 준다 — 빈 엽서는 어색하다 (써니 2026-10-12)
  */
 export function panelPhotos(places: string[]): string[] {
-  if (!places.length) return Object.values(CURATED).map((city) => city.photos[0]);
+  if (!places.length) return OPEN_PLACES.length ? panelPhotos(OPEN_PLACES) : [];
   const lists = places.map((p) => CURATED[p]?.photos ?? []);
   const out: string[] = [];
   for (let i = 0; lists.some((l) => i < l.length); i++) {

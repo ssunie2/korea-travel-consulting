@@ -3,7 +3,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { CURATED, INITIAL_STATE, OPTIONAL, autoAdvance, choicesFor, flowReducer, panelPhotos, pickedPlaces, stepError, stepOrder, toPlanRequest } from "./flow.ts";
+import { CURATED, INITIAL_STATE, OPEN_PLACES, OPTIONAL, autoAdvance, choicesFor, flowReducer, panelPhotos, pickedPlaces, stepError, stepOrder, toPlanRequest } from "./flow.ts";
 import type { FlowState, Step } from "./flow.ts";
 
 const choose = (s: FlowState, value: string) => flowReducer(s, { type: "choose", value });
@@ -159,14 +159,16 @@ test("엽서 사진: 도시마다 번갈아, 사진 없는 곳(직접 적은 곳
   assert.deepEqual(panelPhotos(["Ulsan", "Mokpo"]), CURATED.Mokpo.photos);
 });
 
-test("아직 아무 데도 고르지 않았으면 엽서에 도시마다 첫 장씩 나온다 (빈 엽서 없음)", () => {
+test("아직 아무 데도 고르지 않았으면 엽서에 지금 고를 수 있는 도시 사진이 나온다 (빈 엽서 없음)", () => {
+  assert.ok(OPEN_PLACES.length > 0);
+  for (const place of OPEN_PLACES) assert.ok(CURATED[place], `${place}: 보기·사진이 없는 도시는 열 수 없다`);
   const tour = panelPhotos([]);
-  assert.equal(tour.length, Object.keys(CURATED).length);
+  assert.deepEqual(tour, panelPhotos(OPEN_PLACES));
   assert.equal(new Set(tour).size, tour.length, "같은 사진 두 번");
-  assert.equal(tour[0], CURATED.Seoul.photos[0]);
+  assert.equal(tour[0], CURATED[OPEN_PLACES[0]].photos[0]);
   // 첫 화면에서 도시를 고르면 그 도시 사진으로 바뀐다
-  const s = choose(INITIAL_STATE, "Jeonju");
-  assert.deepEqual(panelPhotos(pickedPlaces(s.answers)), CURATED.Jeonju.photos);
+  const s = choose(INITIAL_STATE, "Seoul");
+  assert.deepEqual(panelPhotos(pickedPlaces(s.answers)), CURATED.Seoul.photos);
 });
 
 // lib/places.ts 의 DESTINATIONS 와 같은 목록 (그 파일은 확장자 없는 import 를 써서 node --test 로 바로 못 불러온다)
