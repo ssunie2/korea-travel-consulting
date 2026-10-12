@@ -38,7 +38,7 @@ export const CURATED: Record<string, Curated> = {
   Seoul: {
     tagline: tx("오래된 골목과 새로운 취향 사이", "Between old alleys and new tastes"),
     // 엽서는 전부 148×100(가로 엽서) 비율로 원본(.impeccable/plates)에서 잘라 둔 것. 서울은 노을 사진 대신 북촌 골목 —
-    // 노을 사진은 하늘이 절반이라 (써니: "하늘만 보이는 느낌"), 북촌은 위 하늘을 조금 덜어 골목 바닥이 보이게 (써니: "땅 부분이 더 보였으면")
+    // 노을 사진은 하늘이 절반이라 (써니: "하늘만 보이는 느낌"). 북촌은 원본 높이 그대로 — 하늘부터 골목 바닥까지 (써니가 고름)
     postcard: "/mohallae/postcard-seoul-bukchon.jpg",
     experiences: [
       { id: "heritage", title: tx("궁궐과 한옥", "Palaces & hanok"), description: tx("시간이 천천히 흐르는 서울", "Where time slows down"), image: "/landing/gyeongbokgung.webp",
