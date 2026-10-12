@@ -37,7 +37,8 @@ const tx = (ko: string, en: string): Text => ({ ko, en });
 export const CURATED: Record<string, Curated> = {
   Seoul: {
     tagline: tx("오래된 골목과 새로운 취향 사이", "Between old alleys and new tastes"),
-    postcard: "/mohallae/card-seoul-sunset.jpg",
+    // 노을 사진은 하늘이 절반이고 한옥이 사진 아래 끝에서 잘려 있어 칸 비율로는 못 살린다 (써니: "하늘만 보이는 느낌") — 북촌 골목으로
+    postcard: "/mohallae/postcard-seoul-bukchon.jpg",
     experiences: [
       { id: "heritage", title: tx("궁궐과 한옥", "Palaces & hanok"), description: tx("시간이 천천히 흐르는 서울", "Where time slows down"), image: "/landing/gyeongbokgung.webp",
         question: tx("옛 서울을 만난다면, 어떤 장면이 좋을까요?", "Old Seoul — which scene is yours?"), scenes: [

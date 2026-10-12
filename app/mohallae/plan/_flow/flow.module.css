@@ -227,7 +227,8 @@
 }
 @media (min-width: 1024px) { .panel { position: sticky; top: 24px; } }
 .panelTitle { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
-.postcard { display: block; width: 100%; aspect-ratio: 16 / 7; margin-top: 14px; border-radius: 14px; object-fit: cover; background: var(--m-band); }
+/* 사진이 칸보다 세로로 길면 아래(골목·지붕)를 더 남긴다 — 하늘보다 땅이 그 도시를 말해 준다 */
+.postcard { display: block; width: 100%; aspect-ratio: 16 / 7; margin-top: 14px; border-radius: 14px; object-fit: cover; object-position: 50% 65%; background: var(--m-band); }
 .postcardBlank {
   display: grid;
   place-items: center;
