@@ -312,8 +312,10 @@ export function pickedPlaces(answers: Answers): string[] {
 /**
  * 오른쪽 판 엽서에서 번갈아 보여 줄 사진. 도시를 여럿 고르면 도시마다 한 장씩 번갈아
  * (서울1 → 부산1 → 서울2 → 부산2 …) — 한 도시 사진만 이어지지 않게. 사진이 없는 곳(직접 적은 곳)은 건너뛴다.
+ * 아직 아무 데도 고르지 않았으면 도시마다 첫 장씩 돌려 보여 준다 — 빈 엽서는 어색하다 (써니 2026-10-12)
  */
 export function panelPhotos(places: string[]): string[] {
+  if (!places.length) return Object.values(CURATED).map((city) => city.photos[0]);
   const lists = places.map((p) => CURATED[p]?.photos ?? []);
   const out: string[] = [];
   for (let i = 0; lists.some((l) => i < l.length); i++) {
