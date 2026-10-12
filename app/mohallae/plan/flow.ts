@@ -44,8 +44,9 @@ export const CURATED: Record<string, Curated> = {
     // 엽서는 전부 148×100(가로 엽서) 비율로 원본(.impeccable/plates)에서 잘라 둔 것. 서울은 노을 사진 대신 북촌 골목 —
     // 노을 사진은 하늘이 절반이라 (써니: "하늘만 보이는 느낌"). 북촌은 원본 높이 그대로 — 하늘부터 골목 바닥까지 (써니가 고름)
     postcard: "/mohallae/postcard-seoul-bukchon.jpg",
-    // 북촌 골목 → 경복궁 → 광장시장 → 한강 (사진 카드의 같은 사진을 엽서 비율로 다시 자른 것)
-    photos: ["/mohallae/postcard-seoul-bukchon.jpg", "/mohallae/panel-seoul-heritage.jpg", "/mohallae/panel-seoul-food.jpg", "/mohallae/panel-seoul-night.jpg"],
+    // 엽서는 사진 카드(경복궁·북촌·광장시장·한강)와 다른 장면만 — 같은 사진이 옆에 또 보이면 의미가 없다 (써니 2026-10-12).
+    // 북촌 골목(써니가 고름) → 노을 진 서울 → 남산
+    photos: ["/mohallae/postcard-seoul-bukchon.jpg", "/mohallae/panel-seoul-sunset.jpg", "/mohallae/panel-seoul-namsan.jpg"],
     experiences: [
       { id: "heritage", title: tx("궁궐과 한옥", "Palaces & hanok"), description: tx("시간이 천천히 흐르는 서울", "Where time slows down"), image: "/landing/gyeongbokgung.webp", ai: "palaces & hanok" },
       { id: "neighbourhood", title: tx("골목과 카페", "Alleys & cafés"), description: tx("발길 닿는 대로 발견하는 취향", "Find your own corners"), image: "/landing/bukchon.webp", ai: "alleys & cafes" },

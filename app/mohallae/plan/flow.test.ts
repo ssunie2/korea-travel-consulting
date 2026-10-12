@@ -163,6 +163,13 @@ test("엽서 사진: 도시마다 번갈아, 사진 없는 곳은 건너뛴다",
   assert.deepEqual(panelPhotos(["Gangneung", "Gyeongju"]), [CURATED.Gyeongju.postcard]);
 });
 
+test("엽서 사진은 그 도시의 사진 카드와 겹치지 않는다 (같은 사진이 옆에 또 보이지 않게)", () => {
+  for (const [place, city] of Object.entries(CURATED)) {
+    const cards = new Set(city.experiences.map((e) => e.image).filter(Boolean));
+    for (const photo of panelPhotos([place])) assert.ok(!cards.has(photo), `${place}: ${photo}`);
+  }
+});
+
 test("늦게 들어온 이전 화면의 클릭은 두 칸을 건너뛰지 않는다", () => {
   const s = choose(INITIAL_STATE, "Seoul");
   const moved = next(s);
