@@ -8,14 +8,15 @@ import s from "./flow.module.css";
 /**
  * 오른쪽 판의 엽서 — 고른 도시들의 사진을 번갈아 보여 준다 (써니 2026-10-12).
  *
- * 바뀌는 간격은 ROTATE_MS 하나. 써니가 1.5초·4초를 영상으로 비교해 보고 정한다.
+ * 바뀌는 간격은 ROTATE_MS 하나. 써니가 1.5초·4초 비교 영상을 보고 2초로 정했다 (2026-10-12 "1.5초는 좀 빠른 듯").
+ * 2초면 겹쳐 바뀌는 시간이 길수록 늘 움직이는 것처럼 보여서, 겹침은 0.6초로 짧게 (flow.module.css .postcard).
  * 질문 바로 옆에서 움직이므로:
  * - 마우스를 올리면 멈추고, 멈춤 단추로 멈출 수도 있다 (WCAG 2.2.2 — 계속 움직이는 것은 멈출 수 있어야 한다)
  * - '움직임 줄이기' 설정이면 넘기지 않고 첫 장만
  * - 사진은 처음부터 다 받지 않는다: 지금 장과 다음 장만 미리 받는다
  * - 고른 도시가 바뀌면 첫 장부터: 부르는 쪽이 key 로 사진 목록을 넘겨 새로 그리게 한다
  */
-export const ROTATE_MS = 4000;
+export const ROTATE_MS = 2000;
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(false);
