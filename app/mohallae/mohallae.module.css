@@ -183,6 +183,18 @@
   .stripPlan, .stripTip { font-size: 15px; }
 }
 
+/* 좁은 칸 안의 띠 (입력 흐름의 기다리는 화면). 랜딩 첫 화면의 띠는 PC 에서 680px 이상으로 고정이라
+   왼쪽 칸이 그보다 좁으면 오른쪽 판에 붙었다 (써니 2026-10-12). 칸 폭을 넘지 않게 하고,
+   칸이 좁으면 휴대폰처럼 두 줄로 쌓는다 — 화면 폭이 아니라 칸 폭으로 정한다 */
+.stripFit { container-type: inline-size; }
+.stripFit .strip { width: 100%; max-width: 780px; }
+@container (max-width: 659px) {
+  .stripFit .strip { border-radius: 22px; padding: 14px 18px 16px; }
+  .stripFit .stripItem { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
+  .stripFit .stripArrow { display: none; }
+  .stripFit .stripPlan, .stripFit .stripTip { font-size: 15px; }
+}
+
 /* ── 샘플 카드 ───────────────────────────────────── */
 
 .card {

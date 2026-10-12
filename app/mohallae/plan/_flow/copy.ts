@@ -104,6 +104,7 @@ export const flowCopy = {
   waiting: {
     title: tx("초안을 쓰고 있어요", "Writing your draft"),
     body: tx("보통 15초쯤 걸려요. 그동안 현지인이 고쳐 쓴 계획을 구경해 보세요.", "Usually about 15 seconds. Meanwhile, a few plans a local would rewrite:"),
+    slow: tx("여행이 길면 1분 가까이 걸리기도 해요. 조금만 더 기다려 주세요.", "Longer trips can take up to a minute. Hang on a little longer."),
   },
   errors: {
     400: tx("적어 주신 값 중에 이상한 게 있어요. 날짜와 인원을 확인해 주세요.", "Something doesn't look right. Please check the dates and the number of people."),
