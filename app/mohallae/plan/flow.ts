@@ -37,7 +37,8 @@ const tx = (ko: string, en: string): Text => ({ ko, en });
 export const CURATED: Record<string, Curated> = {
   Seoul: {
     tagline: tx("오래된 골목과 새로운 취향 사이", "Between old alleys and new tastes"),
-    // 노을 사진은 하늘이 절반이고 한옥이 사진 아래 끝에서 잘려 있어 칸 비율로는 못 살린다 (써니: "하늘만 보이는 느낌") — 북촌 골목으로
+    // 노을 사진은 하늘이 절반이고 한옥이 사진 아래 끝에서 잘려 있어 칸 비율로는 못 살린다 (써니: "하늘만 보이는 느낌") — 북촌 골목으로.
+    // 랜딩 첫 화면 원본(.impeccable/plates/hero-photo.png, 2688×1152)에서 아래쪽(골목 바닥)에 맞춰 잘랐다 (써니: "땅 부분이 더 보였으면")
     postcard: "/mohallae/postcard-seoul-bukchon.jpg",
     experiences: [
       { id: "heritage", title: tx("궁궐과 한옥", "Palaces & hanok"), description: tx("시간이 천천히 흐르는 서울", "Where time slows down"), image: "/landing/gyeongbokgung.webp",
