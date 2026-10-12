@@ -1,0 +1,132 @@
+/*
+  날짜 화면 달력 (Calendar.tsx). 색 이름(--m-ink …)은 mohallae.module.css 의 .page 에서 물려받는다.
+  칸이 넓으면(640px 이상) 두 달, 좁으면 한 달. 화면 폭이 아니라 이 칸의 폭으로 정한다 —
+  PC 라도 1024px 언저리에서는 왼쪽 칸이 좁아 두 달을 넣으면 날짜가 눌리기 어렵다.
+*/
+
+.calendar { margin-top: 28px; max-width: 760px; container-type: inline-size; }
+.fields, .board { max-width: 440px; }
+@container (min-width: 640px) { .fields, .board { max-width: none; } }
+
+/* ── 고른 두 날 ─────────────────────────────────── */
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 11px 16px 12px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #d5d9e1;
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.field:hover { box-shadow: inset 0 0 0 1px var(--m-ink-3); }
+.field[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--m-ink); }
+.field:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
+.fieldLabel { font-size: 12.5px; line-height: 18px; color: var(--m-ink-3); }
+.fieldValue { font-size: 17px; line-height: 24px; font-weight: 600; letter-spacing: -0.01em; color: var(--m-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fieldEmpty { font-weight: 400; color: #9aa0ad; }
+
+.status { margin: 12px 0 0; min-height: 20px; font-size: 14px; line-height: 20px; color: var(--m-ink-2); }
+
+/* ── 달력 판 ─────────────────────────────────────── */
+.board {
+  position: relative;
+  margin-top: 14px;
+  padding: 18px 20px 16px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--m-shadow);
+}
+.navBtn {
+  position: absolute;
+  top: 12px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  color: var(--m-ink);
+  cursor: pointer;
+}
+.navBtn svg { width: 16px; height: 16px; }
+.navBtn:hover:not(:disabled) { background: var(--m-band); }
+.navBtn:disabled { opacity: 0.25; cursor: default; }
+.navBtn:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 2px; }
+.prev { left: 12px; }
+.next { right: 12px; }
+
+.months { display: grid; }
+.month + .month { display: none; }
+@container (min-width: 640px) {
+  .months { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+  .month + .month { display: block; }
+}
+.monthTitle { margin: 0 0 10px; text-align: center; font-size: 15.5px; line-height: 24px; font-weight: 700; letter-spacing: -0.01em; }
+.weekdays, .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.weekdays span { padding-bottom: 6px; text-align: center; font-size: 12px; line-height: 16px; color: var(--m-ink-3); }
+/* 늘 여섯 줄: 달을 넘길 때 판 높이가 바뀌어 아래 단추가 들썩이지 않게 */
+.days { grid-template-rows: repeat(6, 44px); row-gap: 2px; }
+
+/* ── 날 ──────────────────────────────────────────── */
+.day {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  height: 44px;
+  color: var(--m-ink);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.day > span {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(40px, 100%);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  transition: background-color 0.15s, color 0.15s;
+}
+/* 손가락으로 누르는 화면에서는 hover 가 눌린 자리에 남는다 — 다음 화면의 날짜가 골라진 것처럼 보이지 않게 마우스일 때만 */
+@media (hover: hover) {
+  .day:hover:not(:disabled, .picked) > span { box-shadow: inset 0 0 0 1px var(--m-ink); }
+}
+.day:disabled { color: #c3c8d2; cursor: default; }
+.day:focus-visible { outline: none; }
+.day:focus-visible > span { outline: 2px solid var(--m-ink); outline-offset: 2px; }
+
+/* 고른 기간: 두 날 사이를 회색 띠로 잇는다 */
+.between { background: var(--m-band); }
+.rangeStart { background: linear-gradient(to right, transparent 50%, var(--m-band) 50%); }
+.rangeEnd { background: linear-gradient(to left, transparent 50%, var(--m-band) 50%); }
+.picked > span { background: var(--m-ink); color: #fff; font-weight: 700; }
+
+/* 오늘: 숫자 아래 작은 점 */
+.today > span::after {
+  content: "";
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 9999px;
+  background: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field, .day > span { transition: none; }
+}
+
+@media (max-width: 479px) {
+  .calendar { margin-top: 24px; }
+  .field { padding: 10px 14px 11px; }
+  .fieldValue { font-size: 16px; }
+  .board { padding: 16px 10px 12px; }
+  .prev { left: 8px; }
+  .next { right: 8px; }
+}
