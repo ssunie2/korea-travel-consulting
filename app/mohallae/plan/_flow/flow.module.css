@@ -36,7 +36,7 @@
 @media (min-width: 1024px) {
   .grid { grid-template-columns: minmax(0, 11fr) minmax(0, 8fr); column-gap: clamp(40px, 5vw, 96px); align-items: start; }
 }
-.ask { min-width: 0; }
+.ask { display: flex; flex-direction: column; min-width: 0; }
 .question {
   margin: 0;
   max-width: 15em;
@@ -173,8 +173,38 @@
 }
 .languagePick select:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 2px; }
 
-/* ── 아래 단추 줄 ─────────────────────────────────── */
-.nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; }
+/* ── 아래 단추 줄: 어느 질문에서나 같은 자리 ─────────────
+   써니 2026-10-12: "다음 표시가 일정한 위치에 있던가… 계속 다음 다음 다음 누르니까 번거로워".
+   PC 는 왼쪽 칸을 화면 맨 아래까지 늘리고(.grid flex, .ask stretch) 단추 줄을 칸 맨 아래에 둔다.
+   내용이 화면보다 길면 단추 줄이 화면 아래에 붙어 따라온다(sticky). 그래서 '다음'은 늘 같은 자리다.
+   노트북(세로 800px 안팎)에서 사진 카드 단계의 '다음'이 화면 밖으로 밀려나던 것도 함께 풀린다. */
+.push { flex: 1 0 28px; }
+.nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0 calc(18px + env(safe-area-inset-bottom));
+  background: rgb(255 255 255 / 0.96);
+  border-top: 1px solid var(--m-line);
+}
+@media (min-width: 1024px) {
+  .main { padding-bottom: 0; }
+  .grid { flex: 1; }
+  .ask { align-self: stretch; }
+  .panel { margin-bottom: 32px; }
+}
+/* 한 칸짜리 화면(폰·태블릿): 질문 칸이 첫 화면을 채워서 단추 줄이 늘 화면 맨 아래에 온다.
+   136px = 위 막대 61 + 진행 48 + 칸 위 여백 26 (조금 모자라게 — 넘치면 몇 px 스크롤이 생긴다).
+   svh: 주소창이 보일 때 기준이라 스크롤하며 주소창이 숨어도 단추 줄이 들썩이지 않는다.
+   '지금까지의 여행' 판은 그 아래로 스크롤하면 나온다. 단추 줄은 화면 끝까지 */
+@media (max-width: 1023px) {
+  .ask { min-height: calc(100svh - 136px); }
+  .nav { margin-inline: calc(-1 * clamp(20px, 3.4vw, 64px)); padding-inline: clamp(20px, 3.4vw, 64px); }
+}
 .navRight { display: flex; align-items: center; gap: 18px; }
 .back { display: inline-flex; gap: 6px; align-items: center; min-height: 44px; border-radius: 6px; font-size: 15px; font-weight: 500; color: var(--m-ink-2); cursor: pointer; }
 .back:hover { color: var(--m-ink); text-decoration: underline; text-underline-offset: 4px; }
@@ -186,7 +216,7 @@
 .next:disabled { opacity: 0.32; cursor: not-allowed; }
 .next:disabled:active { transform: none; }
 .failure { margin: 20px 0 0; padding: 12px 16px; max-width: 46ch; border-radius: 12px; background: var(--m-band); font-size: 15px; line-height: 1.5; color: var(--m-ink); }
-.reviewNote { margin: 14px 0 0; font-size: 13.5px; color: var(--m-ink-3); text-align: right; }
+.reviewNote { margin: 18px 0 0; font-size: 13.5px; color: var(--m-ink-3); }
 
 /* ── 오른쪽 판: 지금까지의 여행 ───────────────────── */
 .panel {
@@ -282,7 +312,6 @@ button.lineValue:focus-visible { outline: 2px solid var(--m-ink); outline-offset
   .photoChoice .choiceText, .choiceText { padding: 12px 14px 14px; }
   .choiceTitle { font-size: 15.5px; }
   .choiceDesc { font-size: 13px; }
-  .nav { position: sticky; bottom: 0; margin-inline: -20px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); background: rgb(255 255 255 / 0.94); border-top: 1px solid var(--m-line); }
+  .nav { padding-block: 12px calc(12px + env(safe-area-inset-bottom)); }
   .next { height: 46px; padding-inline: 24px; }
-  .reviewNote { text-align: left; }
 }

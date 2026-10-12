@@ -145,7 +145,10 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
                 <Body step={state.step} answers={state.answers} lang={lang} destinations={destinations} dispatch={dispatch} />
 
                 {failure && <p role="alert" className={s.failure}>{t(failure)}</p>}
+                {state.step === "review" && <p className={s.reviewNote}>{t(c.review.note)}</p>}
 
+                {/* 단추 줄은 어느 질문에서나 같은 자리 — 칸 아래 끝 (써니: "다음 다음 다음 누르니까 번거로워") */}
+                <div className={s.push} aria-hidden="true" />
                 <div className={s.nav}>
                   {index > 0 ? (
                     <button type="button" className={s.back} onClick={() => dispatch({ type: "back" })}>
@@ -153,35 +156,50 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
                     </button>
                   ) : <span />}
                   <div className={s.navRight}>
-                    {OPTIONAL.includes(state.step) && (
-                      <button type="button" className={s.jump} onClick={() => dispatch({ type: "goto", to: "review" })} disabled={!!error}>
-                        {t(c.toReview)}
-                      </button>
-                    )}
                     {state.step === "review" ? (
                       <button type="button" className={`${base.pillDark} ${s.next}`} onClick={submit}>
                         {t(c.submit)}
                       </button>
+                    ) : state.reviewed ? (
+                      // 확인 화면을 본 뒤 고치러 왔다: 곧장 돌아가는 단추가 주인공, 한 칸씩 가는 건 옆에 작게
+                      <>
+                        <button type="button" className={s.jump} disabled={!!error}
+                          aria-describedby={error ? "step-error" : undefined}
+                          onClick={() => dispatch({ type: "next", from: state.step })}>
+                          {t(c.nextQuestion)}
+                        </button>
+                        <button type="button" className={`${base.pillDark} ${s.next}`} disabled={!!error}
+                          aria-describedby={error ? "step-error" : undefined}
+                          onClick={() => dispatch({ type: "resume" })}>
+                          {t(c.backToReview)} <span aria-hidden="true">→</span>
+                        </button>
+                      </>
                     ) : (
-                      <button
-                        type="button"
-                        className={`${base.pillDark} ${s.next}`}
-                        disabled={!!error}
-                        aria-describedby={error ? "step-error" : undefined}
-                        onClick={() => dispatch({ type: "next", from: state.step })}
-                      >
-                        {nextLabel(state.step, state.answers, lang)} <span aria-hidden="true">→</span>
-                      </button>
+                      <>
+                        {OPTIONAL.includes(state.step) && (
+                          <button type="button" className={s.jump} onClick={() => dispatch({ type: "goto", to: "review" })} disabled={!!error}>
+                            {t(c.toReview)}
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className={`${base.pillDark} ${s.next}`}
+                          disabled={!!error}
+                          aria-describedby={error ? "step-error" : undefined}
+                          onClick={() => dispatch({ type: "next", from: state.step })}
+                        >
+                          {nextLabel(state.step, state.answers, lang)} <span aria-hidden="true">→</span>
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
                 {error && <p id="step-error" className="sr-only">{t(error)}</p>}
-                {state.step === "review" && <p className={s.reviewNote}>{t(c.review.note)}</p>}
               </>
             )}
           </section>
 
-          <TripPanel answers={state.answers} step={state.step} order={order} lang={lang} placeName={placeName}
+          <TripPanel answers={state.answers} step={state.step} order={order} lang={lang} placeName={placeName} reviewed={!!state.reviewed}
             onEdit={sending ? undefined : (to) => dispatch({ type: "goto", to })} />
         </div>
       </main>
@@ -352,8 +370,8 @@ function Body({ step, answers, lang, destinations, dispatch }: {
 
 type Line = { key: string; label: string; value: string | null; to: Step | null };
 
-function TripPanel({ answers, step, order, lang, placeName, onEdit }: {
-  answers: Answers; step: Step; order: Step[]; lang: Lang; placeName: (v: string) => string; onEdit?: (to: Step) => void;
+function TripPanel({ answers, step, order, lang, placeName, reviewed, onEdit }: {
+  answers: Answers; step: Step; order: Step[]; lang: Lang; placeName: (v: string) => string; reviewed: boolean; onEdit?: (to: Step) => void;
 }) {
   const t = (x: Text) => x[lang];
   const p = c.panel;
@@ -361,7 +379,8 @@ function TripPanel({ answers, step, order, lang, placeName, onEdit }: {
   const sep = lang === "ko" ? ", " : ", ";
   const title = (st: Step, id: string) => choicesFor(st).find((o) => o.id === id)?.title[lang] ?? id;
   const valueOf = (st: Step) => (answers[st] ?? []).map((id) => title(st, id)).join(sep) || null;
-  const reached = (st: Step) => order.indexOf(st) < order.indexOf(step) || (st === step && !!answers[st]?.length);
+  // 확인 화면을 본 뒤에는 앞 질문을 고치는 중이어도 뒤쪽 답(인원 등)을 그대로 보여 준다
+  const reached = (st: Step) => reviewed || order.indexOf(st) < order.indexOf(step) || (st === step && !!answers[st]?.length);
 
   const lines: Line[] = [{ key: "where", label: t(p.where), value: places.length ? places.map(placeName).join(" · ") : null, to: "where" }];
   for (const place of places) {

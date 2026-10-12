@@ -122,6 +122,44 @@ test("필수 질문은 건너뛸 수 없고, 세부에서만 바로 확인으로
   assert.equal(s.step, "dates");
 });
 
+test("확인 화면을 본 뒤 고치러 가면 곧장 돌아오고, 새로 생긴 필수 질문에서는 멈춘다", () => {
+  const resume = (st: FlowState) => flowReducer(st, { type: "resume" });
+  let s = pick(INITIAL_STATE, "Busan");
+  s = pick(s, "coast");
+  s = pick(s, "cafe");
+  s = core(s);
+  assert.equal(resume(s).step, s.step, "확인 화면 전에는 아무 일도 없다");
+  s = flowReducer(s, { type: "goto", to: "review" });
+  assert.equal(s.reviewed, true);
+
+  // 날짜만 고치고 곧장 확인으로
+  s = flowReducer(s, { type: "goto", to: "dates" });
+  s = input(s, ["2100-10-20", "2100-10-24"]);
+  s = resume(s);
+  assert.equal(s.step, "review");
+
+  // 고치다 비워 두면 못 간다
+  s = flowReducer(s, { type: "goto", to: "dates" });
+  assert.equal(resume(input(s, ["2100-10-20", ""])).step, "dates");
+
+  // 서울을 더하면 서울의 '하고 싶은 것'과 장면을 거쳐서 돌아온다
+  s = flowReducer(input(s, ["2100-10-20", "2100-10-24"]), { type: "goto", to: "where" });
+  s = choose(s, "Seoul");
+  s = resume(s);
+  assert.equal(s.step, "do:Seoul");
+  s = resume(choose(s, "heritage"));
+  assert.equal(s.step, "scene:Seoul:heritage");
+  s = resume(choose(s, "hanbok"));
+  assert.equal(s.step, "review");
+
+  // 혼자 → 친구들과: 인원을 다시 세야 하므로 인원에서 멈춘다
+  s = flowReducer(s, { type: "goto", to: "who" });
+  s = resume(choose(s, "friends"));
+  assert.equal(s.step, "travelers");
+  s = resume(input(s, ["3"]));
+  assert.equal(s.step, "review");
+});
+
 test("늦게 들어온 이전 화면의 클릭은 두 칸을 건너뛰지 않는다", () => {
   const s = choose(INITIAL_STATE, "Seoul");
   const moved = next(s);

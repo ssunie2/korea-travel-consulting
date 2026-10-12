@@ -20,6 +20,8 @@ export const flowCopy = {
   next: tx("다음", "Next"),
   skip: tx("건너뛰기", "Skip"),
   toReview: tx("바로 확인으로", "Skip to review"),
+  backToReview: tx("확인 화면으로", "Back to review"),
+  nextQuestion: tx("다음 질문", "Next question"),
   submit: tx("무료 초안 받기", "Get my free draft"),
 
   picked: { ko: (n: number) => `${n}개 골랐어요 · 다시 누르면 풀려요`, en: (n: number) => `${n} picked — tap again to remove` },
@@ -79,7 +81,7 @@ export const flowCopy = {
   },
   review: {
     q: tx("이대로 초안을 쓸까요?", "Ready for your draft?"),
-    help: tx("고칠 곳이 있으면 오른쪽에서 눌러 바로 돌아갈 수 있어요.", "Want to change something? Tap it on the right to go back."),
+    help: tx("고칠 곳이 있으면 '지금까지의 여행'에서 눌러 바로 돌아갈 수 있어요.", "Want to change something? Tap it under “Your trip so far” to go back."),
     language: tx("초안을 받을 언어", "Language of your draft"),
     note: tx("가입도 카드도 필요 없어요. 보통 15초쯤 걸려요.", "No account, no card. Usually about 15 seconds."),
   },

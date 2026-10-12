@@ -260,8 +260,9 @@ export const OPTIONAL: Step[] = ["visited", "transport", "stay", "rhythm", "occa
 const MULTI_SIMPLE: Step[] = ["where", "interests", "avoid", "diet"];
 
 export type Answers = Partial<Record<Step | `${OtherStep}:other` | "budget:currency" | "review:language", string[]>>;
-export type FlowState = { step: Step; answers: Answers };
-export const INITIAL_STATE: FlowState = { step: "where", answers: {} };
+/** reviewed: 확인 화면까지 한 번 와 봤는지. 그 뒤로 앞 질문을 고치러 가면 '확인 화면으로' 단추가 생긴다 */
+export type FlowState = { step: Step; answers: Answers; reviewed?: boolean };
+export const INITIAL_STATE: FlowState = { step: "where", answers: {}, reviewed: false };
 
 /** 화면이 넘겨주는 도시 목록 (lib/places.ts 의 DESTINATIONS 와 같은 모양) */
 export type Destination = { v: string; ko: string };
@@ -376,26 +377,35 @@ export type Action =
   | { type: "next"; from: Step }
   | { type: "back" }
   | { type: "goto"; to: Step } // 확인 화면에서 고칠 곳으로, 세부에서 바로 확인으로
+  | { type: "resume" } // 확인 화면을 본 뒤 고치러 왔을 때: 곧장 확인 화면으로
   | { type: "reset" };
 
 export function flowReducer(state: FlowState, action: Action): FlowState {
   if (action.type === "reset") return INITIAL_STATE;
   const order = stepOrder(state.answers);
   const index = order.indexOf(state.step);
+  const move = (step: Step): FlowState => ({ ...state, step, reviewed: state.reviewed || step === "review" });
 
-  if (action.type === "back") return { ...state, step: order[Math.max(0, index - 1)] };
+  if (action.type === "back") return move(order[Math.max(0, index - 1)]);
+  if (action.type === "resume") {
+    // 확인 화면에서 날짜 하나 고치러 왔는데 다음·다음·다음을 눌러야 돌아가는 건 번거롭다 (써니 2026-10-12).
+    // 고치는 사이에 새로 생긴 필수 질문(새 도시의 '하고 싶은 것', 아이 나이, 다시 세야 할 인원)이 있으면 거기서 멈춘다
+    if (!state.reviewed || state.step === "review" || stepError(state)) return state;
+    const pending = order.find((st) => st !== "review" && stepError({ step: st, answers: state.answers }));
+    return move(pending ?? "review");
+  }
   if (action.type === "goto") {
     if (!order.includes(action.to)) return state;
     // 앞으로 건너뛰는 건 세부 → 확인뿐이다. 필수 질문을 건너뛰지 못하게 한다
     const forward = order.indexOf(action.to) > index;
     if (forward && !(OPTIONAL.includes(state.step) && action.to === "review")) return state;
     if (forward && stepError(state)) return state;
-    return { ...state, step: action.to };
+    return move(action.to);
   }
   if (action.type === "next") {
     // 이전 화면에서 늦게 들어온 클릭이 다음 질문까지 건너뛰지 않게 한다 (베타와 같다)
     if (action.from !== state.step || stepError(state) || state.step === "review") return state;
-    return { ...state, step: order[index + 1] };
+    return move(order[index + 1]);
   }
   if (action.type === "input") {
     if (state.step !== "dates" && state.step !== "travelers") return state;
