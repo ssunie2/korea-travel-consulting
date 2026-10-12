@@ -144,6 +144,13 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
 
                 <Body step={state.step} answers={state.answers} lang={lang} destinations={destinations} dispatch={dispatch} />
 
+                {/* 화면이 좁으면 판이 질문 아래(첫 화면 밖)로 밀린다 — 확인 화면에서는 고칠 목록을 여기에.
+                    초안 언어(위)를 먼저 보이게 하고 그 아래에. CSS 가 화면 넓이에 따라 이것과 오른쪽 판 중 하나만 보여 준다 */}
+                {state.step === "review" && (
+                  <TripPanel variant="inline" answers={state.answers} step={state.step} order={order} lang={lang} placeName={placeName}
+                    reviewed={!!state.reviewed} onEdit={(to) => dispatch({ type: "goto", to })} />
+                )}
+
                 {failure && <p role="alert" className={s.failure}>{t(failure)}</p>}
                 {state.step === "review" && <p className={s.reviewNote}>{t(c.review.note)}</p>}
 
@@ -370,7 +377,8 @@ function Body({ step, answers, lang, destinations, dispatch }: {
 
 type Line = { key: string; label: string; value: string | null; to: Step | null };
 
-function TripPanel({ answers, step, order, lang, placeName, reviewed, onEdit }: {
+function TripPanel({ variant = "aside", answers, step, order, lang, placeName, reviewed, onEdit }: {
+  variant?: "aside" | "inline";
   answers: Answers; step: Step; order: Step[]; lang: Lang; placeName: (v: string) => string; reviewed: boolean; onEdit?: (to: Step) => void;
 }) {
   const t = (x: Text) => x[lang];
@@ -419,14 +427,14 @@ function TripPanel({ answers, step, order, lang, placeName, reviewed, onEdit }: 
   const postcard = places.map((pl) => CURATED[pl]?.postcard).find(Boolean);
 
   return (
-    <aside className={s.panel} aria-label={t(p.title)}>
+    <Frame variant={variant} className={variant === "inline" ? s.reviewInline : `${s.panel} ${step === "review" ? s.panelOnReview : ""}`} label={t(p.title)}>
       <p className={s.panelTitle}>{t(p.title)}</p>
-      {postcard ? (
+      {variant === "aside" && (postcard ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={postcard} alt="" className={s.postcard} />
       ) : (
         <div className={s.postcardBlank} aria-hidden="true">{places.length ? places.map(placeName).join(" · ") : "mohallae"}</div>
-      )}
+      ))}
       <ol className={s.timeline}>
         {lines.map((l) => {
           const done = l.value !== null;
@@ -453,8 +461,15 @@ function TripPanel({ answers, step, order, lang, placeName, reviewed, onEdit }: 
           );
         })}
       </ol>
-    </aside>
+    </Frame>
   );
+}
+
+/** 오른쪽 판은 aside(쪽 영역), 확인 화면 안의 목록은 그냥 묶음 — 같은 내용을 두 번 영역으로 알리지 않는다 */
+function Frame({ variant, className, label, children }: { variant: "aside" | "inline"; className: string; label: string; children: React.ReactNode }) {
+  return variant === "aside"
+    ? <aside className={className} aria-label={label}>{children}</aside>
+    : <div className={className} role="group" aria-label={label}>{children}</div>;
 }
 
 function dayLabel(key: string, lang: Lang) {

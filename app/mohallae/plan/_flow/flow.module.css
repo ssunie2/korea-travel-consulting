@@ -278,6 +278,14 @@ button.lineValue { border-radius: 4px; cursor: pointer; }
 button.lineValue:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); }
 button.lineValue:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
 
+/* 확인 화면: 화면이 좁으면 '지금까지의 여행'을 질문 바로 아래에 (판은 첫 화면 밖으로 밀려
+   고칠 곳이 안 보였다 — 써니 2026-10-12 "해당 항목 눌러서 수정하는 화면이 없어졌는데"). 넓으면 오른쪽 판 그대로 */
+.reviewInline { display: none; }
+@media (max-width: 1023px) {
+  .reviewInline { display: block; max-width: 560px; margin-top: 24px; padding: 18px 20px 20px; border-radius: 16px; background: #fff; box-shadow: var(--m-shadow); }
+  .panelOnReview { display: none; }
+}
+
 /* ── 기다림 ─────────────────────────────────────────── */
 .waiting { min-height: 360px; }
 .waitStrip { margin-top: 34px; }
