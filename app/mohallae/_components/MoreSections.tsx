@@ -1,6 +1,6 @@
 import Link from "next/link";
 import styles from "../mohallae.module.css";
-import { ask, footer, nav, plans, steps, type Lang } from "../content";
+import { ask, footer, nav, planHref, plans, steps, type Lang } from "../content";
 
 /** 무료 초안 vs 전체 일정 ($25). 시안 ③ 아래쪽의 두 카드 자리 — 글은 실제 문구로 바꿨다. */
 export function Plans({ lang }: { lang: Lang }) {
@@ -17,7 +17,7 @@ export function Plans({ lang }: { lang: Lang }) {
             </h3>
             <CheckList items={plans.free.items[lang]} />
             <div className="mt-auto pt-7">
-              <Link href="/plan" className={`${styles.pillDark} h-[48px] px-7 text-[16px]`}>
+              <Link href={planHref(lang)} className={`${styles.pillDark} h-[48px] px-7 text-[16px]`}>
                 {nav.cta[lang]}
               </Link>
             </div>
@@ -93,7 +93,7 @@ export function Ask({ lang }: { lang: Lang }) {
             </Link>
           </p>
         </div>
-        <Link href="/plan" className={`${styles.pillDark} h-[50px] shrink-0 px-8 text-[16.5px]`}>
+        <Link href={planHref(lang)} className={`${styles.pillDark} h-[50px] shrink-0 px-8 text-[16.5px]`}>
           {ask.cta[lang]}
         </Link>
       </div>

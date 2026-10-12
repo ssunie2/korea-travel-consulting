@@ -1,7 +1,7 @@
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import styles from "../mohallae.module.css";
-import { corrections, draftDay, nav, samples, tipLabel, type Lang } from "../content";
+import { corrections, draftDay, nav, planHref, samples, tipLabel, type Lang } from "../content";
 import PlayOnView from "./PlayOnView";
 
 import cardSeoulSunset from "@/public/mohallae/card-seoul-sunset.jpg";
@@ -66,7 +66,7 @@ export default function Samples({ lang }: { lang: Lang }) {
             <p className="mt-3 max-w-[26rem] text-[17px] leading-relaxed text-[var(--m-ink-2)] md:text-[18px]">
               {samples.lead[lang]}
             </p>
-            <Link href="/plan" className={`${styles.pillDark} mt-6 h-[48px] px-7 text-[16px]`}>
+            <Link href={planHref(lang)} className={`${styles.pillDark} mt-6 h-[48px] px-7 text-[16px]`}>
               {nav.cta[lang]}
             </Link>
           </div>

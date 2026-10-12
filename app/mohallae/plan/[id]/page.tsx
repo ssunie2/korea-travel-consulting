@@ -8,7 +8,7 @@ import base from "../../mohallae.module.css";
 import styles from "./plan.module.css";
 import { draftCopy } from "./copy";
 import { keepNumberWithWord, placeName, tripDates } from "./format";
-import { langFrom, samples } from "../../content";
+import { langFrom, planHref, samples } from "../../content";
 import TopBar from "./_components/TopBar";
 import DayColumn from "./_components/DayColumn";
 import LocalTip from "./_components/LocalTip";
@@ -75,7 +75,7 @@ export default async function DraftPage({ params, searchParams }: PageProps<"/mo
         <main className={`${styles.wrap} ${styles.failed}`}>
           <h1>{draftCopy.failedTitle[lang]}</h1>
           <p>{draftCopy.failedBody[lang]}</p>
-          <Link href="/plan" className={`${base.pillDark} mt-8 h-[46px] px-7 text-[16px]`}>
+          <Link href={planHref(lang)} className={`${base.pillDark} mt-8 h-[46px] px-7 text-[16px]`}>
             {draftCopy.startOver[lang]}
           </Link>
         </main>

@@ -3,7 +3,7 @@ import type { FreeItinerary } from "@/lib/types";
 import base from "../../../mohallae.module.css";
 import styles from "../plan.module.css";
 import { draftCopy } from "../copy";
-import { nav, type Lang } from "../../../content";
+import { nav, planHref, type Lang } from "../../../content";
 import CopyLink from "./CopyLink";
 import Facts from "./Facts";
 
@@ -40,7 +40,7 @@ export default function ClosingBand({
           {isSample ? (
             // 샘플은 남의 여행이다: 이 초안으로 신청하지 않고, 내 여행으로 무료 초안을 받으러 간다 (랜딩과 같은 글)
             <div className={styles.buttons}>
-              <Link href="/plan" className={`${base.pillDark} ${styles.cta}`}>
+              <Link href={planHref(lang)} className={`${base.pillDark} ${styles.cta}`}>
                 {nav.cta[lang]}
               </Link>
             </div>

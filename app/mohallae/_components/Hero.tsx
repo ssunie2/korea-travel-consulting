@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import styles from "../mohallae.module.css";
-import { hero, nav, type Lang } from "../content";
+import { hero, nav, planHref, type Lang } from "../content";
 import heroPhoto from "@/public/mohallae/hero-bukchon.jpg";
 import CorrectionStrip from "./CorrectionStrip";
 
@@ -53,7 +53,7 @@ export default function Hero({ lang }: { lang: Lang }) {
             <LangSwitch lang={lang} />
           </span>
           <Link
-            href="/plan"
+            href={planHref(lang)}
             className={`${styles.pillLight} ml-3 hidden h-[35px] px-[10.5px] text-[12px] sm:inline-flex md:ml-[22px]`}
           >
             {nav.cta[lang]}
@@ -75,7 +75,7 @@ export default function Hero({ lang }: { lang: Lang }) {
         </div>
 
         <Link
-          href="/plan"
+          href={planHref(lang)}
           className={`${styles.pillLight} ${styles.pillHero} mt-[22px] h-[50px] px-8 text-[17px]`}
         >
           {nav.cta[lang]}
