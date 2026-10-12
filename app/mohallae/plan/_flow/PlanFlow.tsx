@@ -7,9 +7,10 @@ import base from "../../mohallae.module.css";
 import s from "./flow.module.css";
 import CorrectionStrip from "../../_components/CorrectionStrip";
 import Calendar from "./Calendar";
+import Postcard from "./Postcard";
 import {
   CURATED, CURRENCIES, INITIAL_STATE, LANGUAGES, OPTIONAL, OTHER_STEPS,
-  choicesFor, defaultCurrency, flowReducer, isMultiple, nights, pickedPlaces, stepError, stepOrder, toPlanRequest,
+  choicesFor, defaultCurrency, flowReducer, isMultiple, nights, panelPhotos, pickedPlaces, stepError, stepOrder, toPlanRequest,
   type Answers, type Choice, type Destination, type Lang, type Step, type Text,
 } from "../flow";
 import { flowCopy as c } from "./copy";
@@ -218,10 +219,6 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
 
 function question(step: Step, answers: Answers, lang: Lang, placeName: (v: string) => string): string {
   if (step.startsWith("do:")) return c.todo.q[lang](placeName(step.slice(3)));
-  if (step.startsWith("scene:")) {
-    const [, place, expId] = step.split(":");
-    return CURATED[place]?.experiences.find((e) => e.id === expId)?.question[lang] ?? "";
-  }
   if (step === "interests") {
     const places = pickedPlaces(answers).filter((p) => !CURATED[p]).map(placeName);
     return c.interests.q[lang](places.join(lang === "ko" ? "·" : " & "));
@@ -232,7 +229,6 @@ function question(step: Step, answers: Answers, lang: Lang, placeName: (v: strin
 
 function helper(step: Step, lang: Lang): string {
   if (step.startsWith("do:")) return c.todo.help[lang];
-  if (step.startsWith("scene:")) return c.scene.help[lang];
   if (step === "interests") return c.interests.help[lang];
   if (step === "diet") return c.diet.help[lang];
   if (OPTIONAL.includes(step)) return c.optionalNote[lang];
@@ -394,13 +390,8 @@ function TripPanel({ variant = "aside", answers, step, order, lang, placeName, r
   for (const place of places) {
     const city = CURATED[place];
     if (!city) continue;
-    const scenes = city.experiences
-      .filter((e) => answers[`do:${place}`]?.includes(e.id))
-      .flatMap((e) => {
-        const picks = (answers[`scene:${place}:${e.id}`] ?? []).map((id) => e.scenes.find((x) => x.id === id)?.title[lang]).filter(Boolean);
-        return picks.length ? picks : [e.title[lang]];
-      });
-    lines.push({ key: `do:${place}`, label: `${placeName(place)} — ${t(p.todo)}`, value: scenes.join(sep) || null, to: `do:${place}` });
+    const picks = city.experiences.filter((e) => answers[`do:${place}`]?.includes(e.id)).map((e) => e.title[lang]);
+    lines.push({ key: `do:${place}`, label: `${placeName(place)} — ${t(p.todo)}`, value: picks.join(sep) || null, to: `do:${place}` });
   }
   if (order.includes("interests")) {
     const other = answers["interests:other"]?.[0]?.trim();
@@ -424,27 +415,23 @@ function TripPanel({ variant = "aside", answers, step, order, lang, placeName, r
   const detailsReached = OPTIONAL.some((st) => reached(st)) || step === "review";
   lines.push({ key: "details", label: t(p.details), value: details.length ? details.join(sep) : detailsReached ? "—" : null, to: "visited" });
 
-  const postcard = places.map((pl) => CURATED[pl]?.postcard).find(Boolean);
+  const photos = panelPhotos(places);
 
   return (
     <Frame variant={variant} className={variant === "inline" ? s.reviewInline : `${s.panel} ${step === "review" ? s.panelOnReview : ""}`} label={t(p.title)}>
       <p className={s.panelTitle}>{t(p.title)}</p>
-      {variant === "aside" && (postcard ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={postcard} alt="" className={s.postcard} />
-      ) : (
-        <div className={s.postcardBlank} aria-hidden="true">{places.length ? places.map(placeName).join(" · ") : "mohallae"}</div>
-      ))}
+      {variant === "aside" && (
+        <Postcard key={photos.join("|")} photos={photos} lang={lang} label={places.length ? places.map(placeName).join(" · ") : "mohallae"} />
+      )}
       <ol className={s.timeline}>
         {lines.map((l) => {
           const done = l.value !== null;
           const editable = done && onEdit && l.to && order.includes(l.to) && order.indexOf(l.to) <= order.indexOf(step) && l.to !== step;
-          // 지금 묻고 있는 줄 (도시의 장면 질문은 그 도시 줄, 세부는 세부 줄)
+          // 지금 묻고 있는 줄 (세부 질문들은 세부 줄, 아이 나이는 누구와 줄)
           const current =
             l.to === step ||
             (l.key === "details" && OPTIONAL.includes(step)) ||
-            (l.key === "who" && step === "kids") ||
-            (l.key.startsWith("do:") && step.startsWith(`scene:${l.key.slice(3)}:`));
+            (l.key === "who" && step === "kids");
           return (
             <li key={l.key} className={`${s.line} ${done ? s.done : ""} ${current ? s.current : ""}`} aria-current={current ? "step" : undefined}>
               <span className={s.lineLabel}>{l.label}</span>

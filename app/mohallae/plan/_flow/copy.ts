@@ -38,7 +38,6 @@ export const flowCopy = {
     q: { ko: (city: string) => `${city}에서는 뭘 해볼까요?`, en: (city: string) => `What do you want to do in ${city}?` },
     help: tx("끌리는 것을 다 골라 주세요 — 날짜에 맞춰 골라 담아 초안을 씁니다.", "Pick everything that pulls you in — the draft fits them to your days."),
   },
-  scene: { help: tx("여러 개 골라도 좋아요.", "Pick as many as you like.") },
   interests: {
     q: { ko: (places: string) => `${places}에서는 무엇이 끌리세요?`, en: (places: string) => `What are you into in ${places}?` },
     help: tx("고르지 않아도 돼요. 여러 개 골라도 좋아요.", "Optional — pick as many as you like."),
@@ -85,6 +84,8 @@ export const flowCopy = {
     language: tx("초안을 받을 언어", "Language of your draft"),
     note: tx("가입도 카드도 필요 없어요. 보통 15초쯤 걸려요.", "No account, no card. Usually about 15 seconds."),
   },
+
+  postcardPause: tx("엽서 사진 멈추기", "Pause the photos"),
 
   // 오른쪽 판
   panel: {

@@ -229,9 +229,33 @@
 .panelTitle { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
 /* 엽서: 흔히 쓰는 가로 엽서 148×100mm 비율 (써니 2026-10-12 "흔히 쓰는 엽서 비율로, 가로로 눕힌 엽서 크기로").
    사진은 이 비율로 미리 잘라 둔 postcard-*.jpg. 넓은 한 칸 화면(태블릿)에서는 너무 커지지 않게 480px 까지 */
-.postcard, .postcardBlank { width: 100%; aspect-ratio: 148 / 100; margin-top: 14px; border-radius: 14px; background: var(--m-band); }
-@media (max-width: 1023px) { .postcard, .postcardBlank { max-width: 480px; } }
-.postcard { display: block; object-fit: cover; }
+.postcardFrame, .postcardBlank { width: 100%; aspect-ratio: 148 / 100; margin-top: 14px; border-radius: 14px; background: var(--m-band); }
+@media (max-width: 1023px) { .postcardFrame, .postcardBlank { max-width: 480px; } }
+/* 사진을 겹쳐 두고 한 장씩 천천히 겹쳐 바꾼다 (Postcard.tsx) */
+.postcardFrame { position: relative; overflow: hidden; }
+.postcard { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1s ease; }
+.postcardOn { opacity: 1; }
+.postcardPause {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.88);
+  color: var(--m-ink);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.postcardPause svg { width: 14px; height: 14px; }
+/* 마우스일 때는 올렸을 때만, 손가락 화면·키보드·멈춘 상태에서는 늘 보인다 */
+.postcardFrame:hover .postcardPause, .postcardPause:focus-visible, .postcardPause[aria-pressed="true"] { opacity: 1; }
+@media (hover: none) { .postcardPause { opacity: 1; } }
+.postcardPause:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .postcard { transition: none; } }
 .postcardBlank {
   display: grid;
   place-items: center;

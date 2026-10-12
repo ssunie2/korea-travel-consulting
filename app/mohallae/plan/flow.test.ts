@@ -2,7 +2,7 @@
 // (npm test 는 지금 lib/ 만 본다 — 뮤조가 #82 리뷰에서 짚은 것과 같은 이유로, 넓히는 건 package.json PR 에서)
 import test from "node:test";
 import assert from "node:assert/strict";
-import { CURATED, INITIAL_STATE, OPTIONAL, choicesFor, flowReducer, stepError, stepOrder, toPlanRequest } from "./flow.ts";
+import { CURATED, INITIAL_STATE, OPTIONAL, choicesFor, flowReducer, panelPhotos, stepError, stepOrder, toPlanRequest } from "./flow.ts";
 import type { FlowState, Step } from "./flow.ts";
 
 const choose = (s: FlowState, value: string) => flowReducer(s, { type: "choose", value });
@@ -29,45 +29,40 @@ function core(s: FlowState) {
   return s;
 }
 
-test("서울은 베타처럼 하고 싶은 것 → 장면을 묻고, 그 밖의 도시는 관심사를 한 번 묻는다", () => {
-  let s = next(choose(choose(INITIAL_STATE, "Seoul"), "Gangneung"));
+test("도시마다 '하고 싶은 것'을 한 번씩만 묻고(두 번째 질문 없음), 보기가 없는 곳은 관심사를 한 번 묻는다", () => {
+  let s = choose(choose(INITIAL_STATE, "Seoul"), "Busan");
+  s = next(flowReducer(s, { type: "other", text: "Ulsan" }));
   assert.equal(s.step, "do:Seoul");
   s = next(choose(choose(s, "heritage"), "food"));
-  assert.equal(s.step, "scene:Seoul:heritage");
-  s = pick(s, "palace");
-  assert.equal(s.step, "scene:Seoul:food");
-  s = pick(s, "market");
-  assert.equal(s.step, "interests"); // 강릉 몫
+  assert.equal(s.step, "do:Busan");
+  s = pick(s, "coast");
+  assert.equal(s.step, "interests"); // 직접 적은 울산 몫
   s = next(choose(s, "beaches"));
   assert.equal(s.step, "who");
 });
 
-test("네 도시의 모든 활동·장면이 확인 화면까지 이어진다", () => {
-  for (const [place, city] of Object.entries(CURATED)) for (const exp of city.experiences) for (const scene of exp.scenes) {
+test("모든 도시의 '하고 싶은 것'이 확인 화면까지 이어지고, 도시 이름을 붙여 보낸다", () => {
+  for (const [place, city] of Object.entries(CURATED)) for (const exp of city.experiences) {
     let s = pick(INITIAL_STATE, place);
     s = pick(s, exp.id);
-    s = pick(s, scene.id);
     s = core(s);
     assert.equal(s.step, "visited");
     s = until(s, "review", next); // 세부는 건너뛸 수 있다
-    assert.deepEqual(s.answers[`scene:${place}:${exp.id}`], [scene.id]);
+    assert.deepEqual(toPlanRequest(s.answers, "en").styles, [`${place}: ${exp.ai}`]);
   }
 });
 
 test("도시나 활동을 풀면 그 아래 답만 지워지고 다른 답은 남는다", () => {
   let s = next(choose(choose(INITIAL_STATE, "Seoul"), "Busan"));
-  s = next(choose(s, "food"));
-  s = pick(s, "dessert");
+  s = pick(s, "food");
   assert.equal(s.step, "do:Busan");
   s = pick(s, "night");
-  s = pick(s, "quiet");
   assert.equal(s.step, "who");
   s = until(s, "where", back);
   s = choose(s, "Busan"); // 부산을 뺀다
   assert.equal(s.answers["do:Busan"], undefined);
-  assert.equal(s.answers["scene:Busan:night"], undefined);
-  assert.deepEqual(s.answers["scene:Seoul:food"], ["dessert"]);
-  assert.deepEqual(stepOrder(s.answers).slice(0, 3), ["where", "do:Seoul", "scene:Seoul:food"]);
+  assert.deepEqual(s.answers["do:Seoul"], ["food"]);
+  assert.deepEqual(stepOrder(s.answers).slice(0, 3), ["where", "do:Seoul", "who"]);
 });
 
 test("직접 적은 곳은 장면 질문 대신 관심사로 가고, 비워 두면 못 넘어간다", () => {
@@ -86,7 +81,6 @@ test("직접 적은 곳은 장면 질문 대신 관심사로 가고, 비워 두�
 test("아이와 함께면 나이를 묻고, '누구와'를 바꾸면 그 질문과 인원이 정리된다", () => {
   let s = pick(INITIAL_STATE, "Jeju");
   s = pick(s, "rest");
-  s = pick(s, "view");
   s = pick(s, "family");
   assert.equal(s.step, "kids");
   s = choose(s, "young");
@@ -99,7 +93,6 @@ test("아이와 함께면 나이를 묻고, '누구와'를 바꾸면 그 질문�
 test("날짜·인원 검사: 지난 날짜, 30일 넘는 여행, 혼자인데 2명", () => {
   let s = pick(INITIAL_STATE, "Seoul");
   s = pick(s, "heritage");
-  s = pick(s, "hanbok");
   s = pick(s, "solo");
   s = pick(s, "full");
   assert.ok(stepError(input(s, ["2026-10-01", "2026-10-03"]), TODAY), "지난 날짜");
@@ -148,8 +141,6 @@ test("확인 화면을 본 뒤 고치러 가면 곧장 돌아오고, 새로 생�
   s = resume(s);
   assert.equal(s.step, "do:Seoul");
   s = resume(choose(s, "heritage"));
-  assert.equal(s.step, "scene:Seoul:heritage");
-  s = resume(choose(s, "hanbok"));
   assert.equal(s.step, "review");
 
   // 혼자 → 친구들과: 인원을 다시 세야 하므로 인원에서 멈춘다
@@ -160,6 +151,18 @@ test("확인 화면을 본 뒤 고치러 가면 곧장 돌아오고, 새로 생�
   assert.equal(s.step, "review");
 });
 
+test("엽서 사진: 도시마다 번갈아, 사진 없는 곳은 건너뛴다", () => {
+  const seoul = CURATED.Seoul.photos!;
+  assert.deepEqual(panelPhotos(["Seoul"]), seoul);
+  const both = panelPhotos(["Seoul", "Busan"]);
+  assert.equal(both[0], seoul[0]);
+  assert.equal(both[1], CURATED.Busan.postcard);
+  assert.equal(both[2], seoul[1]);
+  assert.equal(both.length, seoul.length + 1);
+  assert.deepEqual(panelPhotos(["Gangneung", "Mokpo"]), [], "사진이 아직 없는 곳");
+  assert.deepEqual(panelPhotos(["Gangneung", "Gyeongju"]), [CURATED.Gyeongju.postcard]);
+});
+
 test("늦게 들어온 이전 화면의 클릭은 두 칸을 건너뛰지 않는다", () => {
   const s = choose(INITIAL_STATE, "Seoul");
   const moved = next(s);
@@ -167,10 +170,9 @@ test("늦게 들어온 이전 화면의 클릭은 두 칸을 건너뛰지 않는
 });
 
 test("보내는 값은 지금 폼과 같은 모양이다", () => {
-  let s = next(choose(choose(INITIAL_STATE, "Seoul"), "Andong"));
+  let s = choose(INITIAL_STATE, "Seoul");
+  s = next(flowReducer(s, { type: "other", text: "Ulsan" }));
   s = next(choose(choose(s, "heritage"), "food"));
-  s = pick(s, "palace");
-  s = pick(s, "market");
   s = next(choose(s, "culture"));
   s = pick(s, "family");
   s = pick(s, "school");
@@ -189,13 +191,13 @@ test("보내는 값은 지금 폼과 같은 모양이다", () => {
   assert.equal(s.step, "review");
   const req = toPlanRequest(s.answers, "en");
   assert.deepEqual(req, {
-    destinations: ["Seoul", "Andong"],
+    destinations: ["Seoul", "Ulsan"],
     startDate: "2100-10-14",
     durationDays: 4,
     travelers: 3,
     budgetRange: undefined,
     budgetCurrency: "EUR",
-    styles: ["Seoul: palace walks", "Seoul: market food stalls", "Culture & history"],
+    styles: ["Seoul: palaces & hanok", "Seoul: markets & street food", "Culture & history"],
     audience: "Family with kids (primary school)",
     pace: "Balanced",
     visitedBefore: "Been before",
@@ -210,8 +212,8 @@ test("보내는 값은 지금 폼과 같은 모양이다", () => {
   for (const style of req.styles) assert.ok(style.length <= 40, style);
 });
 
-test("모든 장면 값은 도시 이름을 붙여도 서버 한도(40자) 안이다", () => {
-  for (const [place, city] of Object.entries(CURATED)) for (const exp of city.experiences) {
-    for (const c of choicesFor(`scene:${place}:${exp.id}`)) assert.ok(`${place}: ${c.value}`.length <= 40, `${place}: ${c.value}`);
+test("모든 '하고 싶은 것' 값은 도시 이름을 붙여도 서버 한도(40자) 안이다", () => {
+  for (const place of Object.keys(CURATED)) {
+    for (const c of choicesFor(`do:${place}`)) assert.ok(`${place}: ${c.value}`.length <= 40, `${place}: ${c.value}`);
   }
 });
