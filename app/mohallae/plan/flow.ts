@@ -37,8 +37,8 @@ const tx = (ko: string, en: string): Text => ({ ko, en });
 export const CURATED: Record<string, Curated> = {
   Seoul: {
     tagline: tx("오래된 골목과 새로운 취향 사이", "Between old alleys and new tastes"),
-    // 노을 사진은 하늘이 절반이고 한옥이 사진 아래 끝에서 잘려 있어 칸 비율로는 못 살린다 (써니: "하늘만 보이는 느낌") — 북촌 골목으로.
-    // 랜딩 첫 화면 원본(.impeccable/plates/hero-photo.png, 2688×1152)에서 아래쪽(골목 바닥)에 맞춰 잘랐다 (써니: "땅 부분이 더 보였으면")
+    // 엽서는 전부 148×100(가로 엽서) 비율로 원본(.impeccable/plates)에서 잘라 둔 것. 서울은 노을 사진 대신 북촌 골목 —
+    // 노을 사진은 하늘이 절반이라 (써니: "하늘만 보이는 느낌"), 북촌은 위 하늘을 조금 덜어 골목 바닥이 보이게 (써니: "땅 부분이 더 보였으면")
     postcard: "/mohallae/postcard-seoul-bukchon.jpg",
     experiences: [
       { id: "heritage", title: tx("궁궐과 한옥", "Palaces & hanok"), description: tx("시간이 천천히 흐르는 서울", "Where time slows down"), image: "/landing/gyeongbokgung.webp",
@@ -69,7 +69,7 @@ export const CURATED: Record<string, Curated> = {
   },
   Busan: {
     tagline: tx("바닷바람 따라, 조금 더 느긋하게", "Follow the sea breeze, a little slower"),
-    postcard: "/mohallae/card-busan.jpg",
+    postcard: "/mohallae/postcard-busan.jpg",
     experiences: [
       { id: "coast", title: tx("바다와 해변", "Sea & beaches"), description: tx("파도 소리로 채우는 하루", "A day filled with the sound of waves"),
         question: tx("부산 바다를 어떻게 즐기고 싶어요?", "How do you want Busan's sea?"), scenes: [
@@ -128,7 +128,7 @@ export const CURATED: Record<string, Curated> = {
   },
   Gyeongju: {
     tagline: tx("천년의 풍경을 오늘의 걸음으로", "A thousand-year-old view, at today's pace"),
-    postcard: "/mohallae/card-gyeongju.jpg",
+    postcard: "/mohallae/postcard-gyeongju.jpg",
     experiences: [
       { id: "heritage", title: tx("신라와 유적", "Silla history & sites"), description: tx("풍경 속에서 만나는 오래된 이야기", "Old stories in the landscape"),
         question: tx("경주의 옛 이야기를 어떻게 만날까요?", "How do you want to meet Gyeongju's past?"), scenes: [

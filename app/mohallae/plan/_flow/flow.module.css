@@ -227,16 +227,15 @@
 }
 @media (min-width: 1024px) { .panel { position: sticky; top: 24px; } }
 .panelTitle { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
-/* 사진이 칸보다 세로로 길면 아래(골목·지붕)를 더 남긴다 — 하늘보다 땅이 그 도시를 말해 준다 */
-.postcard { display: block; width: 100%; aspect-ratio: 16 / 7; margin-top: 14px; border-radius: 14px; object-fit: cover; object-position: 50% 65%; background: var(--m-band); }
+/* 엽서: 흔히 쓰는 가로 엽서 148×100mm 비율 (써니 2026-10-12 "흔히 쓰는 엽서 비율로, 가로로 눕힌 엽서 크기로").
+   사진은 이 비율로 미리 잘라 둔 postcard-*.jpg. 넓은 한 칸 화면(태블릿)에서는 너무 커지지 않게 480px 까지 */
+.postcard, .postcardBlank { width: 100%; aspect-ratio: 148 / 100; margin-top: 14px; border-radius: 14px; background: var(--m-band); }
+@media (max-width: 1023px) { .postcard, .postcardBlank { max-width: 480px; } }
+.postcard { display: block; object-fit: cover; }
 .postcardBlank {
   display: grid;
   place-items: center;
-  aspect-ratio: 16 / 7;
-  margin-top: 14px;
   padding: 0 24px;
-  border-radius: 14px;
-  background: var(--m-band);
   font-size: clamp(20px, 2vw, 28px);
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -314,7 +313,6 @@ button.lineValue:focus-visible { outline: 2px solid var(--m-ink); outline-offset
   .main { padding-bottom: 48px; }
   .progress { margin-top: 18px; }
   .grid { margin-top: 26px; }
-  .postcard, .postcardBlank { aspect-ratio: 16 / 6; }
 }
 @media (max-width: 479px) {
   .choices { gap: 12px; margin-top: 24px; }
