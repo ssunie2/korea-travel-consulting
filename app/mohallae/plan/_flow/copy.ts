@@ -42,7 +42,8 @@ export const flowCopy = {
     q: { ko: (places: string) => `${places}에서는 무엇이 끌리세요?`, en: (places: string) => `What are you into in ${places}?` },
     help: tx("고르지 않아도 돼요. 여러 개 골라도 좋아요.", "Optional — pick as many as you like."),
   },
-  who: { q: tx("이 여행, 누구와 함께해요?", "Who's coming?"), help: tx("하나만 골라 주세요.", "Pick one.") },
+  // 하나만 고르는 질문의 첫 화면 — 고르면 바로 넘어간다는 것을 미리 알린다 (WCAG 3.2.2)
+  who: { q: tx("이 여행, 누구와 함께해요?", "Who's coming?"), help: tx("하나를 고르면 바로 다음 질문으로 넘어가요.", "Pick one — you'll go straight to the next question.") },
   kids: { q: tx("아이는 몇 살쯤이에요?", "How old are the kids?"), help: tx("이동 거리와 쉬는 시간이 달라져요.", "It changes the distances and the breaks.") },
   pace: { q: tx("이번 여행은 어떤 속도로?", "What pace suits this trip?"), help: tx("하루에 넣는 일정 수가 달라져요.", "It sets how much goes into each day.") },
   dates: { q: tx("언제 떠나세요?", "When are you going?"), help: tx("가는 날과 오는 날을 골라 주세요. 최대 30일까지예요.", "Pick the day you arrive and the day you leave — up to 30 days.") },

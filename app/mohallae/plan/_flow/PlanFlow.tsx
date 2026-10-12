@@ -10,7 +10,7 @@ import Calendar from "./Calendar";
 import Postcard from "./Postcard";
 import {
   CURATED, CURRENCIES, INITIAL_STATE, LANGUAGES, OPTIONAL, OTHER_STEPS,
-  choicesFor, defaultCurrency, flowReducer, isMultiple, nights, panelPhotos, pickedPlaces, stepError, stepOrder, toPlanRequest,
+  autoAdvance, choicesFor, defaultCurrency, flowReducer, isMultiple, nights, panelPhotos, pickedPlaces, stepError, stepOrder, toPlanRequest,
   type Answers, type Choice, type Destination, type Lang, type Step, type Text,
 } from "../flow";
 import { flowCopy as c } from "./copy";
@@ -24,8 +24,12 @@ import { flowCopy as c } from "./copy";
  *
  * - 언어 단추는 이 화면 안에서만 바꾼다 (주소만 고치고 답은 그대로 — 다시 불러오면 답이 사라진다)
  * - 화면이 바뀌면 질문(h1)으로 초점을 옮긴다. 화면 낭독기가 새 질문부터 읽는다 (베타와 같다)
+ * - 하나만 고르는 질문은 고르면 바로 다음 질문으로 — '다음' 단추가 없다 (써니 2026-10-12, flow.ts autoAdvance)
  * - 기다리는 동안은 랜딩의 고쳐 쓰기 장면을 보여 준다
  */
+/** 고른 표시(체크)가 보일 만큼만 기다렸다가 넘어간다 (.check 가 나타나는 데 0.25초) */
+const ADVANCE_MS = 320;
+
 export default function PlanFlow({ initialLang, destinations }: { initialLang: Lang; destinations: Destination[] }) {
   const router = useRouter();
   const [lang, setLang] = useState<Lang>(initialLang);
@@ -34,10 +38,12 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
   const [failure, setFailure] = useState<Text | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const first = useRef(true);
+  const pending = useRef<{ timer: ReturnType<typeof setTimeout>; step: Step; id: string } | null>(null);
 
   const order = stepOrder(state.answers);
   const index = order.indexOf(state.step);
   const error = stepError(state);
+  const single = autoAdvance(state.step);
   const t = (x: Text) => x[lang];
 
   useEffect(() => {
@@ -47,6 +53,26 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
     heading.current?.focus({ preventScroll: true });
     setFailure(null);
   }, [state.step]);
+
+  useEffect(() => () => { if (pending.current) clearTimeout(pending.current.timer); }, []);
+
+  /** 보기를 눌렀을 때. 하나만 고르는 질문이면 잠깐 뒤 다음 질문으로 (확인 화면을 본 뒤라면 확인 화면으로) */
+  function pick(id: string) {
+    const step = state.step;
+    // 같은 보기를 빠르게 두 번 누르면 한 번으로 (세부 질문은 두 번째 누름이 고른 것을 풀어 버린다)
+    if (pending.current?.step === step && pending.current.id === id) return;
+    dispatch({ type: "choose", value: id });
+    if (!autoAdvance(step)) return;
+    // 세부 질문에서 이미 고른 것을 다시 누르면 풀린다 — 그때는 이 화면에 머문다
+    if (OPTIONAL.includes(step) && state.answers[step]?.[0] === id) return;
+    if (pending.current) clearTimeout(pending.current.timer);
+    const reviewed = state.reviewed;
+    const timer = setTimeout(() => {
+      pending.current = null;
+      dispatch(reviewed ? { type: "resume", from: step } : { type: "next", from: step });
+    }, ADVANCE_MS);
+    pending.current = { timer, step, id };
+  }
 
   function switchLang(next: Lang) {
     setLang(next);
@@ -143,7 +169,7 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
                 </h1>
                 <p className={s.helper}>{helper(state.step, lang)}</p>
 
-                <Body step={state.step} answers={state.answers} lang={lang} destinations={destinations} dispatch={dispatch} />
+                <Body step={state.step} answers={state.answers} lang={lang} destinations={destinations} dispatch={dispatch} onPick={pick} />
 
                 {/* 화면이 좁으면 판이 질문 아래(첫 화면 밖)로 밀린다 — 확인 화면에서는 고칠 목록을 여기에.
                     초안 언어(위)를 먼저 보이게 하고 그 아래에. CSS 가 화면 넓이에 따라 이것과 오른쪽 판 중 하나만 보여 준다 */}
@@ -169,13 +195,16 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
                         {t(c.submit)}
                       </button>
                     ) : state.reviewed ? (
-                      // 확인 화면을 본 뒤 고치러 왔다: 곧장 돌아가는 단추가 주인공, 한 칸씩 가는 건 옆에 작게
+                      // 확인 화면을 본 뒤 고치러 왔다: 곧장 돌아가는 단추가 주인공, 한 칸씩 가는 건 옆에 작게.
+                      // 하나만 고르는 질문은 고르면 알아서 돌아가므로 '다음 질문'이 없다
                       <>
-                        <button type="button" className={s.jump} disabled={!!error}
-                          aria-describedby={error ? "step-error" : undefined}
-                          onClick={() => dispatch({ type: "next", from: state.step })}>
-                          {t(c.nextQuestion)}
-                        </button>
+                        {!single && (
+                          <button type="button" className={s.jump} disabled={!!error}
+                            aria-describedby={error ? "step-error" : undefined}
+                            onClick={() => dispatch({ type: "next", from: state.step })}>
+                            {t(c.nextQuestion)}
+                          </button>
+                        )}
                         <button type="button" className={`${base.pillDark} ${s.next}`} disabled={!!error}
                           aria-describedby={error ? "step-error" : undefined}
                           onClick={() => dispatch({ type: "resume" })}>
@@ -189,15 +218,18 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
                             {t(c.toReview)}
                           </button>
                         )}
-                        <button
-                          type="button"
-                          className={`${base.pillDark} ${s.next}`}
-                          disabled={!!error}
-                          aria-describedby={error ? "step-error" : undefined}
-                          onClick={() => dispatch({ type: "next", from: state.step })}
-                        >
-                          {nextLabel(state.step, state.answers, lang)} <span aria-hidden="true">→</span>
-                        </button>
+                        {/* 하나만 고르는 질문에는 '다음'이 없다. 고르지 않아도 되는 세부 질문만 '건너뛰기'를 둔다 */}
+                        {(!single || OPTIONAL.includes(state.step)) && (
+                          <button
+                            type="button"
+                            className={`${base.pillDark} ${s.next}`}
+                            disabled={!!error}
+                            aria-describedby={error ? "step-error" : undefined}
+                            onClick={() => dispatch({ type: "next", from: state.step })}
+                          >
+                            {single ? t(c.skip) : nextLabel(state.step, state.answers, lang)} <span aria-hidden="true">→</span>
+                          </button>
+                        )}
                       </>
                     )}
                   </div>
@@ -245,8 +277,8 @@ function nextLabel(step: Step, answers: Answers, lang: Lang) {
 
 type Dispatch = (a: Parameters<typeof flowReducer>[1]) => void;
 
-function Body({ step, answers, lang, destinations, dispatch }: {
-  step: Step; answers: Answers; lang: Lang; destinations: Destination[]; dispatch: Dispatch;
+function Body({ step, answers, lang, destinations, dispatch, onPick }: {
+  step: Step; answers: Answers; lang: Lang; destinations: Destination[]; dispatch: Dispatch; onPick: (id: string) => void;
 }) {
   const t = (x: Text) => x[lang];
   const picked = answers[step] ?? [];
@@ -293,6 +325,22 @@ function Body({ step, answers, lang, destinations, dispatch }: {
 
   return (
     <>
+      {/* 통화는 예산을 고르기 전에 — 예산을 고르면 바로 다음 질문으로 넘어간다 */}
+      {step === "budget" && (
+        <div className={s.currency} role="group" aria-label={t(c.budget.currency)}>
+          <span>{t(c.budget.currency)}</span>
+          {CURRENCIES.map((cur) => {
+            const on = (answers["budget:currency"]?.[0] ?? defaultCurrency(lang)) === cur;
+            return (
+              <button key={cur} type="button" aria-pressed={on} className={`${s.cur} ${on ? s.curOn : ""}`}
+                onClick={() => dispatch({ type: "set", key: "budget:currency", value: cur })}>
+                {cur}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       <ul className={`${s.choices} ${photos ? s.photoGrid : compact ? s.chipGrid : s.textGrid}`} role="list">
         {options.map((o) => {
           const on = picked.includes(o.id);
@@ -302,7 +350,7 @@ function Body({ step, answers, lang, destinations, dispatch }: {
                 type="button"
                 className={`${s.choice} ${photos ? s.photoChoice : ""} ${on ? s.on : ""}`}
                 aria-pressed={on}
-                onClick={() => dispatch({ type: "choose", value: o.id })}
+                onClick={() => onPick(o.id)}
               >
                 {photos && o.image && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -345,21 +393,6 @@ function Body({ step, answers, lang, destinations, dispatch }: {
             onChange={(e) => dispatch({ type: "other", text: e.target.value })}
           />
         </label>
-      )}
-
-      {step === "budget" && (
-        <div className={s.currency} role="group" aria-label={t(c.budget.currency)}>
-          <span>{t(c.budget.currency)}</span>
-          {CURRENCIES.map((cur) => {
-            const on = (answers["budget:currency"]?.[0] ?? defaultCurrency(lang)) === cur;
-            return (
-              <button key={cur} type="button" aria-pressed={on} className={`${s.cur} ${on ? s.curOn : ""}`}
-                onClick={() => dispatch({ type: "set", key: "budget:currency", value: cur })}>
-                {cur}
-              </button>
-            );
-          })}
-        </div>
       )}
 
       <p className={s.count} aria-live="polite">

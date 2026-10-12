@@ -213,11 +213,15 @@ export const COMPANIONS: Choice[] = [
   choice("parents", "With parents", "부모님과", "With my parents", "함께 걷는 시간부터 소중하게", "Time together, at their pace"),
 ];
 
-/** 아이 나이 (베타). 지금 API 에는 칸이 없어서 '누구와' 값 뒤에 붙여 보낸다: "Family with kids (under 6)" */
+/**
+ * 아이 나이. 지금 API 에는 칸이 없어서 '누구와' 값 뒤에 붙여 보낸다: "Family with kids (under 6)"
+ * 이름은 지하철 요금과 같은 나눔 — 유아(만 6세 미만)·어린이(만 6–12세)·청소년(만 13–18세). 한국에서 가장 익숙한 구분이다
+ * ('아직 어린 아이'는 몇 살인지 알 수 없다 — 써니 2026-10-12. '아동'은 법에서 18세 미만 전부라 청소년과 겹친다)
+ */
 export const CHILDREN: Choice[] = [
-  choice("young", "under 6", "아직 어린 아이", "Little ones", "쉬는 시간과 짧은 이동이 중요해요", "Breaks and short hops matter"),
-  choice("school", "primary school", "초등학생", "Primary school", "직접 보고 해보는 걸 좋아해요", "They love seeing and doing"),
-  choice("teen", "teenagers", "청소년", "Teenagers", "아이의 취향도 함께 골라보고 싶어요", "Their tastes count too"),
+  choice("young", "under 6", "유아 (6세 미만)", "Little ones (under 6)", "쉬는 시간과 짧은 이동이 중요해요", "Breaks and short hops matter"),
+  choice("school", "primary school", "어린이 (6–12세)", "Children (6–12)", "직접 보고 해보는 걸 좋아해요", "They love seeing and doing"),
+  choice("teen", "teenagers", "청소년 (13–18세)", "Teens (13–18)", "아이의 취향도 함께 골라보고 싶어요", "Their tastes count too"),
 ];
 
 /** 속도 — 문구는 베타, 값은 지금 폼의 PACES */
@@ -301,6 +305,14 @@ export type Destination = { v: string; ko: string };
 
 export function isMultiple(step: Step) {
   return MULTI_SIMPLE.includes(step) || step.startsWith("do:");
+}
+
+/**
+ * 하나만 고르는 질문 — 고르면 '다음' 없이 바로 다음 질문으로 (써니 2026-10-12).
+ * 여러 개 고르는 질문, 날짜(달력)·인원(+−)은 다 골랐는지 화면이 알 수 없으니 '다음' 단추를 둔다
+ */
+export function autoAdvance(step: Step) {
+  return !isMultiple(step) && choicesFor(step).length > 0;
 }
 
 /** 고른 도시 + 직접 적은 곳 (값은 영어 이름, 직접 적은 곳은 적은 그대로) */
@@ -412,7 +424,7 @@ export type Action =
   | { type: "next"; from: Step }
   | { type: "back" }
   | { type: "goto"; to: Step } // 확인 화면에서 고칠 곳으로, 세부에서 바로 확인으로
-  | { type: "resume" } // 확인 화면을 본 뒤 고치러 왔을 때: 곧장 확인 화면으로
+  | { type: "resume"; from?: Step } // 확인 화면을 본 뒤 고치러 왔을 때: 곧장 확인 화면으로 (from: next 와 같은 늦은 클릭 막이)
   | { type: "reset" };
 
 export function flowReducer(state: FlowState, action: Action): FlowState {
@@ -425,6 +437,7 @@ export function flowReducer(state: FlowState, action: Action): FlowState {
   if (action.type === "resume") {
     // 확인 화면에서 날짜 하나 고치러 왔는데 다음·다음·다음을 눌러야 돌아가는 건 번거롭다 (써니 2026-10-12).
     // 고치는 사이에 새로 생긴 필수 질문(새 도시의 '하고 싶은 것', 아이 나이, 다시 세야 할 인원)이 있으면 거기서 멈춘다
+    if (action.from && action.from !== state.step) return state;
     if (!state.reviewed || state.step === "review" || stepError(state)) return state;
     const pending = order.find((st) => st !== "review" && stepError({ step: st, answers: state.answers }));
     return move(pending ?? "review");

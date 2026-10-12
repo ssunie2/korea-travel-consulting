@@ -3,7 +3,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { CURATED, INITIAL_STATE, OPTIONAL, choicesFor, flowReducer, panelPhotos, pickedPlaces, stepError, stepOrder, toPlanRequest } from "./flow.ts";
+import { CURATED, INITIAL_STATE, OPTIONAL, autoAdvance, choicesFor, flowReducer, panelPhotos, pickedPlaces, stepError, stepOrder, toPlanRequest } from "./flow.ts";
 import type { FlowState, Step } from "./flow.ts";
 
 const choose = (s: FlowState, value: string) => flowReducer(s, { type: "choose", value });
@@ -196,6 +196,27 @@ test("늦게 들어온 이전 화면의 클릭은 두 칸을 건너뛰지 않는
   const s = choose(INITIAL_STATE, "Seoul");
   const moved = next(s);
   assert.equal(flowReducer(moved, { type: "next", from: "where" }).step, moved.step);
+});
+
+test("하나만 고르는 질문만 고르면 바로 넘어가고, 여러 개·달력·인원·확인은 '다음' 단추를 쓴다", () => {
+  const single: Step[] = ["who", "kids", "pace", "budget", "visited", "transport", "stay", "rhythm", "occasion"];
+  const withButton: Step[] = ["where", "do:Seoul", "interests", "dates", "travelers", "avoid", "diet", "review"];
+  for (const st of single) assert.equal(autoAdvance(st), true, st);
+  for (const st of withButton) assert.equal(autoAdvance(st), false, st);
+});
+
+test("확인 화면으로 돌아가기(resume)도 늦게 들어오면 무시한다", () => {
+  let s = pick(INITIAL_STATE, "Busan");
+  s = pick(s, "coast");
+  s = core(s);
+  s = flowReducer(s, { type: "goto", to: "review" });
+  s = flowReducer(s, { type: "goto", to: "pace" });
+  s = choose(s, "full");
+  // 고른 뒤 잠깐 사이에 '이전'을 눌렀다 — 속도 화면에서 걸어 둔 resume 은 지금 화면(누구와)에서 아무 일도 안 한다
+  s = back(s);
+  assert.equal(s.step, "who");
+  assert.equal(flowReducer(s, { type: "resume", from: "pace" }).step, "who");
+  assert.equal(flowReducer(choose(s, "solo"), { type: "resume", from: "who" }).step, "review");
 });
 
 test("보내는 값은 지금 폼과 같은 모양이다", () => {
