@@ -283,7 +283,7 @@ function Body({ step, answers, lang, destinations, dispatch }: {
   }
 
   const options: Choice[] = step === "where"
-    ? destinations.map((d) => ({ id: d.v, value: d.v, title: { ko: d.ko, en: d.v }, image: CURATED[d.v]?.postcard }))
+    ? destinations.map((d) => ({ id: d.v, value: d.v, title: { ko: d.ko, en: d.v } }))
     : choicesFor(step);
   const photos = options.some((o) => o.image) && step !== "where";
   const compact = step === "where" || step === "interests" || step === "avoid" || step === "diet";

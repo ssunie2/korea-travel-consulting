@@ -7,7 +7,8 @@
  * - 이전 화면의 늦은 클릭이 두 칸을 건너뛰지 않게 막는다 (next 의 from)
  * 베타와 달라진 것:
  * - 도시는 베타의 4곳이 아니라 lib/places.ts 의 전체 목록 + "그 외" (기획서 5장). 목록은 화면이 넘겨준다
- * - 장면 질문은 베타가 써 둔 4개 도시(서울·부산·제주·경주)만. 그 밖의 도시는 지금 폼의 관심사 보기를 쓴다
+ * - '하고 싶은 것' 사진 카드는 목록의 15개 도시 모두에 있다 (써니 2026-10-12: 서울만 사진 보기가 뜨는 건 일관성이 없다).
+ *   직접 적은 곳만 지금 폼의 관심사 보기를 쓴다
  * - 지금 폼(app/plan)이 묻는 것은 하나도 빠뜨리지 않는다. 다만 세부(재방문·교통·숙소·리듬·기념일·피할 것·식이)는
  *   지금 폼처럼 **고르지 않아도 된다** — 건너뛰거나 바로 확인으로 갈 수 있다
  * - 마지막에 지금 폼과 **똑같은 모양**의 PlanInput 을 만든다. /api/plan 과 AI 지시문은 그대로다
@@ -28,24 +29,27 @@ export type Choice = { id: string; title: Text; description?: Text; value: strin
  * 베타에는 고른 것마다 '어떤 장면이 좋을까요?' 두 번째 질문이 있었는데 뺐다 — 모든 도시가 같은 모양으로,
  * 질문 수도 줄게 (써니 2026-10-12 "빼봐")
  */
-type Experience = { id: string; title: Text; description: Text; image?: string; ai: string };
-/** photos: 오른쪽 판 엽서 자리에서 번갈아 보여 줄 사진 (148×100). 없으면 postcard 한 장 */
-type Curated = { tagline: Text; postcard?: string; photos?: string[]; experiences: Experience[] };
+type Experience = { id: string; title: Text; description: Text; image: string; ai: string };
+/** photos: 오른쪽 판 엽서 자리에서 번갈아 보여 줄 사진 (148×100) */
+type Curated = { photos: string[]; experiences: Experience[] };
 
 const tx = (ko: string, en: string): Text => ({ ko, en });
 
+/** 사진 카드 (2:1) 와 엽서 (148×100). 힉스필드로 만든 원본은 .impeccable/plates/places 에 있다 (써니 맥) */
+const card = (id: string) => `/mohallae/do/${id}.webp`;
+const postcard = (id: string) => `/mohallae/postcards/${id}.jpg`;
+
 /**
- * 베타가 써 둔 네 도시. 한국어는 베타 그대로, 영어는 새로 옮겼다.
- * 열쇠는 lib/places.ts 의 값(v)과 같은 영어 이름이다.
+ * 도시별 '하고 싶은 것' — lib/places.ts 의 15개 도시 모두. 열쇠는 lib/places.ts 의 값(v)과 같은 영어 이름이다.
+ * 서울·부산·제주·경주의 글은 베타 그대로(영어는 새로 옮김), 나머지 11곳은 새로 썼다.
+ *
+ * 사진은 모두 '평범한 폰 사진, 맑은 날' 느낌으로 맞췄다 (써니가 고른 강릉 안목 카페거리 판이 기준, 2026-10-12).
+ * 엽서는 그 도시의 사진 카드와 다른 장면만 — 같은 장면이 옆에 또 보이면 의미가 없다 (써니 2026-10-12).
+ * 가게·식당 이름은 쓰지 않는다 — 우리는 정보만 준다 (AGENTS.md 3장)
  */
 export const CURATED: Record<string, Curated> = {
   Seoul: {
-    tagline: tx("오래된 골목과 새로운 취향 사이", "Between old alleys and new tastes"),
-    // 엽서는 전부 148×100(가로 엽서) 비율로 원본(.impeccable/plates)에서 잘라 둔 것. 서울은 노을 사진 대신 북촌 골목 —
-    // 노을 사진은 하늘이 절반이라 (써니: "하늘만 보이는 느낌"). 북촌은 원본 높이 그대로 — 하늘부터 골목 바닥까지 (써니가 고름)
-    postcard: "/mohallae/postcard-seoul-bukchon.jpg",
-    // 엽서는 사진 카드(경복궁·북촌·광장시장·한강)와 다른 장면만 — 같은 사진이 옆에 또 보이면 의미가 없다 (써니 2026-10-12).
-    // 북촌 골목(써니가 고름) → 노을 진 서울 → 남산
+    // 서울 엽서: 북촌 골목(써니가 고름 — 원본 높이 그대로, 하늘부터 골목 바닥까지) → 노을 진 서울 → 남산
     photos: ["/mohallae/postcard-seoul-bukchon.jpg", "/mohallae/panel-seoul-sunset.jpg", "/mohallae/panel-seoul-namsan.jpg"],
     experiences: [
       { id: "heritage", title: tx("궁궐과 한옥", "Palaces & hanok"), description: tx("시간이 천천히 흐르는 서울", "Where time slows down"), image: "/landing/gyeongbokgung.webp", ai: "palaces & hanok" },
@@ -55,32 +59,131 @@ export const CURATED: Record<string, Curated> = {
     ],
   },
   Busan: {
-    tagline: tx("바닷바람 따라, 조금 더 느긋하게", "Follow the sea breeze, a little slower"),
-    postcard: "/mohallae/postcard-busan.jpg",
+    // 바다 카드는 해운대가 아니라 송정 — 엽서(해운대)와 겹치지 않게
+    photos: ["/mohallae/postcard-busan.jpg", postcard("busan-huinnyeoul")],
     experiences: [
-      { id: "coast", title: tx("바다와 해변", "Sea & beaches"), description: tx("파도 소리로 채우는 하루", "A day filled with the sound of waves"), ai: "beaches & sea views" },
-      { id: "food", title: tx("시장과 먹거리", "Markets & local food"), description: tx("부산다운 한 끼를 찾아서", "Looking for a very Busan meal"), ai: "markets & seafood" },
-      { id: "neighbourhood", title: tx("언덕과 골목", "Hills & alleys"), description: tx("오르내릴수록 달라지는 풍경", "Views that change as you climb"), ai: "hillside alleys & villages" },
-      { id: "night", title: tx("야경과 도시", "Night & the city"), description: tx("해가 진 뒤 만나는 또 다른 부산", "Another Busan after dark"), ai: "night views & bridges" },
+      { id: "coast", title: tx("바다와 해변", "Sea & beaches"), description: tx("파도 소리로 채우는 하루", "A day filled with the sound of waves"), image: card("busan-coast"), ai: "beaches & sea views" },
+      { id: "food", title: tx("시장과 먹거리", "Markets & local food"), description: tx("부산다운 한 끼를 찾아서", "Looking for a very Busan meal"), image: card("busan-food"), ai: "markets & seafood" },
+      { id: "neighbourhood", title: tx("언덕과 골목", "Hills & alleys"), description: tx("오르내릴수록 달라지는 풍경", "Views that change as you climb"), image: card("busan-neighbourhood"), ai: "hillside alleys & villages" },
+      { id: "night", title: tx("야경과 도시", "Night & the city"), description: tx("해가 진 뒤 만나는 또 다른 부산", "Another Busan after dark"), image: card("busan-night"), ai: "night views & bridges" },
     ],
   },
   Jeju: {
-    tagline: tx("바람과 숲이 하루의 속도를 정하는 곳", "Where wind and forest set the pace"),
+    photos: [postcard("jeju-seongsan"), postcard("jeju-oreum")],
     experiences: [
-      { id: "coast", title: tx("바다와 해안", "Sea & coast"), description: tx("물빛을 따라 섬을 만나는 시간", "Meet the island by the colour of its water"), ai: "beaches & coastal walks" },
-      { id: "nature", title: tx("숲과 오름", "Forests & oreum"), description: tx("초록 사이에서 깊게 숨 쉬기", "Breathe deep among the green"), ai: "forests & oreum" },
-      { id: "rest", title: tx("카페와 쉼", "Cafés & rest"), description: tx("비워둔 시간이 더 좋은 여행", "A trip that's better with empty time"), ai: "cafes & slow village time" },
-      { id: "food", title: tx("시장과 먹거리", "Markets & food"), description: tx("섬의 맛을 하나씩 발견하기", "Find the island's flavours one by one"), ai: "markets & local food" },
+      { id: "coast", title: tx("바다와 해안", "Sea & coast"), description: tx("물빛을 따라 섬을 만나는 시간", "Meet the island by the colour of its water"), image: card("jeju-coast"), ai: "beaches & coastal walks" },
+      { id: "nature", title: tx("숲과 오름", "Forests & oreum"), description: tx("초록 사이에서 깊게 숨 쉬기", "Breathe deep among the green"), image: card("jeju-nature"), ai: "forests & oreum" },
+      { id: "rest", title: tx("카페와 쉼", "Cafés & rest"), description: tx("비워둔 시간이 더 좋은 여행", "A trip that's better with empty time"), image: card("jeju-rest"), ai: "cafes & slow village time" },
+      { id: "food", title: tx("시장과 먹거리", "Markets & food"), description: tx("섬의 맛을 하나씩 발견하기", "Find the island's flavours one by one"), image: card("jeju-food"), ai: "markets & local food" },
     ],
   },
   Gyeongju: {
-    tagline: tx("천년의 풍경을 오늘의 걸음으로", "A thousand-year-old view, at today's pace"),
-    postcard: "/mohallae/postcard-gyeongju.jpg",
+    photos: ["/mohallae/postcard-gyeongju.jpg", postcard("gyeongju-bulguksa")],
     experiences: [
-      { id: "heritage", title: tx("신라와 유적", "Silla history & sites"), description: tx("풍경 속에서 만나는 오래된 이야기", "Old stories in the landscape"), ai: "Silla tombs & temples" },
-      { id: "neighbourhood", title: tx("골목과 한옥", "Alleys & hanok"), description: tx("익숙한 듯 새로운 동네 산책", "A walk that's familiar and new"), ai: "hanok alleys & cafes" },
-      { id: "night", title: tx("야경과 산책", "Night views & walks"), description: tx("밤이 되면 새로 보이는 경주", "Gyeongju, new again at night"), ai: "night views by the water" },
-      { id: "rest", title: tx("자연과 여유", "Nature & slow time"), description: tx("역사 구경 사이에 잠깐의 쉼", "A pause between the history"), ai: "lakes & green walks" },
+      { id: "heritage", title: tx("신라와 유적", "Silla history & sites"), description: tx("풍경 속에서 만나는 오래된 이야기", "Old stories in the landscape"), image: card("gyeongju-heritage"), ai: "Silla tombs & temples" },
+      { id: "neighbourhood", title: tx("골목과 한옥", "Alleys & hanok"), description: tx("익숙한 듯 새로운 동네 산책", "A walk that's familiar and new"), image: card("gyeongju-neighbourhood"), ai: "hanok alleys & cafes" },
+      { id: "night", title: tx("야경과 산책", "Night views & walks"), description: tx("밤이 되면 새로 보이는 경주", "Gyeongju, new again at night"), image: card("gyeongju-night"), ai: "night views by the water" },
+      { id: "rest", title: tx("자연과 여유", "Nature & slow time"), description: tx("역사 구경 사이에 잠깐의 쉼", "A pause between the history"), image: card("gyeongju-rest"), ai: "lakes & green walks" },
+    ],
+  },
+  Gangneung: {
+    photos: [postcard("gangneung-jeongdongjin"), postcard("gangneung-jumunjin")],
+    experiences: [
+      // 카페 카드가 이번 사진들의 기준이 된 판이다 (써니 2026-10-12 "그냥 내가 최근에 보낸 장면으로 하자")
+      { id: "cafe", title: tx("커피거리와 바다", "Coffee by the sea"), description: tx("안목 해변 카페에서 보내는 느린 오후", "A slow afternoon in Anmok's seaside cafés"), image: card("gangneung-cafe"), ai: "Anmok coffee street" },
+      { id: "beach", title: tx("바다와 솔숲", "Sea & pine woods"), description: tx("경포 해변을 따라 걷는 하루", "A day along Gyeongpo Beach"), image: card("gangneung-gyeongpo"), ai: "Gyeongpo beach & pine walks" },
+      { id: "tofu", title: tx("초당 순두부", "Chodang soft tofu"), description: tx("바닷물로 굳힌 강릉의 두부 한 그릇", "Gangneung's tofu, set with seawater"), image: card("gangneung-tofu"), ai: "Chodang soft tofu" },
+      { id: "heritage", title: tx("오죽헌과 옛집", "Ojukheon & old houses"), description: tx("검은 대나무 숲 곁의 조선 집", "A Joseon house by the black bamboo"), image: card("gangneung-ojukheon"), ai: "Ojukheon & old hanok" },
+    ],
+  },
+  Sokcho: {
+    photos: [postcard("sokcho-cheongchoho"), postcard("sokcho-daepo")],
+    experiences: [
+      { id: "mountain", title: tx("설악산 케이블카", "Seoraksan cable car"), description: tx("바위 봉우리 가까이 올라가 보기", "Ride up close to the granite peaks"), image: card("sokcho-seorak"), ai: "Seoraksan & cable car" },
+      { id: "market", title: tx("시장 먹거리", "Market snacks"), description: tx("닭강정과 오징어순대로 채우는 한 끼", "Crispy fried chicken and squid sundae"), image: card("sokcho-market"), ai: "Jungang Market street food" },
+      { id: "ferry", title: tx("아바이마을 갯배", "Abai Village ferry"), description: tx("줄을 당겨 건너는 작은 배", "A tiny ferry pulled across by rope"), image: card("sokcho-ferry"), ai: "Abai Village & hand ferry" },
+      { id: "coast", title: tx("바닷가 정자와 등대", "Seaside pavilion & lighthouse"), description: tx("파도 소리 들리는 영금정과 등대 전망대", "Yeonggeumjeong and the lighthouse lookout"), image: card("sokcho-lighthouse"), ai: "Yeonggeumjeong & lighthouse" },
+    ],
+  },
+  Incheon: {
+    photos: [postcard("incheon-bridge"), postcard("incheon-eurwangni")],
+    experiences: [
+      { id: "oldport", title: tx("차이나타운과 개항장", "Chinatown & old port"), description: tx("백 년 전 항구 도시를 걷는 산책", "Walk a century-old port town"), image: card("incheon-chinatown"), ai: "Chinatown & old port streets" },
+      { id: "seaside", title: tx("월미도 바닷길", "Wolmido seaside"), description: tx("배와 놀이기구가 보이는 바닷가 산책", "A seaside stroll past ships and rides"), image: card("incheon-wolmido"), ai: "Wolmido seaside promenade" },
+      { id: "songdo", title: tx("송도 센트럴파크", "Songdo Central Park"), description: tx("수로를 따라 걷는 빌딩 숲의 저녁", "An evening by the canal among the towers"), image: card("incheon-songdo"), ai: "Songdo Central Park at dusk" },
+      { id: "market", title: tx("신포시장 먹거리", "Sinpo Market snacks"), description: tx("닭강정과 만두로 채우는 시장 나들이", "Crispy fried chicken and dumplings"), image: card("incheon-sinpo"), ai: "Sinpo Market street food" },
+    ],
+  },
+  Chuncheon: {
+    photos: [postcard("chuncheon-uiamho"), postcard("chuncheon-soyangho")],
+    experiences: [
+      { id: "dakgalbi", title: tx("닭갈비 한 판", "Dakgalbi on the pan"), description: tx("춘천에 왔다면 꼭 먹는 철판 요리", "The dish people come to Chuncheon for"), image: card("chuncheon-dakgalbi"), ai: "dakgalbi & local food" },
+      { id: "island", title: tx("남이섬 나무길", "Nami Island tree lanes"), description: tx("키 큰 나무 사이를 걷거나 자전거로", "Tall tree lanes on foot or by bike"), image: card("chuncheon-nami"), ai: "Nami Island tree lanes" },
+      { id: "skywalk", title: tx("소양강 스카이워크", "Soyang River skywalk"), description: tx("강 위로 걸어 나가는 유리 다리", "A glass walkway out over the river"), image: card("chuncheon-skywalk"), ai: "Soyang River skywalk" },
+      { id: "railbike", title: tx("레일바이크", "Rail bike"), description: tx("옛 기찻길을 페달 밟아 달리기", "Pedal along an old railway line"), image: card("chuncheon-railbike"), ai: "rail bike on old tracks" },
+    ],
+  },
+  Andong: {
+    photos: [postcard("andong-andongho"), postcard("andong-bongjeongsa")],
+    experiences: [
+      { id: "village", title: tx("하회마을", "Hahoe Folk Village"), description: tx("강이 휘감아 도는 옛 마을", "An old village in a bend of the river"), image: card("andong-hahoe"), ai: "Hahoe Folk Village" },
+      { id: "jjimdak", title: tx("안동찜닭", "Andong jjimdak"), description: tx("구시장 골목의 간장 찜닭 한 접시", "Soy-braised chicken in the old market"), image: card("andong-jjimdak"), ai: "jjimdak in the old market" },
+      { id: "night", title: tx("월영교 밤 산책", "Woryeonggyo at night"), description: tx("불 켜진 나무다리를 건너는 저녁", "Cross the lit wooden bridge at dusk"), image: card("andong-woryeonggyo"), ai: "Woryeonggyo bridge at night" },
+      { id: "seowon", title: tx("병산서원", "Byeongsan Seowon"), description: tx("강과 절벽을 마주한 옛 서원의 마루", "An old academy facing river and cliffs"), image: card("andong-byeongsan"), ai: "Byeongsan Seowon academy" },
+    ],
+  },
+  Pohang: {
+    photos: [postcard("pohang-guryongpo"), postcard("pohang-igari")],
+    experiences: [
+      { id: "sunrise", title: tx("호미곶 해돋이", "Sunrise at Homigot"), description: tx("바다 위 손 조각 너머로 뜨는 해", "The sun rising past the hand in the sea"), image: card("pohang-homigot"), ai: "Homigot sunrise" },
+      { id: "mulhoe", title: tx("죽도시장 물회", "Mulhoe at Jukdo Market"), description: tx("살얼음 육수에 말아 먹는 회 한 그릇", "Raw fish in an icy, spicy broth"), image: card("pohang-mulhoe"), ai: "mulhoe at Jukdo Market" },
+      { id: "spacewalk", title: tx("스페이스워크", "Space Walk"), description: tx("걸어서 오르는 롤러코스터 모양 전망대", "A roller-coaster-shaped walkway you climb"), image: card("pohang-spacewalk"), ai: "Space Walk lookout" },
+      { id: "beach", title: tx("영일대 해변", "Yeongildae Beach"), description: tx("바다 위 정자가 있는 도심 해변", "A city beach with a pavilion over the sea"), image: card("pohang-yeongildae"), ai: "Yeongildae beach & pavilion" },
+    ],
+  },
+  Daegu: {
+    photos: [postcard("daegu-suseongmot"), postcard("daegu-dongseongno")],
+    experiences: [
+      { id: "alleys", title: tx("근대골목", "Modern history alleys"), description: tx("붉은 벽돌과 담쟁이 사이 옛 골목", "Old lanes of red brick and ivy"), image: card("daegu-alleys"), ai: "modern history alleys" },
+      { id: "nightmarket", title: tx("서문시장 야시장", "Seomun Night Market"), description: tx("불 밝힌 노점에서 골라 먹는 밤", "Pick your snacks under the stall lights"), image: card("daegu-seomun"), ai: "Seomun Night Market" },
+      { id: "view", title: tx("앞산 전망대 야경", "Apsan night view"), description: tx("도시 불빛이 산자락까지 이어지는 밤", "City lights all the way to the hills"), image: card("daegu-apsan"), ai: "Apsan Observatory night view" },
+      { id: "mountain", title: tx("팔공산과 산사", "Palgongsan & temples"), description: tx("산자락의 오래된 절까지 걷는 길", "A walk up to an old mountain temple"), image: card("daegu-palgongsan"), ai: "Palgongsan & mountain temples" },
+    ],
+  },
+  Tongyeong: {
+    photos: [postcard("tongyeong-harbor"), postcard("tongyeong-park")],
+    experiences: [
+      { id: "murals", title: tx("동피랑 벽화마을", "Dongpirang murals"), description: tx("벽화 골목 끝에 보이는 항구", "Mural alleys that end at the harbour"), image: card("tongyeong-dongpirang"), ai: "Dongpirang mural village" },
+      { id: "cablecar", title: tx("케이블카와 섬 풍경", "Cable car & islands"), description: tx("작은 섬들이 흩어진 바다 내려다보기", "Look down on a sea full of small islands"), image: card("tongyeong-cablecar"), ai: "cable car & island views" },
+      { id: "market", title: tx("충무김밥과 시장", "Chungmu gimbap & market"), description: tx("충무김밥과 꿀빵으로 채우는 한 끼", "Chungmu gimbap and honey bread"), image: card("tongyeong-market"), ai: "chungmu gimbap & market food" },
+      { id: "island", title: tx("섬 나들이", "Island day trip"), description: tx("배 타고 가는 소매물도 등대섬", "By boat to Somaemuldo's lighthouse"), image: card("tongyeong-island"), ai: "island trip to Somaemuldo" },
+    ],
+  },
+  Jeonju: {
+    photos: [postcard("jeonju-deokjin"), postcard("jeonju-stream")],
+    experiences: [
+      { id: "hanok", title: tx("한옥마을", "Hanok Village"), description: tx("기와지붕 사이로 걷는 골목", "Lanes between tiled roofs"), image: card("jeonju-hanok"), ai: "Hanok Village lanes" },
+      { id: "food", title: tx("비빔밥과 콩나물국밥", "Bibimbap & bean sprout soup"), description: tx("전주에서 먹는 전주의 한 끼", "Jeonju's own dishes, in Jeonju"), image: card("jeonju-bibimbap"), ai: "bibimbap & kongnamul gukbap" },
+      { id: "nightmarket", title: tx("남부시장 야시장", "Nambu night market"), description: tx("밤이면 불이 켜지는 시장 골목", "Market lanes that light up after dark"), image: card("jeonju-nambu"), ai: "Nambu night market" },
+      { id: "cathedral", title: tx("전동성당과 옛 성문", "Jeondong Cathedral"), description: tx("붉은 벽돌 성당과 오래된 성문", "A red-brick cathedral by an old city gate"), image: card("jeonju-cathedral"), ai: "Jeondong Cathedral & old gate" },
+    ],
+  },
+  Yeosu: {
+    photos: [postcard("yeosu-hyangiram"), postcard("yeosu-expo")],
+    experiences: [
+      { id: "night", title: tx("밤바다와 포차", "Night sea & tent bars"), description: tx("불빛 비치는 바다 앞 포장마차", "Tent bars glowing by the night sea"), image: card("yeosu-night"), ai: "night sea & tent pubs" },
+      { id: "cablecar", title: tx("해상 케이블카", "Sea cable car"), description: tx("바다 위를 건너 돌산까지", "Over the water to Dolsan Island"), image: card("yeosu-cablecar"), ai: "maritime cable car" },
+      { id: "island", title: tx("오동도 동백숲", "Odongdo camellias"), description: tx("동백나무 숲길 사이로 보이는 바다", "Sea glimpses through a camellia forest"), image: card("yeosu-odongdo"), ai: "Odongdo camellia forest walk" },
+      { id: "gejang", title: tx("게장 한 상", "Marinated crab"), description: tx("간장게장과 양념게장에 밥 한 공기", "Soy and spicy marinated crab with rice"), image: card("yeosu-gejang"), ai: "gejang (marinated crab)" },
+    ],
+  },
+  Mokpo: {
+    photos: [postcard("mokpo-gatbawi"), postcard("mokpo-bridge")],
+    experiences: [
+      { id: "cablecar", title: tx("유달산과 케이블카", "Yudalsan & cable car"), description: tx("바위산을 넘어 바다 건너 섬까지", "Over the rocky hill and out across the sea"), image: card("mokpo-cablecar"), ai: "Yudalsan & marine cable car" },
+      { id: "modern", title: tx("근대역사거리", "Modern history streets"), description: tx("백 년 전 건물이 남은 옛 항구 거리", "Old port streets with century-old buildings"), image: card("mokpo-modern"), ai: "modern history streets" },
+      { id: "seafood", title: tx("남도 바다 한 상", "Mokpo seafood"), description: tx("민어회와 낙지로 차린 한 상", "Croaker sashimi, octopus and more"), image: card("mokpo-seafood"), ai: "seafood: croaker & octopus" },
+      { id: "fountain", title: tx("바다 분수 쇼", "Sea fountain show"), description: tx("밤바다 위에서 춤추는 분수", "Fountains dancing over the night sea"), image: card("mokpo-fountain"), ai: "dancing sea fountain at night" },
     ],
   },
 };
@@ -208,10 +311,10 @@ export function pickedPlaces(answers: Answers): string[] {
 
 /**
  * 오른쪽 판 엽서에서 번갈아 보여 줄 사진. 도시를 여럿 고르면 도시마다 한 장씩 번갈아
- * (서울1 → 부산1 → 서울2 → 부산2 …) — 한 도시 사진만 이어지지 않게. 사진이 없는 곳은 건너뛴다.
+ * (서울1 → 부산1 → 서울2 → 부산2 …) — 한 도시 사진만 이어지지 않게. 사진이 없는 곳(직접 적은 곳)은 건너뛴다.
  */
 export function panelPhotos(places: string[]): string[] {
-  const lists = places.map((p) => CURATED[p]?.photos ?? (CURATED[p]?.postcard ? [CURATED[p].postcard!] : []));
+  const lists = places.map((p) => CURATED[p]?.photos ?? []);
   const out: string[] = [];
   for (let i = 0; lists.some((l) => i < l.length); i++) {
     for (const l of lists) if (i < l.length && !out.includes(l[i])) out.push(l[i]);

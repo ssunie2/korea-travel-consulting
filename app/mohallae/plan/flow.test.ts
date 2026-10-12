@@ -2,6 +2,7 @@
 // (npm test 는 지금 lib/ 만 본다 — 뮤조가 #82 리뷰에서 짚은 것과 같은 이유로, 넓히는 건 package.json PR 에서)
 import test from "node:test";
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { CURATED, INITIAL_STATE, OPTIONAL, choicesFor, flowReducer, panelPhotos, stepError, stepOrder, toPlanRequest } from "./flow.ts";
 import type { FlowState, Step } from "./flow.ts";
 
@@ -106,7 +107,6 @@ test("필수 질문은 건너뛸 수 없고, 세부에서만 바로 확인으로
   let s = pick(INITIAL_STATE, "Busan");
   assert.equal(flowReducer(s, { type: "goto", to: "review" }).step, "do:Busan", "필수 질문에서 건너뛰기");
   s = pick(s, "coast");
-  s = pick(s, "cafe");
   s = core(s);
   assert.ok(OPTIONAL.includes(s.step));
   s = flowReducer(s, { type: "goto", to: "review" });
@@ -119,7 +119,6 @@ test("확인 화면을 본 뒤 고치러 가면 곧장 돌아오고, 새로 생�
   const resume = (st: FlowState) => flowReducer(st, { type: "resume" });
   let s = pick(INITIAL_STATE, "Busan");
   s = pick(s, "coast");
-  s = pick(s, "cafe");
   s = core(s);
   assert.equal(resume(s).step, s.step, "확인 화면 전에는 아무 일도 없다");
   s = flowReducer(s, { type: "goto", to: "review" });
@@ -135,7 +134,7 @@ test("확인 화면을 본 뒤 고치러 가면 곧장 돌아오고, 새로 생�
   s = flowReducer(s, { type: "goto", to: "dates" });
   assert.equal(resume(input(s, ["2100-10-20", ""])).step, "dates");
 
-  // 서울을 더하면 서울의 '하고 싶은 것'과 장면을 거쳐서 돌아온다
+  // 서울을 더하면 서울의 '하고 싶은 것'을 거쳐서 돌아온다
   s = flowReducer(input(s, ["2100-10-20", "2100-10-24"]), { type: "goto", to: "where" });
   s = choose(s, "Seoul");
   s = resume(s);
@@ -151,16 +150,29 @@ test("확인 화면을 본 뒤 고치러 가면 곧장 돌아오고, 새로 생�
   assert.equal(s.step, "review");
 });
 
-test("엽서 사진: 도시마다 번갈아, 사진 없는 곳은 건너뛴다", () => {
-  const seoul = CURATED.Seoul.photos!;
+test("엽서 사진: 도시마다 번갈아, 사진 없는 곳(직접 적은 곳)은 건너뛴다", () => {
+  const seoul = CURATED.Seoul.photos;
+  const busan = CURATED.Busan.photos;
   assert.deepEqual(panelPhotos(["Seoul"]), seoul);
-  const both = panelPhotos(["Seoul", "Busan"]);
-  assert.equal(both[0], seoul[0]);
-  assert.equal(both[1], CURATED.Busan.postcard);
-  assert.equal(both[2], seoul[1]);
-  assert.equal(both.length, seoul.length + 1);
-  assert.deepEqual(panelPhotos(["Gangneung", "Mokpo"]), [], "사진이 아직 없는 곳");
-  assert.deepEqual(panelPhotos(["Gangneung", "Gyeongju"]), [CURATED.Gyeongju.postcard]);
+  assert.deepEqual(panelPhotos(["Seoul", "Busan"]), [seoul[0], busan[0], seoul[1], busan[1], seoul[2]]);
+  assert.deepEqual(panelPhotos(["Ulsan"]), [], "직접 적은 곳");
+  assert.deepEqual(panelPhotos(["Ulsan", "Mokpo"]), CURATED.Mokpo.photos);
+});
+
+// lib/places.ts 의 DESTINATIONS 와 같은 목록 (그 파일은 확장자 없는 import 를 써서 node --test 로 바로 못 불러온다)
+const DESTINATIONS = ["Seoul", "Incheon", "Chuncheon", "Gangneung", "Sokcho", "Gyeongju", "Andong", "Pohang",
+  "Daegu", "Busan", "Tongyeong", "Jeonju", "Yeosu", "Mokpo", "Jeju"];
+
+test("목록의 모든 도시에 사진 카드 4장과 엽서 사진이 있고, 사진 파일이 실제로 있다", () => {
+  assert.deepEqual(Object.keys(CURATED).sort(), [...DESTINATIONS].sort());
+  for (const [place, city] of Object.entries(CURATED)) {
+    assert.equal(city.experiences.length, 4, place);
+    assert.equal(new Set(city.experiences.map((e) => e.id)).size, 4, `${place}: 같은 id`);
+    assert.ok(city.photos.length >= 2, `${place}: 엽서 사진`);
+    for (const src of [...city.experiences.map((e) => e.image), ...city.photos]) {
+      assert.ok(existsSync(new URL(`../../../public${src}`, import.meta.url)), `${place}: public${src} 이 없다`);
+    }
+  }
 });
 
 test("엽서 사진은 그 도시의 사진 카드와 겹치지 않는다 (같은 사진이 옆에 또 보이지 않게)", () => {
