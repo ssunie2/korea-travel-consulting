@@ -9,28 +9,29 @@ import CorrectionStrip from "../../_components/CorrectionStrip";
 import Calendar from "./Calendar";
 import Postcard from "./Postcard";
 import {
-  CURATED, CURRENCIES, INITIAL_STATE, LANGUAGES, OPEN_PLACES, OPTIONAL, OTHER_PLACE, OTHER_STEPS,
-  autoAdvance, choicesFor, defaultCurrency, flowReducer, isMultiple, nights, panelPhotos, pickedPlaces, stepError, stepOrder, toPlanRequest,
-  type Answers, type Choice, type Destination, type Lang, type Step, type Text,
+  CURRENCIES, INITIAL_STATE, LANGUAGES, OPEN_PLACES, STEP,
+  autoAdvance, defaultCurrency, flowReducer, labelsOf, nights, optionsFor, panelPhotos, stepError, stepOrder, toPlanRequest, visibleFields,
+  type Action, type Answers, type Field, type Lang, type StepId, type Text,
 } from "../flow";
 import { flowCopy as c } from "./copy";
 
 /**
- * 새 입력 흐름 (승인 시안 input-comp-3 "초안이 자라나는 판", 써니 2026-10-12).
+ * 새 입력 흐름 (승인 시안 input-comp-3 "초안이 자라나는 판", 써니 2026-10-12. 질문은 2026-10-13 새로 짰다 — flow.ts).
  *
  * 왼쪽에 질문 하나, 오른쪽에 '지금까지의 여행' 판. 고른 것이 그 판에 한 줄씩 적히고,
- * 아직 묻지 않은 것은 회색으로 기다린다. 마지막에 지금 폼과 똑같은 값을 /api/plan 으로 보내고
+ * 아직 묻지 않은 것은 회색으로 기다린다. 마지막에 지금 폼과 같은 모양의 값을 /api/plan 으로 보내고
  * 새 결과 화면(/mohallae/plan/[id])으로 넘어간다.
  *
  * - 언어 단추는 이 화면 안에서만 바꾼다 (주소만 고치고 답은 그대로 — 다시 불러오면 답이 사라진다)
  * - 화면이 바뀌면 질문(h1)으로 초점을 옮긴다. 화면 낭독기가 새 질문부터 읽는다 (베타와 같다)
- * - 하나만 고르는 질문은 고르면 바로 다음 질문으로 — '다음' 단추가 없다 (써니 2026-10-12, flow.ts autoAdvance)
+ * - 하나만 고르는 질문은 고르면 바로 다음 질문으로 — '다음' 단추가 없다 (써니 2026-10-12, flow.ts autoAdvance).
+ *   줄이 둘인 질문(도착·출발 시간 등)은 마지막 줄을 채우는 순간 넘어간다
  * - 기다리는 동안은 랜딩의 고쳐 쓰기 장면을 보여 준다
  */
 /** 고른 표시(체크)가 보일 만큼만 기다렸다가 넘어간다 (.check 가 나타나는 데 0.25초) */
 const ADVANCE_MS = 320;
 
-export default function PlanFlow({ initialLang, destinations }: { initialLang: Lang; destinations: Destination[] }) {
+export default function PlanFlow({ initialLang }: { initialLang: Lang }) {
   const router = useRouter();
   const [lang, setLang] = useState<Lang>(initialLang);
   const [state, dispatch] = useReducer(flowReducer, INITIAL_STATE);
@@ -38,12 +39,17 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
   const [failure, setFailure] = useState<Text | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const first = useRef(true);
-  const pending = useRef<{ timer: ReturnType<typeof setTimeout>; step: Step; id: string } | null>(null);
+  const pending = useRef<{ timer: ReturnType<typeof setTimeout>; step: StepId; field: string; id: string } | null>(null);
 
   const order = stepOrder(state.answers);
   const index = order.indexOf(state.step);
+  const def = STEP[state.step];
   const error = stepError(state);
-  const single = autoAdvance(state.step);
+  const fields = visibleFields(state.step, state.answers);
+  // 고르면 넘어가는 질문에는 '다음'이 없다. 줄이 여럿인 질문은 다 채워 둔 걸 고치러 왔을 때만 보인다
+  const showNext = !autoAdvance(state.step, state.answers) || (fields.length > 1 && !error);
+  const empty = fields.every((f) => !state.answers[f.key]?.some((v) => v.trim()) && state.answers[`${f.key}:other`] === undefined);
+  const nextText = fields.length > 0 && fields.every((f) => f.optional) && empty ? c.skip : c.next;
   const t = (x: Text) => x[lang];
 
   useEffect(() => {
@@ -56,23 +62,29 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
 
   useEffect(() => () => { if (pending.current) clearTimeout(pending.current.timer); }, []);
 
-  /** 보기를 눌렀을 때. 하나만 고르는 질문이면 잠깐 뒤 다음 질문으로 (확인 화면을 본 뒤라면 확인 화면으로) */
-  function pick(id: string) {
+  /** 보기를 눌렀을 때. 고르면 넘어가는 질문이면 잠깐 뒤 다음 질문으로 (확인 화면을 본 뒤라면 확인 화면으로) */
+  function pick(field: string, id: string) {
+    if (sending) return;
     const step = state.step;
-    // 같은 보기를 빠르게 두 번 누르면 한 번으로 (세부 질문은 두 번째 누름이 고른 것을 풀어 버린다)
-    if (pending.current?.step === step && pending.current.id === id) return;
-    dispatch({ type: "choose", value: id });
-    if (!autoAdvance(step)) return;
-    // 세부 질문에서 이미 고른 것을 다시 누르면 풀린다 — 그때는 이 화면에 머문다
-    if (OPTIONAL.includes(step) && state.answers[step]?.[0] === id) return;
-    if (pending.current) clearTimeout(pending.current.timer);
+    // 같은 보기를 빠르게 두 번 누르면 한 번으로 (두 번째 누름이 고른 것을 풀어 버리지 않게)
+    const p = pending.current;
+    if (p && p.step === step && p.field === field && p.id === id) return;
+    const after = flowReducer(state, { type: "choose", field, value: id });
+    dispatch({ type: "choose", field, value: id });
+    if (!autoAdvance(step, after.answers) || stepError(after) || !after.answers[field]?.length) return;
+    // 줄이 여럿이면 이번에 고른 것으로 다 채워졌을 때만 넘어간다 — 다 채운 걸 고치는 중이면 머문다
+    if (visibleFields(step, after.answers).length > 1 && !stepError(state)) return;
+    if (p) clearTimeout(p.timer);
     const reviewed = state.reviewed;
     const timer = setTimeout(() => {
       pending.current = null;
       dispatch(reviewed ? { type: "resume", from: step } : { type: "next", from: step });
     }, ADVANCE_MS);
-    pending.current = { timer, step, id };
+    pending.current = { timer, step, field, id };
   }
+
+  /** 오른쪽 판에서 이 줄을 눌러 고치러 갈 수 있는지 (확인 화면을 본 뒤에는 앞쪽 질문으로도) */
+  const canGo = (to: StepId) => !sending && flowReducer(state, { type: "goto", to }).step === to;
 
   function switchLang(next: Lang) {
     setLang(next);
@@ -114,11 +126,6 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
       clearTimeout(timer);
     }
   }
-
-  const placeName = (value: string) => {
-    const hit = destinations.find((d) => d.v === value);
-    return hit ? (lang === "ko" ? hit.ko : hit.v) : value;
-  };
 
   return (
     <div lang={lang} className={`${base.page} ${s.shell}`}>
@@ -164,22 +171,20 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
               <Waiting lang={lang} />
             ) : (
               <>
-                <h1 id="question" ref={heading} tabIndex={-1} className={s.question}>
-                  {question(state.step, state.answers, lang, placeName)}
-                </h1>
-                <p className={s.helper}>{helper(state.step, lang)}</p>
+                <h1 id="question" ref={heading} tabIndex={-1} className={s.question}>{t(def.q)}</h1>
+                <p className={s.helper}>{t(def.help)}</p>
 
-                <Body step={state.step} answers={state.answers} lang={lang} destinations={destinations} dispatch={dispatch} onPick={pick} />
+                <Body step={state.step} answers={state.answers} lang={lang} dispatch={dispatch} onPick={pick} />
 
                 {/* 화면이 좁으면 판이 질문 아래(첫 화면 밖)로 밀린다 — 확인 화면에서는 고칠 목록을 여기에.
                     초안 언어(위)를 먼저 보이게 하고 그 아래에. CSS 가 화면 넓이에 따라 이것과 오른쪽 판 중 하나만 보여 준다 */}
                 {state.step === "review" && (
-                  <TripPanel variant="inline" answers={state.answers} step={state.step} order={order} lang={lang} placeName={placeName}
-                    reviewed={!!state.reviewed} onEdit={(to) => dispatch({ type: "goto", to })} />
+                  <TripPanel variant="inline" answers={state.answers} step={state.step} order={order} lang={lang}
+                    reviewed={!!state.reviewed} canGo={canGo} onEdit={(to) => dispatch({ type: "goto", to })} />
                 )}
 
                 {failure && <p role="alert" className={s.failure}>{t(failure)}</p>}
-                {state.step === "review" && <p className={s.reviewNote}>{t(c.review.note)}</p>}
+                {state.step === "review" && <p className={s.reviewNote}>{t(c.reviewNote)}</p>}
 
                 {/* 단추 줄은 어느 질문에서나 같은 자리 — 칸 아래 끝 (써니: "다음 다음 다음 누르니까 번거로워") */}
                 <div className={s.push} aria-hidden="true" />
@@ -196,9 +201,9 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
                       </button>
                     ) : state.reviewed ? (
                       // 확인 화면을 본 뒤 고치러 왔다: 곧장 돌아가는 단추가 주인공, 한 칸씩 가는 건 옆에 작게.
-                      // 하나만 고르는 질문은 고르면 알아서 돌아가므로 '다음 질문'이 없다
+                      // 고르면 넘어가는 질문은 고르면 알아서 돌아가므로 '다음 질문'이 없다
                       <>
-                        {!single && (
+                        {showNext && (
                           <button type="button" className={s.jump} disabled={!!error}
                             aria-describedby={error ? "step-error" : undefined}
                             onClick={() => dispatch({ type: "next", from: state.step })}>
@@ -211,27 +216,17 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
                           {t(c.backToReview)} <span aria-hidden="true">→</span>
                         </button>
                       </>
-                    ) : (
-                      <>
-                        {OPTIONAL.includes(state.step) && (
-                          <button type="button" className={s.jump} onClick={() => dispatch({ type: "goto", to: "review" })} disabled={!!error}>
-                            {t(c.toReview)}
-                          </button>
-                        )}
-                        {/* 하나만 고르는 질문에는 '다음'이 없다. 고르지 않아도 되는 세부 질문만 '건너뛰기'를 둔다 */}
-                        {(!single || OPTIONAL.includes(state.step)) && (
-                          <button
-                            type="button"
-                            className={`${base.pillDark} ${s.next}`}
-                            disabled={!!error}
-                            aria-describedby={error ? "step-error" : undefined}
-                            onClick={() => dispatch({ type: "next", from: state.step })}
-                          >
-                            {single ? t(c.skip) : nextLabel(state.step, state.answers, lang)} <span aria-hidden="true">→</span>
-                          </button>
-                        )}
-                      </>
-                    )}
+                    ) : showNext ? (
+                      <button
+                        type="button"
+                        className={`${base.pillDark} ${s.next}`}
+                        disabled={!!error}
+                        aria-describedby={error ? "step-error" : undefined}
+                        onClick={() => dispatch({ type: "next", from: state.step })}
+                      >
+                        {t(nextText)} <span aria-hidden="true">→</span>
+                      </button>
+                    ) : null}
                   </div>
                 </div>
                 {error && <p id="step-error" className="sr-only">{t(error)}</p>}
@@ -239,104 +234,69 @@ export default function PlanFlow({ initialLang, destinations }: { initialLang: L
             )}
           </section>
 
-          <TripPanel answers={state.answers} step={state.step} order={order} lang={lang} placeName={placeName} reviewed={!!state.reviewed}
-            onEdit={sending ? undefined : (to) => dispatch({ type: "goto", to })} />
+          <TripPanel answers={state.answers} step={state.step} order={order} lang={lang} reviewed={!!state.reviewed}
+            canGo={canGo} onEdit={sending ? undefined : (to) => dispatch({ type: "goto", to })} />
         </div>
       </main>
     </div>
   );
 }
 
-/* ── 질문 글 ─────────────────────────────────────────────────────── */
-
-function question(step: Step, answers: Answers, lang: Lang, placeName: (v: string) => string): string {
-  if (step.startsWith("do:")) return c.todo.q[lang](placeName(step.slice(3)));
-  if (step === "interests") {
-    const places = pickedPlaces(answers).filter((p) => !CURATED[p]).map(placeName);
-    return c.interests.q[lang](places.join(lang === "ko" ? "·" : " & "));
-  }
-  const simple = c[step as "where" | "who" | "kids" | "pace" | "dates" | "travelers" | "budget" | "visited" | "transport" | "stay" | "rhythm" | "occasion" | "avoid" | "diet" | "review"];
-  return simple.q[lang];
-}
-
-function helper(step: Step, lang: Lang): string {
-  if (step === "where" && OPEN_PLACES.length === 1 && !OTHER_PLACE) return c.where.helpOne[lang];
-  if (step.startsWith("do:")) return c.todo.help[lang];
-  if (step === "interests") return c.interests.help[lang];
-  if (step === "diet") return c.diet.help[lang];
-  if (OPTIONAL.includes(step)) return c.optionalNote[lang];
-  const entry = c[step as "where" | "who" | "kids" | "pace" | "dates" | "travelers" | "budget" | "review"];
-  return "help" in entry ? entry.help[lang] : "";
-}
-
-function nextLabel(step: Step, answers: Answers, lang: Lang) {
-  const empty = !(answers[step]?.length) && !(answers[`${step}:other` as keyof Answers]?.[0]?.trim());
-  return (OPTIONAL.includes(step) || step === "interests") && empty ? c.skip[lang] : c.next[lang];
-}
-
 /* ── 답하는 칸 ───────────────────────────────────────────────────── */
 
-type Dispatch = (a: Parameters<typeof flowReducer>[1]) => void;
+type Dispatch = (a: Action) => void;
 
-function Body({ step, answers, lang, destinations, dispatch, onPick }: {
-  step: Step; answers: Answers; lang: Lang; destinations: Destination[]; dispatch: Dispatch; onPick: (id: string) => void;
+function Body({ step, answers, lang, dispatch, onPick }: {
+  step: StepId; answers: Answers; lang: Lang; dispatch: Dispatch; onPick: (field: string, id: string) => void;
 }) {
   const t = (x: Text) => x[lang];
-  const picked = answers[step] ?? [];
+  const kind = STEP[step].kind;
 
-  if (step === "dates") {
+  if (kind === "dates") {
     const [start = "", end = ""] = answers.dates ?? [];
-    return <Calendar start={start} end={end} lang={lang} onChange={(a, b) => dispatch({ type: "input", values: [a, b] })} />;
+    return <Calendar start={start} end={end} lang={lang} onChange={(a, b) => dispatch({ type: "input", field: "dates", values: [a, b] })} />;
   }
 
-  if (step === "travelers") {
+  if (kind === "travelers") {
+    // 혼자·둘이가 아닐 때만 묻는다 — 본인 포함 2명부터
     const n = Number(answers.travelers?.[0] ?? 0);
-    const set = (v: number) => dispatch({ type: "input", values: [String(Math.min(20, Math.max(1, v)))] });
+    const set = (v: number) => dispatch({ type: "input", field: "travelers", values: [String(Math.min(20, Math.max(2, v)))] });
     return (
       <div className={s.stepper}>
-        <button type="button" className={s.stepBtn} onClick={() => set((n || 1) - 1)} disabled={n <= 1} aria-label={t(c.minus)}>−</button>
+        <button type="button" className={s.stepBtn} onClick={() => set(n - 1)} disabled={n <= 2} aria-label={t(c.minus)}>−</button>
         <p className={s.stepValue} aria-live="polite">{n ? c.travelersUnit[lang](n) : "–"}</p>
-        <button type="button" className={s.stepBtn} onClick={() => set((n || 0) + 1)} disabled={n >= 20} aria-label={t(c.plus)}>+</button>
+        <button type="button" className={s.stepBtn} onClick={() => set(n ? n + 1 : 2)} disabled={n >= 20} aria-label={t(c.plus)}>+</button>
       </div>
     );
   }
 
-  if (step === "review") {
+  if (kind === "review") {
     return (
       <label className={s.languagePick}>
-        <span>{t(c.review.language)}</span>
-        <select
-          value={answers["review:language"]?.[0] ?? lang}
-          onChange={(e) => dispatch({ type: "set", key: "review:language", value: e.target.value })}
-        >
+        <span>{t(c.language)}</span>
+        <select value={answers.language?.[0] ?? lang} onChange={(e) => dispatch({ type: "set", key: "language", value: e.target.value })}>
           {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
         </select>
       </label>
     );
   }
 
-  const options: Choice[] = step === "where"
-    ? destinations.map((d) => ({ id: d.v, value: d.v, title: { ko: d.ko, en: d.v } }))
-    : choicesFor(step);
-  const photos = options.some((o) => o.image) && step !== "where";
-  const compact = step === "where" || step === "interests" || step === "avoid" || step === "diet";
-  const otherKey = `${step}:other` as keyof Answers;
-  // '그 외 — 직접 적기' 칸. 도시는 서울만 열어 둔 동안 숨긴다 (flow.ts OTHER_PLACE)
-  const otherAllowed = (OTHER_STEPS as readonly string[]).includes(step) && (step !== "where" || OTHER_PLACE);
-  const otherOpen = otherAllowed && answers[otherKey] !== undefined;
-  const multiple = isMultiple(step);
+  const fields = visibleFields(step, answers);
+  // 줄이 하나인 질문만 '몇 개 골랐어요'를 적는다
+  const only = fields.length === 1 && !fields[0].text ? fields[0] : null;
+  const picked = only ? answers[only.key] ?? [] : [];
 
   return (
     <>
       {/* 통화는 예산을 고르기 전에 — 예산을 고르면 바로 다음 질문으로 넘어간다 */}
       {step === "budget" && (
-        <div className={s.currency} role="group" aria-label={t(c.budget.currency)}>
-          <span>{t(c.budget.currency)}</span>
+        <div className={s.currency} role="group" aria-label={t(c.currency)}>
+          <span>{t(c.currency)}</span>
           {CURRENCIES.map((cur) => {
-            const on = (answers["budget:currency"]?.[0] ?? defaultCurrency(lang)) === cur;
+            const on = (answers.currency?.[0] ?? defaultCurrency(lang)) === cur;
             return (
               <button key={cur} type="button" aria-pressed={on} className={`${s.cur} ${on ? s.curOn : ""}`}
-                onClick={() => dispatch({ type: "set", key: "budget:currency", value: cur })}>
+                onClick={() => dispatch({ type: "set", key: "currency", value: cur })}>
                 {cur}
               </button>
             );
@@ -344,41 +304,83 @@ function Body({ step, answers, lang, destinations, dispatch, onPick }: {
         </div>
       )}
 
-      <ul className={`${s.choices} ${photos ? s.photoGrid : compact ? s.chipGrid : s.textGrid}`} role="list">
+      <div className={s.fields}>
+        {fields.map((f) => <FieldRow key={f.key} field={f} answers={answers} lang={lang} dispatch={dispatch} onPick={onPick} />)}
+      </div>
+
+      <p className={s.count} aria-live="polite">
+        {only && picked.length ? (only.multiple ? c.picked[lang](picked.length) : t(c.pickedOne)) : " "}
+      </p>
+    </>
+  );
+}
+
+const Check = () => (
+  <span className={s.check} aria-hidden="true">
+    <svg viewBox="0 0 16 16"><path d="M3.5 8.4l2.9 2.8 6.1-6.4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+  </span>
+);
+
+/** 한 줄: 보기들(+ 그 외 — 직접 적기), 또는 직접 적는 칸 */
+function FieldRow({ field, answers, lang, dispatch, onPick }: {
+  field: Field; answers: Answers; lang: Lang; dispatch: Dispatch; onPick: (field: string, id: string) => void;
+}) {
+  const t = (x: Text) => x[lang];
+
+  if (field.text) {
+    return (
+      <label className={s.field}>
+        {field.label && <span className={s.fieldLabel}>{t(field.label)}</span>}
+        <span className={s.textBox}>
+          <input
+            type="text"
+            value={answers[field.key]?.[0] ?? ""}
+            maxLength={field.text.max}
+            placeholder={t(field.text.placeholder)}
+            onChange={(e) => dispatch({ type: "text", field: field.key, text: e.target.value })}
+          />
+        </span>
+      </label>
+    );
+  }
+
+  const options = optionsFor(field, answers);
+  const picked = answers[field.key] ?? [];
+  const otherKey = `${field.key}:other`;
+  const otherOpen = !!field.other && answers[otherKey] !== undefined;
+  // 설명이 있는 보기는 카드, 이름뿐인 보기는 작은 칩. 카드가 많으면(서울 동네 12곳) 넓은 화면에서 세 칸으로
+  const cards = options.some((o) => o.description);
+  const grid = cards ? `${s.textGrid} ${options.length > 8 ? s.wideGrid : ""}` : s.chipGrid;
+  const labelId = `label-${field.key}`;
+
+  return (
+    <div className={s.field} role={field.label ? "group" : undefined} aria-labelledby={field.label ? labelId : undefined}>
+      {field.label && <p id={labelId} className={s.fieldLabel}>{t(field.label)}</p>}
+      <ul className={`${s.choices} ${grid}`} role="list">
         {options.map((o) => {
           const on = picked.includes(o.id);
           return (
             <li key={o.id}>
-              <button
-                type="button"
-                className={`${s.choice} ${photos ? s.photoChoice : ""} ${on ? s.on : ""}`}
-                aria-pressed={on}
-                onClick={() => onPick(o.id)}
-              >
-                {photos && o.image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={o.image} alt="" className={s.photo} decoding="async" />
-                )}
+              <button type="button" className={`${s.choice} ${on ? s.on : ""}`} aria-pressed={on} onClick={() => onPick(field.key, o.id)}>
                 <span className={s.choiceText}>
                   <span className={s.choiceTitle}>{t(o.title)}</span>
                   {o.description && <span className={s.choiceDesc}>{t(o.description)}</span>}
                 </span>
-                <span className={s.check} aria-hidden="true">
-                  <svg viewBox="0 0 16 16"><path d="M3.5 8.4l2.9 2.8 6.1-6.4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                </span>
+                <Check />
               </button>
             </li>
           );
         })}
-        {otherAllowed && (
+        {field.other && (
           <li>
             <button
               type="button"
               className={`${s.choice} ${s.otherChoice} ${otherOpen ? s.on : ""}`}
               aria-pressed={otherOpen}
-              onClick={() => dispatch({ type: "other", text: otherOpen ? null : "" })}
+              onClick={() => dispatch({ type: "other", field: field.key, text: otherOpen ? null : "" })}
             >
-              <span className={s.choiceText}><span className={s.choiceTitle}>{t(step === "where" ? c.otherPlace : c.other)}</span></span>
+              <span className={s.choiceText}><span className={s.choiceTitle}>{t(c.other)}</span></span>
+              <Check />
             </button>
           </li>
         )}
@@ -393,87 +395,106 @@ function Body({ step, answers, lang, destinations, dispatch, onPick }: {
             maxLength={40}
             autoFocus
             placeholder={t(c.otherPlaceholder)}
-            onChange={(e) => dispatch({ type: "other", text: e.target.value })}
+            onChange={(e) => dispatch({ type: "other", field: field.key, text: e.target.value })}
           />
         </label>
       )}
-
-      <p className={s.count} aria-live="polite">
-        {multiple && picked.length > 0 ? c.picked[lang](picked.length) : !multiple && picked.length ? t(c.pickedOne) : " "}
-      </p>
-    </>
+    </div>
   );
 }
 
 /* ── 오른쪽 판: 지금까지의 여행 ─────────────────────────────────── */
 
-type Line = { key: string; label: string; value: string | null; to: Step | null };
+/** 판의 한 줄 — 질문 한두 개를 모아 적는다. to: 눌렀을 때 고치러 가는 질문, steps: 이 줄에 적히는 질문들 */
+type Line = { key: string; label: string; value: string | null; to: StepId; steps: StepId[] };
 
-function TripPanel({ variant = "aside", answers, step, order, lang, placeName, reviewed, onEdit }: {
+function panelLines(a: Answers, order: StepId[], step: StepId, reviewed: boolean, lang: Lang): Line[] {
+  const t = (x: Text) => x[lang];
+  const p = c.panel;
+  const L = (key: string) => labelsOf(a, key).map(t);
+  const id = (key: string) => a[key]?.[0];
+  const join = (xs: (string | null | undefined | false | 0)[], sep = " · ") => xs.filter(Boolean).join(sep) || null;
+  // 고르지 않아도 되는 질문을 지나왔으면 빈칸 대신 '—'
+  const passed = (st: StepId) => reviewed || (order.includes(st) && order.indexOf(st) < order.indexOf(step));
+
+  const must = L("must")[0];
+  const [start, end] = a.dates ?? [];
+  const known = (key: string) => (id(key) && id(key) !== "unknown" ? L(key)[0] : null);
+  const n = Number(a.travelers?.[0] ?? 0);
+  const spicy = L("spicy")[0];
+  const needs = labelsOf({ ...a, needs: (a.needs ?? []).filter((x) => x !== "none") }, "needs").map(t);
+
+  const lines: Line[] = [
+    { key: "plan", label: t(p.plan), value: join([...L("mode"), ...L("vibe")]), to: "mode", steps: ["mode", "vibe"] },
+    { key: "area", label: t(p.area), value: join([L("area").join(", "), ...L("famous"), ...L("era")]), to: "area", steps: ["area", "taste"] },
+    {
+      key: "interests", label: t(p.interests), to: "interests", steps: ["interests", "must"],
+      value: join([must && `${must} (${t(p.top)})`, ...L("interests").filter((x) => x !== must)], ", "),
+    },
+    { key: "wish", label: t(p.wish), value: join([L("place")[0], L("foods").join(", ")]) ?? (passed("wish") ? "—" : null), to: "wish", steps: ["wish"] },
+    {
+      key: "dates", label: t(p.dates), to: "dates", steps: ["dates", "times"],
+      value: start && end
+        ? join([`${dayLabel(start, lang)} – ${dayLabel(end, lang)}`, p.days[lang](nights(start, end) + 1),
+          known("arrive") && p.arrive[lang](known("arrive")!), known("leave") && p.leave[lang](known("leave")!)])
+        : null,
+    },
+    {
+      key: "who", label: t(p.who), to: "who", steps: ["who", "kids", "travelers"],
+      value: join([L("who")[0], L("kids").join(", "), order.includes("travelers") && n ? c.travelersUnit[lang](n) : null]),
+    },
+    { key: "visited", label: t(p.visited), value: L("visited")[0] ?? null, to: "visited", steps: ["visited"] },
+    { key: "stay", label: t(p.stay), value: join([L("stay")[0], L("stayArea")[0]]), to: "stay", steps: ["stay", "stayArea"] },
+    { key: "budget", label: t(p.budget), value: L("budget")[0] ?? null, to: "budget", steps: ["budget"] },
+    {
+      key: "food", label: t(p.food), to: "food", steps: ["food", "needs", "allergy"],
+      value: join([L("adventure")[0], spicy && `${t(p.spicy)}: ${lang === "en" ? spicy.toLowerCase() : spicy}`, ...needs, ...L("allergy")]),
+    },
+    { key: "pace", label: t(p.pace), value: L("pace")[0] ?? null, to: "pace", steps: ["pace"] },
+    { key: "avoid", label: t(p.avoid), value: join(L("avoid"), ", ") ?? (passed("avoid") ? "—" : null), to: "avoid", steps: ["avoid"] },
+  ];
+
+  if (id("mode") === "detail") {
+    const transport = L("transport")[0];
+    lines.push({
+      key: "detail", label: t(p.detail), to: "hours", steps: ["hours", "move", "airport", "hanbok", "buy"],
+      value: join([
+        L("start")[0] && L("end")[0] && `${L("start")[0]} → ${L("end")[0]}`,
+        transport && (id("subway") === "new" ? `${transport} (${t(p.subwayNew)})` : transport),
+        known("airport") && join([known("airport"), L("ride")[0]], " → "),
+        id("hanbok") === "yes" && t(p.hanbok),
+        L("buy").join(", "),
+      ]),
+    });
+  }
+  return lines;
+}
+
+function TripPanel({ variant = "aside", answers, step, order, lang, reviewed, canGo, onEdit }: {
   variant?: "aside" | "inline";
-  answers: Answers; step: Step; order: Step[]; lang: Lang; placeName: (v: string) => string; reviewed: boolean; onEdit?: (to: Step) => void;
+  answers: Answers; step: StepId; order: StepId[]; lang: Lang; reviewed: boolean;
+  canGo: (to: StepId) => boolean; onEdit?: (to: StepId) => void;
 }) {
   const t = (x: Text) => x[lang];
   const p = c.panel;
-  const places = pickedPlaces(answers);
-  const sep = lang === "ko" ? ", " : ", ";
-  const title = (st: Step, id: string) => choicesFor(st).find((o) => o.id === id)?.title[lang] ?? id;
-  const valueOf = (st: Step) => (answers[st] ?? []).map((id) => title(st, id)).join(sep) || null;
-  // 확인 화면을 본 뒤에는 앞 질문을 고치는 중이어도 뒤쪽 답(인원 등)을 그대로 보여 준다
-  const reached = (st: Step) => reviewed || order.indexOf(st) < order.indexOf(step) || (st === step && !!answers[st]?.length);
-
-  const lines: Line[] = [{ key: "where", label: t(p.where), value: places.length ? places.map(placeName).join(" · ") : null, to: "where" }];
-  for (const place of places) {
-    const city = CURATED[place];
-    if (!city) continue;
-    const picks = city.experiences.filter((e) => answers[`do:${place}`]?.includes(e.id)).map((e) => e.title[lang]);
-    lines.push({ key: `do:${place}`, label: `${placeName(place)} — ${t(p.todo)}`, value: picks.join(sep) || null, to: `do:${place}` });
-  }
-  if (order.includes("interests")) {
-    const other = answers["interests:other"]?.[0]?.trim();
-    const v = [valueOf("interests"), other].filter(Boolean).join(sep);
-    lines.push({ key: "interests", label: t(p.interests), value: v || (reached("interests") ? "—" : null), to: "interests" });
-  }
-  const who = valueOf("who");
-  const kids = valueOf("kids");
-  lines.push({ key: "who", label: t(p.who), value: who ? (kids ? `${who} · ${kids}` : who) : null, to: "who" });
-  lines.push({ key: "pace", label: t(p.pace), value: valueOf("pace"), to: "pace" });
-  const [start, end] = answers.dates ?? [];
-  lines.push({ key: "dates", label: t(p.dates), value: start && end ? `${dayLabel(start, lang)} – ${dayLabel(end, lang)} · ${p.days[lang](nights(start, end) + 1)}` : null, to: "dates" });
-  const n = Number(answers.travelers?.[0] ?? 0);
-  lines.push({ key: "travelers", label: t(p.travelers), value: n && reached("travelers") ? c.travelersUnit[lang](n) : null, to: "travelers" });
-  lines.push({ key: "budget", label: t(p.budget), value: valueOf("budget"), to: "budget" });
-  const details = OPTIONAL.flatMap((st) => {
-    const v = valueOf(st);
-    const other = answers[`${st}:other` as keyof Answers]?.[0]?.trim();
-    return [v, other].filter(Boolean) as string[];
-  });
-  const detailsReached = OPTIONAL.some((st) => reached(st)) || step === "review";
-  lines.push({ key: "details", label: t(p.details), value: details.length ? details.join(sep) : detailsReached ? "—" : null, to: "visited" });
-
-  const photos = panelPhotos(places);
+  const lines = panelLines(answers, order, step, reviewed, lang);
 
   return (
     <Frame variant={variant} className={variant === "inline" ? s.reviewInline : `${s.panel} ${step === "review" ? s.panelOnReview : ""}`} label={t(p.title)}>
       <p className={s.panelTitle}>{t(p.title)}</p>
-      {variant === "aside" && (
-        <Postcard key={photos.join("|")} photos={photos} lang={lang} label={places.length ? places.map(placeName).join(" · ") : "mohallae"} />
-      )}
+      {/* 지금은 서울만 — 서울 사진을 번갈아 (flow.ts OPEN_PLACES) */}
+      {variant === "aside" && <Postcard photos={panelPhotos(OPEN_PLACES)} lang={lang} label={t(p.place)} />}
       <ol className={s.timeline}>
         {lines.map((l) => {
           const done = l.value !== null;
-          const editable = done && onEdit && l.to && order.includes(l.to) && order.indexOf(l.to) <= order.indexOf(step) && l.to !== step;
-          // 지금 묻고 있는 줄 (세부 질문들은 세부 줄, 아이 나이는 누구와 줄)
-          const current =
-            l.to === step ||
-            (l.key === "details" && OPTIONAL.includes(step)) ||
-            (l.key === "who" && step === "kids");
+          const current = l.steps.includes(step);
+          const editable = done && onEdit && l.to !== step && canGo(l.to);
           return (
             <li key={l.key} className={`${s.line} ${done ? s.done : ""} ${current ? s.current : ""}`} aria-current={current ? "step" : undefined}>
               <span className={s.lineLabel}>{l.label}</span>
               {done && (
                 editable ? (
-                  <button key={l.value} type="button" className={s.lineValue} onClick={() => onEdit!(l.to!)}>
+                  <button key={l.value} type="button" className={s.lineValue} onClick={() => onEdit!(l.to)}>
                     {l.value} <span className="sr-only">— {t(p.edit)}</span>
                   </button>
                 ) : (

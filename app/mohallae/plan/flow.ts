@@ -1,21 +1,23 @@
 /**
  * 새 입력 흐름(/mohallae/plan)의 질문 순서와 답 정리 — 화면 없이 돌아가는 부분만.
  *
- * 베타(#82, app/plan/beta/flow.ts)의 짜임을 이어받았다 (써니 결정 2026-10-12: "베타 짜임 그대로 + 새 모양").
- * - 한 화면에 질문 하나. 도시 → 도시별로 하고 싶은 것 → 그 장면 → 누구와 → … → 확인
- * - 고른 것을 다시 누르면 풀린다. 도시나 활동을 풀면 **그 아래 답만** 지우고 나머지는 둔다
+ * 2026-10-13 질문을 새로 짰다. 써니가 후보 300개(첫 질문 "러프하게? 디테일하게?" 아래로 이어지는 것)에서
+ * ★★★ 41개만 골라 "일단 만들어서 줘, 확인해 볼게". 뮤조와 정한 방향: 손님 중심, 짧게, "딱 내가 원하는 스타일대로".
+ * - 첫 질문은 "이번 여행 계획, 어떻게 짜고 싶으세요?" — 러프하게 / 디테일하게. 고른 쪽에 따라 뒤 질문이 달라진다
+ *   (러프만: 여행을 한 단어로 / 디테일만: 하루 시간·이동·공항·한복·살 것)
+ * - 도시는 서울만 연다. '어디로'는 서울 안의 동네를 묻는다 (써니: "서울도 넓고 할 거 구경할 거 먹을 거 많으니까")
+ * - 재미있는 것부터 묻는다: 분위기 → 동네 → 하고 싶은 것 → 꼭 → 날짜·누구와 → 숙소·예산·식단 같은 사실은 뒤로
+ * - 한 화면에 질문 하나. 줄이 둘인 질문(도착·출발 시간 등)은 줄마다 하나씩 고르면 넘어간다
+ * - 고른 것을 풀면 **그 아래 답만** 지운다 (디테일 → 러프로 바꾸면 디테일 질문의 답만 지운다)
  * - 이전 화면의 늦은 클릭이 두 칸을 건너뛰지 않게 막는다 (next 의 from)
- * 베타와 달라진 것:
- * - 도시는 베타의 4곳이 아니라 lib/places.ts 의 전체 목록 + "그 외" (기획서 5장). 목록은 화면이 넘겨준다
- * - '하고 싶은 것' 사진 카드는 목록의 15개 도시 모두에 있다 (써니 2026-10-12: 서울만 사진 보기가 뜨는 건 일관성이 없다).
- *   직접 적은 곳만 지금 폼의 관심사 보기를 쓴다
- * - 지금 폼(app/plan)이 묻는 것은 하나도 빠뜨리지 않는다. 다만 세부(재방문·교통·숙소·리듬·기념일·피할 것·식이)는
- *   지금 폼처럼 **고르지 않아도 된다** — 건너뛰거나 바로 확인으로 갈 수 있다
- * - 마지막에 지금 폼과 **똑같은 모양**의 PlanInput 을 만든다. /api/plan 과 AI 지시문은 그대로다
+ *
+ * 보내는 값은 지금 /api/plan 이 받는 모양 그대로다 (lib/validate.ts 의 한도 안). 새로 묻는 것 중 받을 칸이 없는 것
+ * (러프·디테일, 1순위, 동네, 도착·출발 시간 …)은 styles 에 짧은 영어 문장으로 넣는다.
+ * 칸을 새로 만들고 AI 지시문이 제대로 쓰게 하는 건 공용 파일(lib/) PR 에서 — 뮤조 리뷰를 받는다.
  *
  * 화면에 나가는 글은 한국어·영어를 나란히 둔다 (app/mohallae/content.ts 와 같은 방식).
- * AI 에게 가는 값(ai, value)은 늘 영어다 — 지금 폼과 같은 글자라 지난 초안과 말이 맞는다.
- * 이 파일은 다른 파일을 불러오지 않는다 (node --test 로 바로 돌리려고).
+ * AI 에게 가는 값(value)은 늘 영어다. 이 파일은 다른 파일을 불러오지 않는다 (node --test 로 바로 돌리려고).
+ * 규칙 3장(법적 경계): 대신 예약하거나 안내한다는 말을 쓰지 않는다. 초안은 프로그램이 쓰는 정보 문서다.
  */
 
 export type Lang = "ko" | "en";
@@ -25,9 +27,8 @@ export type Text = { ko: string; en: string };
 export type Choice = { id: string; title: Text; description?: Text; value: string; image?: string };
 
 /**
- * 도시별 '하고 싶은 것'. ai 는 "Seoul: palaces & hanok" 처럼 도시 이름을 붙여 보낸다 (서버 한도 40자 안).
- * 베타에는 고른 것마다 '어떤 장면이 좋을까요?' 두 번째 질문이 있었는데 뺐다 — 모든 도시가 같은 모양으로,
- * 질문 수도 줄게 (써니 2026-10-12 "빼봐")
+ * 도시별 '하고 싶은 것' 사진 카드. ai 는 "Seoul: palaces & hanok" 처럼 도시 이름을 붙여 보내던 값 (서버 한도 40자 안).
+ * 2026-10-13 새 질문(서울 안의 동네·관심사)으로 바꾸면서 흐름에서는 쓰지 않는다 — 다른 도시를 다시 열 때 쓰려고 둔다
  */
 type Experience = { id: string; title: Text; description: Text; image: string; ai: string };
 /** photos: 오른쪽 판 엽서 자리에서 번갈아 보여 줄 사진 (148×100) */
@@ -189,150 +190,15 @@ export const CURATED: Record<string, Curated> = {
 };
 
 /**
- * 지금 고를 수 있는 도시 — 일단 서울만 (써니 2026-10-13).
- * 다른 14개 도시의 보기와 사진(CURATED, public/mohallae/do·postcards)은 그대로 두었다 — 다시 열 때는 여기에 이름만 더한다.
- * OTHER_PLACE: '그 외 — 직접 적기'를 보여 줄지. 서울만 열어 둔 동안은 숨긴다
+ * 지금 열어 둔 도시 — 일단 서울만 (써니 2026-10-13).
+ * 위의 CURATED(15개 도시의 사진 카드·엽서)는 그대로 두었다 — 다시 열 때 쓴다. 지금 흐름은 서울 엽서 사진만 쓴다.
  */
 export const OPEN_PLACES: string[] = ["Seoul"];
-export const OTHER_PLACE = false;
-
-/* ── 지금 폼(app/plan/page.tsx)과 같은 보기·같은 영어 값 ─────────────────── */
-
-const choice = (id: string, value: string, ko: string, en: string, dko?: string, den?: string): Choice => ({
-  id, value, title: tx(ko, en), ...(dko && den ? { description: tx(dko, den) } : {}),
-});
-
-/** 장면 질문이 없는 도시에서 쓰는 관심사 (지금 폼의 STYLES) */
-export const INTERESTS: Choice[] = [
-  choice("food", "Food", "먹거리", "Food"), choice("culture", "Culture & history", "문화·역사", "Culture & history"),
-  choice("kculture", "K-culture", "K-컬처", "K-culture"), choice("hanbok", "Hanbok", "한복 체험", "Hanbok"),
-  choice("nature", "Nature & hiking", "자연·등산", "Nature & hiking"), choice("beaches", "Beaches", "바다·해변", "Beaches"),
-  choice("springs", "Hot springs & jjimjilbang", "온천·찜질방", "Hot springs & jjimjilbang"), choice("parks", "Theme parks", "테마파크", "Theme parks"),
-  choice("art", "Art & exhibitions", "미술관·전시", "Art & exhibitions"), choice("shopping", "Shopping", "쇼핑", "Shopping"),
-  choice("night", "Nightlife", "밤 문화", "Nightlife"), choice("photo", "Photo spots", "사진 명소", "Photo spots"),
-];
-
-/** 누구와 — 문구는 베타, 값은 지금 폼의 AUDIENCES */
-export const COMPANIONS: Choice[] = [
-  choice("solo", "Solo", "나 혼자", "Just me", "내 마음이 이끄는 대로", "Wherever I feel like going"),
-  choice("couple", "Couple", "좋아하는 사람과", "With my partner", "둘이서 오래 기억할 장면", "Scenes for the two of us"),
-  choice("friends", "Friends", "친구들과", "With friends", "함께 웃을 이야기를 모으러", "Stories to laugh about later"),
-  choice("family", "Family with kids", "아이와 함께", "With kids", "작은 발견도 큰 추억이 되게", "Small finds, big memories"),
-  choice("parents", "With parents", "부모님과", "With my parents", "함께 걷는 시간부터 소중하게", "Time together, at their pace"),
-];
-
-/**
- * 아이 나이. 지금 API 에는 칸이 없어서 '누구와' 값 뒤에 붙여 보낸다: "Family with kids (under 6)"
- * 이름은 지하철 요금과 같은 나눔 — 유아(만 6세 미만)·어린이(만 6–12세)·청소년(만 13–18세). 한국에서 가장 익숙한 구분이다
- * ('아직 어린 아이'는 몇 살인지 알 수 없다 — 써니 2026-10-12. '아동'은 법에서 18세 미만 전부라 청소년과 겹친다)
- */
-export const CHILDREN: Choice[] = [
-  choice("young", "under 6", "유아 (6세 미만)", "Little ones (under 6)", "쉬는 시간과 짧은 이동이 중요해요", "Breaks and short hops matter"),
-  choice("school", "primary school", "어린이 (6–12세)", "Children (6–12)", "직접 보고 해보는 걸 좋아해요", "They love seeing and doing"),
-  choice("teen", "teenagers", "청소년 (13–18세)", "Teens (13–18)", "아이의 취향도 함께 골라보고 싶어요", "Their tastes count too"),
-];
-
-/** 속도 — 문구는 베타, 값은 지금 폼의 PACES */
-export const PACES: Choice[] = [
-  choice("slow", "Relaxed", "천천히, 깊게", "Slow and deep", "한 곳에 오래 머물러도 좋아요", "Happy to stay long in one place"),
-  choice("balanced", "Balanced", "구경도, 쉬는 시간도", "A bit of both", "딱 좋은 균형으로 즐길래요", "Sights and rest, balanced"),
-  choice("full", "Packed", "한 장면이라도 더", "As much as possible", "발견하는 즐거움으로 채울래요", "Fill it with discoveries"),
-];
-
-/** 1인 예산 — 여행 전체 기준 (지금 폼의 BUDGETS 와 같은 값). '아직 몰라요'는 값을 보내지 않는다 */
-export const BUDGETS: Choice[] = [
-  choice("under150", "Under 150,000 KRW (about $110) for the whole trip", "15만원 미만", "Under ₩150,000", "약 $110", "about $110"),
-  choice("150to250", "150,000–250,000 KRW (about $110–185) for the whole trip", "15–25만원", "₩150,000–250,000", "약 $110–185", "about $110–185"),
-  choice("250to350", "250,000–350,000 KRW (about $185–260) for the whole trip", "25–35만원", "₩250,000–350,000", "약 $185–260", "about $185–260"),
-  choice("350to500", "350,000–500,000 KRW (about $260–370) for the whole trip", "35–50만원", "₩350,000–500,000", "약 $260–370", "about $260–370"),
-  choice("over500", "Over 500,000 KRW (about $370) for the whole trip", "50만원 이상", "Over ₩500,000", "약 $370 이상", "about $370 and up"),
-  choice("undecided", "", "아직 몰라요", "Not sure yet", "취향부터 알아가는 중이에요", "Still working it out"),
-];
-export const CURRENCIES = ["KRW", "USD", "EUR", "JPY"] as const;
-
-/* 세부 — 지금 폼에서도 고르지 않아도 되는 것들. 화면마다 '건너뛰기'와 '바로 확인'이 있다 */
-export const VISITS: Choice[] = [
-  choice("first", "First time", "처음이에요", "First time"),
-  choice("again", "Been before", "와본 적 있어요", "Been before"),
-];
-export const TRANSPORTS: Choice[] = [
-  choice("transit", "Subway and bus", "지하철·버스", "Subway and bus"),
-  choice("car", "Rental car", "렌터카", "Rental car"),
-  choice("taxi", "Mostly taxi", "택시 위주", "Mostly taxi"),
-];
-export const STAY_AREAS: Choice[] = [
-  choice("centre", "City centre", "도심 한가운데", "In the middle of it all"),
-  choice("quiet", "Quiet neighbourhood", "조용한 동네", "A quiet neighbourhood"),
-];
-export const RHYTHMS: Choice[] = [
-  choice("early", "Early start", "일찍 시작할게요", "Early starts"),
-  choice("late", "Late start", "늦게 시작할게요", "Late starts"),
-];
-export const OCCASIONS: Choice[] = [
-  choice("birthday", "Birthday", "생일", "Birthday"), choice("anniversary", "Anniversary", "기념일", "Anniversary"),
-  choice("honeymoon", "Honeymoon", "신혼여행", "Honeymoon"), choice("graduation", "Graduation", "졸업·합격", "Graduation"),
-];
-export const AVOIDS: Choice[] = [
-  choice("crowds", "Crowded places", "사람 많은 곳", "Crowded places"), choice("stairs", "Lots of stairs", "계단 많은 곳", "Lots of stairs"),
-  choice("spicy", "Spicy food", "매운 음식", "Spicy food"), choice("late", "Late nights", "늦은 밤 일정", "Late nights"),
-  choice("long", "Long travel legs", "긴 이동", "Long journeys"), choice("drinking", "Drinking", "술자리", "Drinking"),
-];
-/** 식이·접근성 — 건강·종교 정보라 고르는 방식으로만 받는다 (lib/types.ts 의 경고 그대로) */
-export const DIETARY: Choice[] = [
-  choice("halal", "Halal", "할랄", "Halal"), choice("vegetarian", "Vegetarian", "채식", "Vegetarian"), choice("vegan", "Vegan", "비건", "Vegan"),
-  choice("nut", "Nut allergy", "견과류 알레르기", "Nut allergy"), choice("dairy", "Dairy allergy", "유제품 알레르기", "Dairy allergy"),
-  choice("seafood", "Seafood allergy", "해산물 알레르기", "Seafood allergy"), choice("nospicy", "No spicy food", "매운 음식 못 먹음", "No spicy food"),
-  choice("wheelchair", "Wheelchair access", "휠체어 접근", "Wheelchair access"), choice("stroller", "Stroller", "유아차", "Stroller"),
-  choice("walk", "Hard to walk far", "오래 걷기 어려움", "Can't walk far"),
-];
-export const LANGUAGES = [
-  { code: "en", label: "English" }, { code: "ko", label: "한국어" }, { code: "ja", label: "日本語" }, { code: "zh", label: "中文" },
-] as const;
-
-/* ── 단계 ─────────────────────────────────────────────────────────── */
-
-/** 직접 적는 '그 외' 칸이 있는 단계 */
-export const OTHER_STEPS = ["where", "interests", "avoid", "diet"] as const;
-type OtherStep = (typeof OTHER_STEPS)[number];
-
-type Simple = "where" | "interests" | "who" | "kids" | "pace" | "dates" | "travelers" | "budget"
-  | "visited" | "transport" | "stay" | "rhythm" | "occasion" | "avoid" | "diet" | "review";
-export type Step = Simple | `do:${string}`;
-
-/** 고르지 않아도 되는 세부. 여기부터는 '바로 확인으로' 가 보인다 */
-export const OPTIONAL: Step[] = ["visited", "transport", "stay", "rhythm", "occasion", "avoid", "diet"];
-const MULTI_SIMPLE: Step[] = ["where", "interests", "avoid", "diet"];
-
-export type Answers = Partial<Record<Step | `${OtherStep}:other` | "budget:currency" | "review:language", string[]>>;
-/** reviewed: 확인 화면까지 한 번 와 봤는지. 그 뒤로 앞 질문을 고치러 가면 '확인 화면으로' 단추가 생긴다 */
-export type FlowState = { step: Step; answers: Answers; reviewed?: boolean };
-export const INITIAL_STATE: FlowState = { step: "where", answers: {}, reviewed: false };
-
-/** 화면이 넘겨주는 도시 목록 (lib/places.ts 의 DESTINATIONS 와 같은 모양) */
-export type Destination = { v: string; ko: string };
-
-export function isMultiple(step: Step) {
-  return MULTI_SIMPLE.includes(step) || step.startsWith("do:");
-}
-
-/**
- * 하나만 고르는 질문 — 고르면 '다음' 없이 바로 다음 질문으로 (써니 2026-10-12).
- * 여러 개 고르는 질문, 날짜(달력)·인원(+−)은 다 골랐는지 화면이 알 수 없으니 '다음' 단추를 둔다
- */
-export function autoAdvance(step: Step) {
-  return !isMultiple(step) && choicesFor(step).length > 0;
-}
-
-/** 고른 도시 + 직접 적은 곳 (값은 영어 이름, 직접 적은 곳은 적은 그대로) */
-export function pickedPlaces(answers: Answers): string[] {
-  const typed = (answers["where:other"]?.[0] ?? "").trim();
-  return [...new Set([...(answers.where ?? []), ...(typed ? [typed] : [])])];
-}
 
 /**
  * 오른쪽 판 엽서에서 번갈아 보여 줄 사진. 도시를 여럿 고르면 도시마다 한 장씩 번갈아
  * (서울1 → 부산1 → 서울2 → 부산2 …) — 한 도시 사진만 이어지지 않게. 사진이 없는 곳(직접 적은 곳)은 건너뛴다.
- * 아직 아무 데도 고르지 않았으면 지금 고를 수 있는 도시(OPEN_PLACES)의 사진을 돌려 보여 준다 — 빈 엽서는 어색하다 (써니 2026-10-12)
+ * 아무 데도 없으면 지금 열어 둔 도시(OPEN_PLACES)의 사진 — 빈 엽서는 어색하다 (써니 2026-10-12)
  */
 export function panelPhotos(places: string[]): string[] {
   if (!places.length) return OPEN_PLACES.length ? panelPhotos(OPEN_PLACES) : [];
@@ -344,38 +210,547 @@ export function panelPhotos(places: string[]): string[] {
   return out;
 }
 
-export function stepOrder(answers: Answers): Step[] {
-  const steps: Step[] = ["where"];
-  const places = pickedPlaces(answers);
-  for (const place of places) if (CURATED[place]) steps.push(`do:${place}`);
-  // '하고 싶은 것' 보기가 없는 곳(직접 적은 곳 등)이 하나라도 있으면 관심사를 한 번 묻는다
-  if (places.some((p) => !CURATED[p])) steps.push("interests");
-  steps.push("who");
-  if (answers.who?.[0] === "family") steps.push("kids");
-  return [...steps, "pace", "dates", "travelers", "budget", ...OPTIONAL, "review"];
+/* ── 보기 ──────────────────────────────────────────────────────────── */
+
+const choice = (id: string, value: string, ko: string, en: string, dko?: string, den?: string): Choice => ({
+  id, value, title: tx(ko, en), ...(dko && den ? { description: tx(dko, den) } : {}),
+});
+
+/** 첫 질문. 디테일을 고르면 하루 시간·이동·공항·한복·살 것을 더 묻는다 */
+export const MODES: Choice[] = [
+  choice("rough", "rough", "러프하게", "Keep it rough", "큰 틀만 — 하루 주제와 꼭 갈 곳", "The big picture — a theme and key spots each day"),
+  choice("detail", "detailed", "디테일하게", "Go into detail", "시간 단위까지 — 이동·식사·예약할 곳까지", "Down to the hour — routes, meals, what to book"),
+];
+
+/** 러프만: 여행을 한 단어로. 초안 제목과 하루 분위기의 재료 */
+export const VIBES: Choice[] = [
+  choice("thrill", "excitement", "설렘", "Excitement", "처음 보는 장면에 두근두근", "Butterflies at every new sight"),
+  choice("heal", "healing & rest", "힐링", "Healing", "쉬어 가는 게 목적이에요", "Here to slow down"),
+  choice("eat", "eating everything", "먹방", "Eat everything", "하루 다섯 끼도 좋아요", "Five meals a day? Sure"),
+  choice("photo", "photo-worthy moments", "인생샷", "Photos", "어디서 찍어도 작품", "Every frame a keeper"),
+  choice("shop", "shopping", "쇼핑", "Shopping", "캐리어는 비워서 왔어요", "Came with an empty suitcase"),
+  choice("learn", "learning", "배움", "Learning", "알고 보면 더 재미있는 서울", "Seoul's better with the story"),
+  choice("romance", "romance", "로맨스", "Romance", "둘만의 장면을 남기러", "Scenes for just the two of you"),
+  choice("adventure", "adventure", "모험", "Adventure", "안 해 본 걸 해 보기", "Try what you've never tried"),
+];
+
+/**
+ * 서울 안의 동네 12곳. value 는 AI 로 가는 영어 이름이다 — "Booked near …"(12자)를 붙여도 40자 안.
+ * 설명은 그 동네가 어떤 곳인지 한 줄 — 가게·브랜드 이름은 쓰지 않는다 (규칙 3장, 상표)
+ */
+export const AREAS: Choice[] = [
+  choice("gwanghwamun", "Gwanghwamun/Gyeongbokgung", "광화문·경복궁", "Gwanghwamun & Gyeongbokgung", "궁궐과 광장, 서울의 한가운데", "Palaces and the big square at the centre"),
+  choice("bukchon", "Bukchon/Seochon/Ikseon-dong", "북촌·서촌·익선동", "Bukchon, Seochon & Ikseon-dong", "한옥 골목과 작은 가게들", "Hanok lanes and little shops"),
+  choice("myeongdong", "Myeongdong/Namsan", "명동·남산", "Myeongdong & Namsan", "쇼핑 거리와 남산 전망", "Shopping streets and the Namsan lookout"),
+  choice("dongdaemun", "Dongdaemun/DDP", "동대문·DDP", "Dongdaemun & DDP", "밤늦게까지 여는 쇼핑, 곡선 건물", "Late-night shopping and a curving landmark"),
+  choice("euljiro", "Euljiro/Gwangjang Market", "을지로·광장시장", "Euljiro & Gwangjang Market", "시장 먹거리와 오래된 골목 가게", "Market food and old backstreet spots"),
+  choice("hongdae", "Hongdae/Yeonnam/Mangwon", "홍대·연남·망원", "Hongdae, Yeonnam & Mangwon", "버스킹, 젊은 거리, 동네 카페", "Buskers, young streets, local cafés"),
+  choice("seongsu", "Seongsu/Seoul Forest", "성수·서울숲", "Seongsu & Seoul Forest", "팝업과 카페, 공장을 고친 거리", "Pop-ups and cafés in old factories"),
+  choice("itaewon", "Itaewon/Hannam", "이태원·한남", "Itaewon & Hannam", "세계 음식과 편집숍, 밤 문화", "World food, boutiques, nightlife"),
+  choice("yongsan", "Yongsan", "용산", "Yongsan", "큰 박물관과 새로 뜨는 골목", "Big museums and up-and-coming lanes"),
+  choice("yeouido", "Yeouido/Han River", "여의도·한강", "Yeouido & the Han River", "강변 공원의 피크닉과 노을", "Riverside picnics and sunsets"),
+  choice("gangnam", "Gangnam/Apgujeong/Sinsa", "강남·압구정·신사", "Gangnam, Apgujeong & Sinsa", "가로수길 쇼핑과 세련된 밤", "Boutique streets and polished nights"),
+  choice("jamsil", "Jamsil", "잠실", "Jamsil", "호수 공원과 높은 전망대", "A lake park and a sky-high lookout"),
+];
+/** '잘 모르겠어요'는 동네와 같이 고를 수 없다. 고르면 취향 두 가지를 묻는다 */
+const UNSURE = choice("unsure", "", "잘 모르겠어요", "Not sure", "취향 두 가지만 더 물어볼게요", "Two quick taste questions instead");
+
+/** 동네를 모를 때만 */
+export const FAMOUS: Choice[] = [
+  choice("famous", "famous sights", "유명한 곳", "Famous sights"),
+  choice("mix", "a mix of famous & local", "반반", "A bit of both"),
+  choice("local", "local neighbourhoods", "현지인 동네", "Where locals go"),
+];
+export const ERAS: Choice[] = [
+  choice("old", "old Seoul (palaces, hanok)", "옛 서울 (궁궐·한옥)", "Old Seoul (palaces, hanok)"),
+  choice("mix", "old & new Seoul", "반반", "A bit of both"),
+  choice("new", "new Seoul (cafes, boutiques)", "요즘 서울 (카페·편집숍)", "New Seoul (cafés, boutiques)"),
+];
+
+export const INTERESTS: Choice[] = [
+  choice("history", "history & palaces", "역사·궁궐", "History & palaces"),
+  choice("kpop", "K-pop & K-culture", "K-pop·한류", "K-pop & K-culture"),
+  choice("food", "food", "먹거리", "Food"),
+  choice("shopping", "shopping", "쇼핑", "Shopping"),
+  choice("cafe", "cafes", "카페", "Cafés"),
+  choice("nature", "nature & walks", "자연·산책", "Nature & walks"),
+  choice("night", "night views", "야경", "Night views"),
+  choice("art", "art & exhibitions", "전시·예술", "Art & exhibitions"),
+  choice("nightlife", "nightlife", "밤 문화", "Nightlife"),
+  choice("hands", "hands-on activities", "체험", "Hands-on activities"),
+];
+
+export const FOODS: Choice[] = [
+  choice("bbq", "Korean BBQ", "한국식 바비큐", "Korean BBQ"),
+  choice("chicken", "fried chicken", "치킨", "Fried chicken"),
+  choice("tteokbokki", "tteokbokki", "떡볶이", "Tteokbokki"),
+  choice("bibimbap", "bibimbap", "비빔밥", "Bibimbap"),
+  choice("naengmyeon", "naengmyeon", "냉면", "Naengmyeon (cold noodles)"),
+  choice("gukbap", "gukbap", "국밥", "Gukbap (rice soup)"),
+  choice("street", "street snacks", "길거리 간식", "Street snacks"),
+  choice("hanjeongsik", "hanjeongsik", "한정식", "Hanjeongsik (set meal)"),
+];
+
+/** 몰라요는 보내지 않는다 (value "") */
+export const ARRIVALS: Choice[] = [
+  choice("morning", "morning", "오전", "Morning"),
+  choice("afternoon", "afternoon", "오후", "Afternoon"),
+  choice("evening", "evening", "저녁", "Evening"),
+  choice("late", "late night", "밤늦게", "Late at night"),
+  choice("unknown", "", "몰라요", "Not sure"),
+];
+export const DEPARTURES: Choice[] = [
+  choice("early", "early morning", "오전 일찍", "Early morning"),
+  choice("noon", "around noon", "점심쯤", "Around noon"),
+  choice("afternoon", "afternoon", "오후", "Afternoon"),
+  choice("night", "night", "밤", "At night"),
+  choice("unknown", "", "몰라요", "Not sure"),
+];
+
+/** 누구와 — 문구는 베타, 값은 지금 폼의 AUDIENCES + 직장 동료 */
+export const COMPANIONS: Choice[] = [
+  choice("solo", "Solo", "나 혼자", "Just me", "내 마음이 이끄는 대로", "Wherever I feel like going"),
+  choice("couple", "Couple", "좋아하는 사람과", "With my partner", "둘이서 오래 기억할 장면", "Scenes for the two of us"),
+  choice("friends", "Friends", "친구들과", "With friends", "함께 웃을 이야기를 모으러", "Stories to laugh about later"),
+  choice("family", "Family with kids", "아이와 함께", "With kids", "작은 발견도 큰 추억이 되게", "Small finds, big memories"),
+  choice("parents", "With parents", "부모님과", "With my parents", "함께 걷는 시간부터 소중하게", "Time together, at their pace"),
+  choice("coworkers", "Coworkers", "직장 동료와", "With coworkers", "다 같이 즐길 만한 곳 위주로", "Places the whole group enjoys"),
+];
+
+/**
+ * 아이 나이 — 여러 명이면 여럿 고른다. 지금 API 에는 칸이 없어서 '누구와' 값 뒤에 붙인다:
+ * "Family with kids (under 6, 6–12, 13–18)" — 셋 다 골라도 40자 안.
+ * 이름은 지하철 요금과 같은 나눔 — 유아(만 6세 미만)·어린이(만 6–12세)·청소년(만 13–18세) (써니 2026-10-12)
+ */
+export const CHILDREN: Choice[] = [
+  choice("young", "under 6", "유아 (6세 미만)", "Little ones (under 6)", "쉬는 시간과 짧은 이동이 중요해요", "Breaks and short hops matter"),
+  choice("school", "6–12", "어린이 (6–12세)", "Children (6–12)", "직접 보고 해보는 걸 좋아해요", "They love seeing and doing"),
+  choice("teen", "13–18", "청소년 (13–18세)", "Teens (13–18)", "아이의 취향도 함께 골라보고 싶어요", "Their tastes count too"),
+];
+
+export const VISITS: Choice[] = [
+  choice("first", "First time", "처음이에요", "First time", "대표 명소부터 담아요", "The landmarks come first"),
+  choice("again", "Been before", "와 본 적 있어요", "Been before", "새로운 동네 위주로 담아요", "Fresher, lesser-known spots"),
+];
+
+export const STAYS: Choice[] = [
+  choice("booked", "booked", "네, 정했어요", "Yes, it's booked", "숙소 근처부터 동선을 짜요", "Each day starts from where you stay"),
+  choice("open", "not booked", "아직이에요", "Not yet", "묵기 좋은 동네를 알려 드려요", "We'll suggest good areas to stay"),
+];
+
+/**
+ * 1인 예산 — 현지에서 쓸 돈, 숙소·항공 빼고, 여행 전체 기준 (★★★ 지문 그대로).
+ * 구간 숫자는 지금 폼과 같다. AI 에게는 기준을 글로 밝힌다: 지시문이 뒤에 " per person" 을 붙여서
+ * "Whole trip, excl. stay & flights: 150,000–250,000 KRW per person" 으로 읽힌다 (서버 한도 60자 안)
+ */
+export const BUDGETS: Choice[] = [
+  choice("under150", "Whole trip, excl. stay & flights: under 150,000 KRW", "15만원 미만", "Under ₩150,000", "약 $110", "about $110"),
+  choice("150to250", "Whole trip, excl. stay & flights: 150,000–250,000 KRW", "15–25만원", "₩150,000–250,000", "약 $110–185", "about $110–185"),
+  choice("250to350", "Whole trip, excl. stay & flights: 250,000–350,000 KRW", "25–35만원", "₩250,000–350,000", "약 $185–260", "about $185–260"),
+  choice("350to500", "Whole trip, excl. stay & flights: 350,000–500,000 KRW", "35–50만원", "₩350,000–500,000", "약 $260–370", "about $260–370"),
+  choice("over500", "Whole trip, excl. stay & flights: over 500,000 KRW", "50만원 이상", "Over ₩500,000", "약 $370 이상", "about $370 and up"),
+  choice("undecided", "", "아직 몰라요", "Not sure yet", "취향부터 알아가는 중이에요", "Still working it out"),
+];
+export const CURRENCIES = ["KRW", "USD", "EUR", "JPY"] as const;
+
+export const ADVENTURES: Choice[] = [
+  choice("familiar", "familiar food only", "익숙한 맛 위주", "Familiar flavours"),
+  choice("some", "tries a little", "조금씩 도전", "A little adventurous"),
+  choice("anything", "eats anything", "뭐든 먹어요", "Anything goes"),
+];
+/**
+ * 못 먹어요는 식단(dietary)으로 보낸다 — 지시문이 "MUST WORK AROUND" 로 지킨다.
+ * 나머지는 맛과 한 줄로: "Food: familiar food only, mild spice ok" — 어느 둘을 골라도 40자 안
+ */
+export const SPICES: Choice[] = [
+  choice("none", "No spicy food", "못 먹어요", "Can't do spicy"),
+  choice("mild", "mild spice ok", "조금", "A little"),
+  choice("likes", "likes spicy", "좋아해요", "Love it"),
+  choice("hot", "loves it hot", "아주 매워도 OK", "The hotter the better"),
+];
+
+/** 식단·접근성 — 건강·종교 정보라 고르는 방식으로만 받는다 (lib/types.ts 의 경고 그대로). 값은 지금 폼과 같다 */
+export const NEEDS: Choice[] = [
+  choice("halal", "Halal", "할랄", "Halal"),
+  choice("vegetarian", "Vegetarian", "채식", "Vegetarian"),
+  choice("vegan", "Vegan", "비건", "Vegan"),
+  choice("allergy", "Food allergy", "알레르기", "Allergies"),
+  choice("wheelchair", "Wheelchair access", "휠체어", "Wheelchair"),
+  choice("stroller", "Stroller", "유아차", "Stroller"),
+  choice("walk", "Hard to walk far", "오래 걷기 어려움", "Can't walk far"),
+  choice("none", "", "없어요", "None"),
+];
+export const ALLERGIES: Choice[] = [
+  choice("nut", "Nut allergy", "견과류", "Nuts"),
+  choice("shellfish", "Shellfish allergy", "갑각류", "Shellfish"),
+  choice("dairy", "Dairy allergy", "유제품", "Dairy"),
+  choice("wheat", "Wheat allergy", "밀", "Wheat"),
+  choice("egg", "Egg allergy", "달걀", "Eggs"),
+];
+
+/** 하루에 몇 곳 — 지시문의 Pace 줄에 그대로 들어간다 */
+export const PACES: Choice[] = [
+  choice("slow", "Relaxed: about 2 stops a day", "2곳 정도", "About 2", "한 곳에 오래, 여유롭게", "Linger, no rush"),
+  choice("balanced", "Balanced: 3–4 stops a day", "3–4곳", "3 or 4", "구경도, 쉬는 시간도", "Sights and breaks"),
+  choice("full", "Packed: 5+ stops a day", "5곳 이상", "5 or more", "한 곳이라도 더", "As much as you can fit"),
+];
+
+export const AVOIDS: Choice[] = [
+  choice("crowds", "Crowded places", "사람 많은 곳", "Crowds"),
+  choice("stairs", "Lots of stairs & hills", "계단·언덕", "Stairs & hills"),
+  choice("long", "Long travel legs", "긴 이동", "Long journeys"),
+  choice("late", "Late nights", "늦은 밤", "Late nights"),
+  choice("queues", "Long queues", "줄 서기", "Queues"),
+  choice("touristy", "Places that feel too touristy", "너무 관광지 같은 곳", "Tourist traps"),
+];
+
+/* 디테일만 */
+export const STARTS: Choice[] = [
+  choice("8", "8am", "아침 8시", "8am"),
+  choice("9", "9am", "9시", "9am"),
+  choice("10", "10am", "10시", "10am"),
+  choice("11", "11am or later", "11시 이후", "11am or later"),
+];
+export const ENDS: Choice[] = [
+  choice("18", "6pm", "저녁 6시", "6pm"),
+  choice("21", "9pm", "밤 9시", "9pm"),
+  choice("23", "11pm", "밤 11시", "11pm"),
+  choice("late", "late at night", "늦게까지", "Late"),
+];
+export const TRANSPORTS: Choice[] = [
+  choice("transit", "Subway and bus", "지하철·버스", "Subway & bus"),
+  choice("taxi", "Mostly taxi", "택시 위주", "Mostly taxi"),
+  choice("walk", "Walking", "걷기", "Walking"),
+  choice("car", "Rental car", "렌터카", "Rental car"),
+];
+/** 처음이면 교통 값 뒤에 붙인다: "Subway and bus, new to the subway" */
+export const SUBWAY: Choice[] = [
+  choice("new", "new", "처음이라 자세히 알려 주세요", "New to it — spell it out"),
+  choice("used", "used", "어느 정도 알아요", "I know my way around"),
+];
+export const AIRPORTS: Choice[] = [
+  choice("icn", "Incheon (ICN)", "인천", "Incheon (ICN)"),
+  choice("gmp", "Gimpo (GMP)", "김포", "Gimpo (GMP)"),
+  choice("none", "none", "공항 아님 (기차·배)", "Not flying in (train, ferry)"),
+  choice("unknown", "", "아직 몰라요", "Not sure yet"),
+];
+export const RIDES: Choice[] = [
+  choice("arex", "AREX train", "공항철도", "Airport railroad (AREX)"),
+  choice("bus", "limousine bus", "리무진 버스", "Limousine bus"),
+  choice("taxi", "taxi", "택시", "Taxi"),
+  choice("compare", "compare options", "비교해 주세요", "Compare them for me"),
+];
+/** 빌리는 곳·입기 좋은 길은 정보로만 — 대여 예약을 대신하지 않는다 (규칙 3장) */
+export const HANBOK: Choice[] = [
+  choice("yes", "Wants to wear hanbok", "네, 입어 볼래요", "Yes, I'd love to"),
+  choice("no", "", "아니요", "No thanks"),
+];
+export const BUYS: Choice[] = [
+  choice("cosmetics", "cosmetics", "화장품", "Cosmetics"),
+  choice("clothes", "clothes", "옷", "Clothes"),
+  choice("souvenirs", "souvenirs", "기념품", "Souvenirs"),
+  choice("electronics", "electronics", "전자제품", "Electronics"),
+  choice("snacks", "snacks & food", "과자·식품", "Snacks & food"),
+  choice("books", "books & stationery", "책·문구", "Books & stationery"),
+];
+
+export const LANGUAGES = [
+  { code: "en", label: "English" }, { code: "ko", label: "한국어" }, { code: "ja", label: "日本語" }, { code: "zh", label: "中文" },
+] as const;
+
+/* ── 질문 ──────────────────────────────────────────────────────────── */
+
+/**
+ * 답은 칸(key) 이름으로 모은다. 직접 적은 '그 외'는 `${key}:other`, 통화·초안 언어는 currency·language.
+ * 칸은 늘 글자 목록이다 — 하나만 고르는 칸도 [id].
+ */
+export type Answers = Partial<Record<string, string[]>>;
+
+/** 한 화면 안의 한 줄. 줄이 여럿이면 label 로 무엇을 묻는지 적는다 */
+export type Field = {
+  key: string;
+  label?: Text;
+  /** 보기. 앞의 답에 따라 바뀌면 함수 (예: '꼭 하나'는 고른 관심사 중에서) */
+  options?: Choice[] | ((a: Answers) => Choice[]);
+  multiple?: boolean;
+  /** 이 보기를 고르면 다른 것이 풀린다 (잘 모르겠어요, 없어요) */
+  exclusive?: string[];
+  /** 고르지 않아도 된다 */
+  optional?: boolean;
+  /** '그 외 — 직접 적기' */
+  other?: boolean;
+  /** 보기 대신 직접 적는 칸 */
+  text?: { placeholder: Text; max: number };
+  /** 앞의 답에 따라 보이는 줄 (예: 지하철·버스를 고르면 '지하철은 익숙해요?') */
+  show?: (a: Answers) => boolean;
+};
+
+export type StepId =
+  | "mode" | "vibe" | "area" | "taste" | "interests" | "must" | "wish" | "dates" | "times"
+  | "who" | "kids" | "travelers" | "visited" | "stay" | "stayArea" | "budget" | "food" | "needs" | "allergy"
+  | "pace" | "avoid" | "hours" | "move" | "airport" | "hanbok" | "buy" | "review";
+
+export type StepDef = {
+  id: StepId;
+  q: Text;
+  help: Text;
+  kind: "choice" | "dates" | "travelers" | "review";
+  fields: Field[];
+  /** 앞의 답에 따라 묻는 질문 */
+  when?: (a: Answers) => boolean;
+  /** 러프·디테일 한쪽에서만 묻는 질문 */
+  mode?: "rough" | "detail";
+};
+
+const first = (a: Answers, key: string) => a[key]?.[0];
+const has = (a: Answers, key: string, id: string) => !!a[key]?.includes(id);
+
+/** 묻는 순서 그대로. 재미있는 것 먼저, 사실은 뒤로 */
+export const STEPS: StepDef[] = [
+  {
+    id: "mode", kind: "choice",
+    q: tx("이번 여행 계획, 어떻게 짜고 싶으세요?", "How do you want to plan this trip?"),
+    // 하나만 고르는 질문의 첫 화면 — 고르면 바로 넘어간다는 것을 미리 알린다 (WCAG 3.2.2)
+    help: tx("하나를 고르면 바로 다음 질문으로 넘어가요.", "Pick one — you'll go straight to the next question."),
+    fields: [{ key: "mode", options: MODES }],
+  },
+  {
+    id: "vibe", kind: "choice", mode: "rough",
+    q: tx("이번 서울 여행을 한 단어로 하면?", "Sum up this Seoul trip in one word."),
+    help: tx("초안의 제목과 하루하루의 분위기가 이 단어를 따라가요.", "Your draft's title and the feel of each day follow it."),
+    fields: [{ key: "vibe", options: VIBES }],
+  },
+  {
+    id: "area", kind: "choice",
+    q: tx("서울 어디를 가 보고 싶어요?", "Where in Seoul do you want to go?"),
+    help: tx("끌리는 동네를 다 골라 주세요. 잘 모르겠으면 '잘 모르겠어요'.", "Pick every area that pulls you in — or ‘Not sure’."),
+    fields: [{ key: "area", options: [...AREAS, UNSURE], multiple: true, exclusive: ["unsure"], other: true }],
+  },
+  {
+    id: "taste", kind: "choice", when: (a) => has(a, "area", "unsure"),
+    q: tx("그럼 취향만 알려 주세요.", "Then just tell us your taste."),
+    help: tx("줄마다 하나씩 고르면 넘어가요. 맞는 동네는 초안이 골라 담아요.", "One in each row and you'll move on — the draft picks the areas."),
+    fields: [
+      { key: "famous", label: tx("유명한 곳 위주? 현지인 동네 위주?", "Famous sights, or where locals go?"), options: FAMOUS },
+      { key: "era", label: tx("옛 서울과 요즘 서울, 어느 쪽이 더 끌려요?", "Old Seoul or new Seoul?"), options: ERAS },
+    ],
+  },
+  {
+    id: "interests", kind: "choice",
+    q: tx("서울에서 끌리는 걸 다 골라 주세요.", "Pick everything in Seoul that pulls you in."),
+    help: tx("하루하루의 주제가 여기서 나와요. 여러 개 골라도 좋아요.", "Each day's theme comes from these. Pick as many as you like."),
+    fields: [{ key: "interests", options: INTERESTS, multiple: true }],
+  },
+  {
+    // 관심사를 하나만 골랐으면 그게 1순위다 — 묻지 않는다
+    id: "must", kind: "choice", when: (a) => (a.interests?.length ?? 0) !== 1,
+    q: tx("이것만은 꼭! 하나만 고른다면?", "If you could only do one?"),
+    help: tx("그걸 가장 좋은 시간에 넣고, 나머지를 그 주변으로 짜요.", "It gets the best time of day, and the rest is built around it."),
+    fields: [{ key: "must", options: (a) => INTERESTS.filter((c) => has(a, "interests", c.id)) }],
+  },
+  {
+    id: "wish", kind: "choice",
+    q: tx("꼭 가고 싶은 곳이나 먹고 싶은 게 있어요?", "Anywhere you have to go, or anything you have to eat?"),
+    help: tx("없으면 건너뛰어도 돼요.", "Nothing yet? Skip it."),
+    fields: [
+      {
+        key: "place", label: tx("꼭 가고 싶은 곳", "Places you have to see"), optional: true,
+        text: { placeholder: tx("예: 경복궁, 성수동, 광장시장", "e.g. Gyeongbokgung, Seongsu, Gwangjang Market"), max: 80 },
+      },
+      { key: "foods", label: tx("꼭 먹어 보고 싶은 것", "Food you have to try"), options: FOODS, multiple: true, optional: true },
+    ],
+  },
+  {
+    id: "dates", kind: "dates",
+    q: tx("언제 서울에 도착하고, 언제 떠나세요?", "When do you arrive in Seoul, and when do you leave?"),
+    help: tx("가는 날과 오는 날을 골라 주세요. 최대 30일까지예요.", "Pick the day you arrive and the day you leave — up to 30 days."),
+    fields: [{ key: "dates" }],
+  },
+  {
+    id: "times", kind: "choice",
+    q: tx("몇 시쯤 도착하고, 몇 시쯤 떠나요?", "Roughly when do you land, and leave?"),
+    help: tx("첫날과 마지막 날에 넣는 일정 양이 달라져요.", "It sets how much fits on your first and last day."),
+    fields: [
+      { key: "arrive", label: tx("첫날 서울 도착", "Getting to Seoul on day one"), options: ARRIVALS },
+      { key: "leave", label: tx("마지막 날 출발", "Leaving on the last day"), options: DEPARTURES },
+    ],
+  },
+  {
+    id: "who", kind: "choice",
+    q: tx("누구와 함께해요?", "Who's coming with you?"),
+    help: tx("장소 고르는 기준과 하루 속도가 달라져요.", "It changes the places and the pace."),
+    fields: [{ key: "who", options: COMPANIONS }],
+  },
+  {
+    id: "kids", kind: "choice", when: (a) => first(a, "who") === "family",
+    q: tx("아이는 몇 살쯤이에요?", "How old are the kids?"),
+    help: tx("해당하는 걸 다 골라 주세요. 이동 거리와 쉬는 시간이 달라져요.", "Pick all that apply — it changes distances and breaks."),
+    fields: [{ key: "kids", options: CHILDREN, multiple: true }],
+  },
+  {
+    // 혼자는 1명, 둘이는 2명 — 묻지 않는다
+    id: "travelers", kind: "travelers", when: (a) => !["solo", "couple"].includes(first(a, "who") ?? ""),
+    q: tx("모두 몇 명이에요?", "How many of you are going?"),
+    help: tx("본인을 포함해서 세어 주세요.", "Count yourself in."),
+    fields: [{ key: "travelers" }],
+  },
+  {
+    id: "visited", kind: "choice",
+    q: tx("서울은 처음이에요?", "Is this your first time in Seoul?"),
+    help: tx("처음이면 대표 명소부터, 와 봤으면 새로운 동네 위주로 담아요.", "First-timers get the landmarks; repeat visitors get fresher spots."),
+    fields: [{ key: "visited", options: VISITS }],
+  },
+  {
+    id: "stay", kind: "choice",
+    q: tx("숙소는 이미 정했어요?", "Have you booked your stay yet?"),
+    help: tx("정했으면 그 동네를 하루의 시작점으로 삼아요.", "If you have, each day starts from there."),
+    fields: [{ key: "stay", options: STAYS }],
+  },
+  {
+    id: "stayArea", kind: "choice", when: (a) => first(a, "stay") === "booked",
+    q: tx("숙소가 어느 동네예요?", "Which area is your stay in?"),
+    help: tx("매일 출발·도착 지점이 정해져서 이동 시간이 정확해져요.", "Each day starts and ends there, so travel times get accurate."),
+    // 같은 12곳 — 여기서는 설명 없이 이름만 (어디 묵는지는 손님이 이미 안다)
+    fields: [{ key: "stayArea", options: AREAS.map((c) => ({ id: c.id, title: c.title, value: c.value })), other: true }],
+  },
+  {
+    id: "budget", kind: "choice",
+    q: tx("현지에서 쓸 1인 예산은 어느 정도예요?", "How much will each person spend in Seoul?"),
+    help: tx("숙소·항공은 빼고, 여행 전체 기준이에요.", "Not counting flights or your stay — for the whole trip."),
+    fields: [{ key: "budget", options: BUDGETS }],
+  },
+  {
+    id: "food", kind: "choice",
+    q: tx("먹는 건 어때요?", "How do you like to eat?"),
+    help: tx("줄마다 하나씩 고르면 넘어가요.", "One in each row and you'll move on."),
+    fields: [
+      { key: "adventure", label: tx("처음 보는 음식은", "Unfamiliar dishes"), options: ADVENTURES },
+      { key: "spicy", label: tx("매운 음식은", "Spicy food"), options: SPICES },
+    ],
+  },
+  {
+    id: "needs", kind: "choice",
+    q: tx("꼭 맞춰야 할 게 있어요?", "Anything the plan must work around?"),
+    help: tx("식단이나 이동에서 맞춰야 할 걸 골라 주세요. 고르지 않아도 돼요.", "Diet or getting around — optional."),
+    fields: [{ key: "needs", options: NEEDS, multiple: true, exclusive: ["none"], optional: true }],
+  },
+  {
+    id: "allergy", kind: "choice", when: (a) => has(a, "needs", "allergy"),
+    q: tx("어떤 알레르기예요?", "What are you allergic to?"),
+    help: tx("피해야 할 메뉴를 표시해요. 고르지 않아도 돼요.", "The draft flags dishes to avoid. Optional."),
+    fields: [{ key: "allergy", options: ALLERGIES, multiple: true, optional: true, other: true }],
+  },
+  {
+    id: "pace", kind: "choice",
+    q: tx("하루에 몇 군데 정도 가고 싶어요?", "How many places a day feels right?"),
+    help: tx("하루에 넣는 일정 수가 달라져요.", "It sets how much goes into each day."),
+    fields: [{ key: "pace", options: PACES }],
+  },
+  {
+    id: "avoid", kind: "choice",
+    q: tx("빼고 싶은 게 있어요?", "Anything you'd rather avoid?"),
+    help: tx("고른 건 일정에서 빼거나 줄여요. 고르지 않아도 돼요.", "Whatever you pick gets cut or kept short. Optional."),
+    fields: [{ key: "avoid", options: AVOIDS, multiple: true, optional: true, other: true }],
+  },
+  {
+    id: "hours", kind: "choice", mode: "detail",
+    q: tx("하루는 몇 시에 시작해서 몇 시에 마칠까요?", "When should each day start and finish?"),
+    help: tx("매일 첫 일정과 마지막 일정의 시간이 정해져요.", "It sets the first and last stop of every day."),
+    fields: [
+      { key: "start", label: tx("시작", "Start"), options: STARTS },
+      { key: "end", label: tx("마침", "Finish"), options: ENDS },
+    ],
+  },
+  {
+    id: "move", kind: "choice", mode: "detail",
+    q: tx("주로 어떻게 다닐 거예요?", "How will you mostly get around?"),
+    help: tx("이동 안내 방식과 걸리는 시간이 달라져요.", "It changes the directions and the travel times."),
+    fields: [
+      { key: "transport", label: tx("다니는 방법", "Getting around"), options: TRANSPORTS },
+      { key: "subway", label: tx("지하철 타는 건 익숙해요?", "Used to the subway?"), options: SUBWAY, show: (a) => first(a, "transport") === "transit" },
+    ],
+  },
+  {
+    id: "airport", kind: "choice", mode: "detail",
+    q: tx("어느 공항으로 들어와요?", "Which airport are you flying into?"),
+    help: tx("공항에서 숙소까지 가는 길을 맞춰 적어요.", "The draft covers the way from the airport to your stay."),
+    fields: [
+      { key: "airport", label: tx("공항", "Airport"), options: AIRPORTS },
+      {
+        key: "ride", label: tx("공항에서 숙소까지는", "From the airport to your stay"), options: RIDES,
+        show: (a) => ["icn", "gmp"].includes(first(a, "airport") ?? ""),
+      },
+    ],
+  },
+  {
+    id: "hanbok", kind: "choice", mode: "detail",
+    q: tx("한복 입고 다녀 볼래요?", "Want to wear hanbok for a day?"),
+    help: tx("입어 본다면 빌리는 동네와 입고 걷기 좋은 길을 초안에 적어요.", "If so, the draft notes where to rent one and where to wear it."),
+    fields: [{ key: "hanbok", options: HANBOK }],
+  },
+  {
+    id: "buy", kind: "choice", mode: "detail", when: (a) => has(a, "interests", "shopping"),
+    q: tx("무엇을 사고 싶어요?", "What do you want to buy?"),
+    help: tx("쇼핑할 동네를 고르는 기준이 돼요. 여러 개 골라도 좋아요.", "It decides where you shop. Pick as many as you like."),
+    fields: [{ key: "buy", options: BUYS, multiple: true }],
+  },
+  {
+    id: "review", kind: "review",
+    q: tx("이대로 초안을 쓸까요?", "Ready for your draft?"),
+    help: tx("고칠 곳이 있으면 '지금까지의 여행'에서 눌러 바로 돌아갈 수 있어요.", "Want to change something? Tap it under “Your trip so far” to go back."),
+    fields: [],
+  },
+];
+
+export const STEP = Object.fromEntries(STEPS.map((st) => [st.id, st])) as Record<StepId, StepDef>;
+const FIELD: Record<string, Field> = Object.fromEntries(STEPS.flatMap((st) => st.fields.map((f) => [f.key, f])));
+/** 질문 밖에서 정하는 값 (예산 화면의 통화, 확인 화면의 초안 언어) — 지우지 않는다 */
+const AUX = ["currency", "language"];
+
+export type FlowState = { step: StepId; answers: Answers; reviewed?: boolean };
+/** reviewed: 확인 화면까지 한 번 와 봤는지. 그 뒤로 앞 질문을 고치러 가면 '확인 화면으로' 단추가 생긴다 */
+export const INITIAL_STATE: FlowState = { step: "mode", answers: {}, reviewed: false };
+
+/** 지금 답으로 묻게 되는 질문들, 순서대로. 러프·디테일을 고르기 전에는 둘 다에 있는 질문만 */
+export function stepOrder(a: Answers): StepId[] {
+  const mode = first(a, "mode");
+  return STEPS.filter((st) => (!st.mode || st.mode === mode) && (!st.when || st.when(a))).map((st) => st.id);
 }
 
-/** 이 단계의 보기 */
-export function choicesFor(step: Step): Choice[] {
-  if (step.startsWith("do:")) {
-    const city = CURATED[step.slice(3)];
-    return (city?.experiences ?? []).map((e) => ({ id: e.id, title: e.title, description: e.description, value: e.ai, image: e.image }));
+/** 이 화면에 지금 보이는 줄 */
+export function visibleFields(step: StepId, a: Answers): Field[] {
+  return STEP[step].fields.filter((f) => !f.show || f.show(a));
+}
+
+export function optionsFor(f: Field, a: Answers): Choice[] {
+  return typeof f.options === "function" ? f.options(a) : f.options ?? [];
+}
+
+const typed = (a: Answers, key: string) => (a[`${key}:other`]?.[0] ?? "").trim();
+
+/** 고른 보기의 이름 (+ 직접 적은 것) — 오른쪽 판에 적을 글 */
+export function labelsOf(a: Answers, key: string): Text[] {
+  const f = FIELD[key];
+  if (!f) return [];
+  if (f.text) {
+    const v = (a[key]?.[0] ?? "").trim();
+    return v ? [{ ko: v, en: v }] : [];
   }
-  switch (step as Simple) {
-    case "interests": return INTERESTS;
-    case "who": return COMPANIONS;
-    case "kids": return CHILDREN;
-    case "pace": return PACES;
-    case "budget": return BUDGETS;
-    case "visited": return VISITS;
-    case "transport": return TRANSPORTS;
-    case "stay": return STAY_AREAS;
-    case "rhythm": return RHYTHMS;
-    case "occasion": return OCCASIONS;
-    case "avoid": return AVOIDS;
-    case "diet": return DIETARY;
-    default: return [];
-  }
+  const options = optionsFor(f, a);
+  const picked = (a[key] ?? []).map((id) => options.find((o) => o.id === id)?.title).filter((x): x is Text => !!x);
+  const other = typed(a, key);
+  return other ? [...picked, { ko: other, en: other }] : picked;
+}
+
+/**
+ * 고르면 '다음' 없이 넘어가는 질문인지 — 보이는 줄이 모두 하나만 고르는 보기이고, 직접 적는 칸이 열려 있지 않을 때.
+ * 여러 개 고르는 질문, 직접 적는 칸, 날짜(달력)·인원(+−)은 다 됐는지 화면이 알 수 없으니 '다음' 단추를 둔다.
+ * 줄이 여럿이면 마지막 줄을 채운 순간 넘어간다 (화면 쪽 PlanFlow.pick)
+ */
+export function autoAdvance(step: StepId, a: Answers): boolean {
+  if (STEP[step].kind !== "choice") return false;
+  const fields = visibleFields(step, a);
+  return fields.length > 0 && fields.every((f) => !f.multiple && !f.text && a[`${f.key}:other`] === undefined);
 }
 
 export function localToday(now = new Date()) {
@@ -391,21 +766,11 @@ const realDate = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v) && new Date(`${v}T
 
 /** 다음으로 못 가는 이유 (없으면 null). 화면에 그대로 보이는 말이라 두 언어로 돌려준다 */
 export function stepError(state: FlowState, today = localToday()): Text | null {
-  const { step, answers } = state;
-  const values = answers[step] ?? [];
-  if (step === "review" || OPTIONAL.includes(step) || step === "interests") {
-    // 고르지 않아도 된다. 다만 '그 외'를 켜 두고 비워 두면 무엇인지 알 수 없다
-    const other = answers[`${step}:other` as keyof Answers];
-    if (other && other.length && !other[0].trim()) return tx("직접 적는 칸이 비어 있어요. 적거나 닫아 주세요.", "The ‘other’ box is empty — type something or close it.");
-    return null;
-  }
-  if (step === "where") {
-    const other = answers["where:other"];
-    if (other && other.length && !other[0].trim()) return tx("그 외를 고르셨어요 — 어디인지 적어 주세요.", "You picked somewhere else — please type where.");
-    return pickedPlaces(answers).length ? null : tx("가고 싶은 곳을 하나 이상 골라 주세요.", "Pick at least one place you want to go.");
-  }
-  if (step === "dates") {
-    const [start, end] = values;
+  const { step, answers: a } = state;
+  const def = STEP[step];
+  if (def.kind === "review") return null;
+  if (def.kind === "dates") {
+    const [start, end] = a.dates ?? [];
     if (!start || !end) return tx("가는 날과 오는 날을 모두 골라 주세요.", "Pick the day you arrive and the day you leave.");
     if (!realDate(start) || !realDate(end)) return tx("달력에 있는 날짜를 골라 주세요.", "Please pick dates from the calendar.");
     if (start < today) return tx("가는 날은 오늘 이후로 골라 주세요.", "Arrival can't be in the past.");
@@ -413,96 +778,152 @@ export function stepError(state: FlowState, today = localToday()): Text | null {
     if (nights(start, end) + 1 > 30) return tx("여행 기간은 30일까지 고를 수 있어요.", "Trips can be up to 30 days.");
     return null;
   }
-  if (step === "travelers") {
-    const n = Number(values[0]);
-    if (!values[0] || !Number.isInteger(n) || n < 1 || n > 20) return tx("인원은 1명부터 20명까지 적어 주세요.", "Travellers: 1 to 20.");
-    if (answers.who?.[0] === "solo" && n !== 1) return tx("혼자 여행을 고르셨어요. 1명으로 적거나 '누구와'를 바꿔 주세요.", "You picked ‘just me’ — set 1 or change who's coming.");
-    if (answers.who?.[0] && answers.who[0] !== "solo" && n < 2) return tx("함께하는 여행은 본인 포함 2명 이상이에요.", "With company it's at least 2, you included.");
+  if (def.kind === "travelers") {
+    // 이 질문은 혼자·둘이가 아닐 때만 묻는다 — 본인 포함 2명부터
+    const v = a.travelers?.[0];
+    const n = Number(v);
+    if (!v || !Number.isInteger(n) || n < 2 || n > 20) return tx("인원은 본인 포함 2명부터 20명까지예요.", "Travellers: 2 to 20, you included.");
     return null;
   }
-  const ok = values.length > 0 && values.every((id) => choicesFor(step).some((c) => c.id === id));
-  return ok ? null : tx("마음에 드는 것을 골라 주세요.", "Pick the one that fits.");
+  const fields = visibleFields(step, a);
+  for (const f of fields) {
+    if (f.text) {
+      if (!f.optional && !(a[f.key]?.[0] ?? "").trim()) return tx("적어 주세요.", "Please type something.");
+      continue;
+    }
+    const otherOpen = !!f.other && a[`${f.key}:other`] !== undefined;
+    if (otherOpen && !typed(a, f.key)) return tx("직접 적는 칸이 비어 있어요. 적거나 닫아 주세요.", "The ‘other’ box is empty — type something or close it.");
+    const values = a[f.key] ?? [];
+    const ids = new Set(optionsFor(f, a).map((o) => o.id));
+    if (!values.every((v) => ids.has(v))) return tx("고를 수 없는 보기가 들어 있어요.", "Something picked isn't on the list.");
+    if (!f.optional && !values.length && !otherOpen) {
+      if (fields.length > 1) return tx("줄마다 하나씩 골라 주세요.", "Pick one in each row.");
+      return f.multiple ? tx("하나 이상 골라 주세요.", "Pick at least one.") : tx("마음에 드는 것을 골라 주세요.", "Pick the one that fits.");
+    }
+  }
+  return null;
 }
 
 export type Action =
-  | { type: "choose"; value: string }
-  | { type: "input"; values: string[] }
-  | { type: "other"; text: string | null } // null 이면 '그 외' 칸을 닫는다
-  | { type: "set"; key: "budget:currency" | "review:language"; value: string }
-  | { type: "next"; from: Step }
+  | { type: "choose"; field: string; value: string }
+  | { type: "input"; field: "dates" | "travelers"; values: string[] }
+  | { type: "text"; field: string; text: string }
+  | { type: "other"; field: string; text: string | null } // null 이면 '그 외' 칸을 닫는다
+  | { type: "set"; key: "currency" | "language"; value: string }
+  | { type: "next"; from: StepId }
   | { type: "back" }
-  | { type: "goto"; to: Step } // 확인 화면에서 고칠 곳으로, 세부에서 바로 확인으로
-  | { type: "resume"; from?: Step } // 확인 화면을 본 뒤 고치러 왔을 때: 곧장 확인 화면으로 (from: next 와 같은 늦은 클릭 막이)
+  | { type: "goto"; to: StepId } // 오른쪽 판에서 고칠 곳으로
+  | { type: "resume"; from?: StepId } // 확인 화면을 본 뒤 고치러 왔을 때: 곧장 확인 화면으로 (from: next 와 같은 늦은 클릭 막이)
   | { type: "reset" };
 
 export function flowReducer(state: FlowState, action: Action): FlowState {
   if (action.type === "reset") return INITIAL_STATE;
   const order = stepOrder(state.answers);
   const index = order.indexOf(state.step);
-  const move = (step: Step): FlowState => ({ ...state, step, reviewed: state.reviewed || step === "review" });
+  const move = (step: StepId): FlowState => ({ ...state, step, reviewed: state.reviewed || step === "review" });
+  const broken = (st: StepId) => !!stepError({ step: st, answers: state.answers });
 
-  if (action.type === "back") return move(order[Math.max(0, index - 1)]);
-  if (action.type === "resume") {
-    // 확인 화면에서 날짜 하나 고치러 왔는데 다음·다음·다음을 눌러야 돌아가는 건 번거롭다 (써니 2026-10-12).
-    // 고치는 사이에 새로 생긴 필수 질문(새 도시의 '하고 싶은 것', 아이 나이, 다시 세야 할 인원)이 있으면 거기서 멈춘다
-    if (action.from && action.from !== state.step) return state;
-    if (!state.reviewed || state.step === "review" || stepError(state)) return state;
-    const pending = order.find((st) => st !== "review" && stepError({ step: st, answers: state.answers }));
-    return move(pending ?? "review");
-  }
-  if (action.type === "goto") {
-    if (!order.includes(action.to)) return state;
-    // 앞으로 건너뛰는 건 세부 → 확인뿐이다. 필수 질문을 건너뛰지 못하게 한다
-    const forward = order.indexOf(action.to) > index;
-    if (forward && !(OPTIONAL.includes(state.step) && action.to === "review")) return state;
-    if (forward && stepError(state)) return state;
-    return move(action.to);
-  }
-  if (action.type === "next") {
-    // 이전 화면에서 늦게 들어온 클릭이 다음 질문까지 건너뛰지 않게 한다 (베타와 같다)
-    if (action.from !== state.step || stepError(state) || state.step === "review") return state;
-    return move(order[index + 1]);
-  }
-  if (action.type === "input") {
-    if (state.step !== "dates" && state.step !== "travelers") return state;
-    return { ...state, answers: { ...state.answers, [state.step]: action.values } };
-  }
-  if (action.type === "set") {
-    return { ...state, answers: { ...state.answers, [action.key]: [action.value] } };
-  }
-  if (action.type === "other") {
-    if (!(OTHER_STEPS as readonly string[]).includes(state.step)) return state;
-    const key = `${state.step}:other` as keyof Answers;
-    const answers: Answers = { ...state.answers };
-    if (action.text === null) delete answers[key];
-    else answers[key] = [action.text.slice(0, 40)];
-    return { ...state, answers: prune(answers) };
+  switch (action.type) {
+    case "back":
+      return move(order[Math.max(0, index - 1)]);
+    case "next":
+      // 이전 화면에서 늦게 들어온 클릭이 다음 질문까지 건너뛰지 않게 한다 (베타와 같다)
+      if (action.from !== state.step || state.step === "review" || broken(state.step)) return state;
+      return move(order[index + 1]);
+    case "resume": {
+      // 확인 화면에서 날짜 하나 고치러 왔는데 다음·다음·다음을 눌러야 돌아가는 건 번거롭다 (써니 2026-10-12).
+      // 고치는 사이에 새로 생긴 필수 질문(아이 나이, 다시 세야 할 인원, 디테일 질문 …)이 있으면 거기서 멈춘다
+      if (action.from && action.from !== state.step) return state;
+      if (!state.reviewed || state.step === "review" || broken(state.step)) return state;
+      return move(order.find((st) => st !== "review" && broken(st)) ?? "review");
+    }
+    case "goto": {
+      const target = order.indexOf(action.to);
+      if (target < 0 || target === index) return state;
+      // 앞으로 건너뛰는 건 확인 화면을 본 뒤에만, 지금 화면부터 그 앞까지 모두 답이 있을 때만 — 필수 질문을 건너뛰지 못하게
+      if (target > index && (!state.reviewed || order.slice(index, target).some(broken))) return state;
+      return move(action.to);
+    }
+    case "set":
+      return { ...state, answers: { ...state.answers, [action.key]: [action.value] } };
+    case "input":
+      if (STEP[state.step].kind !== action.field) return state;
+      return { ...state, answers: { ...state.answers, [action.field]: action.values } };
   }
 
-  // choose
-  const options = state.step === "where" ? null : choicesFor(state.step);
-  if (options && !options.some((c) => c.id === action.value)) return state;
-  const current = state.answers[state.step] ?? [];
-  const values = isMultiple(state.step)
-    ? current.includes(action.value) ? current.filter((v) => v !== action.value) : [...current, action.value]
-    : OPTIONAL.includes(state.step) && current[0] === action.value ? [] // 세부는 다시 누르면 풀린다
-      : [action.value];
-  const answers: Answers = { ...state.answers, [state.step]: values };
-  // 누구와를 바꾸면 인원을 다시 채운다 (혼자 1, 둘이 2) — 베타와 같다
-  if (state.step === "who" && current[0] !== action.value) {
-    delete answers.travelers;
-    if (action.value === "solo") answers.travelers = ["1"];
-    if (action.value === "couple") answers.travelers = ["2"];
+  // 아래는 지금 화면의 한 줄에 답하는 것
+  const field = visibleFields(state.step, state.answers).find((f) => f.key === action.field);
+  if (!field) return state;
+  const answers: Answers = { ...state.answers };
+  const otherKey = `${field.key}:other`;
+
+  if (action.type === "text") {
+    if (!field.text) return state;
+    answers[field.key] = [action.text.slice(0, field.text.max)];
+  } else if (action.type === "other") {
+    if (!field.other) return state;
+    if (action.text === null) delete answers[otherKey];
+    else {
+      // 직접 적기를 열면: 하나만 고르는 줄은 고른 것을 풀고, '잘 모르겠어요' 같은 혼자 고르는 보기도 푼다
+      if (answers[otherKey] === undefined) {
+        answers[field.key] = field.multiple ? (answers[field.key] ?? []).filter((v) => !field.exclusive?.includes(v)) : [];
+      }
+      answers[otherKey] = [action.text.slice(0, 40)];
+    }
+  } else {
+    if (!optionsFor(field, state.answers).some((o) => o.id === action.value)) return state;
+    const current = answers[field.key] ?? [];
+    if (field.multiple) {
+      if (current.includes(action.value)) answers[field.key] = current.filter((v) => v !== action.value);
+      else if (field.exclusive?.includes(action.value)) {
+        answers[field.key] = [action.value];
+        delete answers[otherKey];
+      } else answers[field.key] = [...current.filter((v) => !field.exclusive?.includes(v)), action.value];
+    } else {
+      // 고르지 않아도 되는 줄은 다시 누르면 풀린다. 하나만 고르는 줄에서 보기를 고르면 '직접 적기'는 닫힌다
+      answers[field.key] = field.optional && current[0] === action.value ? [] : [action.value];
+      delete answers[otherKey];
+    }
+    // 누구와를 바꾸면 인원을 다시 센다 (혼자·둘이는 묻지 않는다)
+    if (field.key === "who" && current[0] !== action.value) delete answers.travelers;
   }
   return { ...state, answers: prune(answers) };
 }
 
-/** 없어진 도시·활동·아이 질문의 답만 지운다. 아직 유효한 답은 둔다 */
-function prune(answers: Answers): Answers {
-  const active = new Set<string>(stepOrder(answers));
-  for (const key of Object.keys(answers)) {
-    const base = key.endsWith(":other") || key === "budget:currency" || key === "review:language" ? key.split(":")[0] : key;
-    if (!active.has(base)) delete answers[key as keyof Answers];
+/**
+ * 더는 묻지 않는 질문의 답만 지운다 (동네를 알게 되면 취향, 러프로 바꾸면 디테일 질문 …).
+ * 보기가 앞의 답에 따라 바뀌는 줄('꼭 하나')은 없어진 보기만 뺀다. 지운 것 때문에 또 바뀔 수 있어 멈출 때까지 돈다
+ */
+function prune(input: Answers): Answers {
+  let answers = input;
+  for (let round = 0; round < 8; round++) {
+    const keep = new Set<string>(AUX);
+    for (const st of stepOrder(answers)) {
+      for (const f of visibleFields(st, answers)) {
+        keep.add(f.key);
+        if (f.other) keep.add(`${f.key}:other`);
+      }
+    }
+    let changed = false;
+    const next: Answers = {};
+    for (const [key, values] of Object.entries(answers)) {
+      if (keep.has(key)) next[key] = values;
+      else changed = true;
+    }
+    for (const st of stepOrder(next)) {
+      for (const f of visibleFields(st, next)) {
+        const values = next[f.key];
+        if (!f.options || !values) continue;
+        const ids = new Set(optionsFor(f, next).map((o) => o.id));
+        const kept = values.filter((v) => ids.has(v));
+        if (kept.length !== values.length) {
+          next[f.key] = kept;
+          changed = true;
+        }
+      }
+    }
+    answers = next;
+    if (!changed) break;
   }
   return answers;
 }
@@ -530,44 +951,141 @@ export type PlanRequest = {
   language: string;
 };
 
-const pick = (step: Step, answers: Answers) => {
-  const id = answers[step]?.[0];
-  return choicesFor(step).find((c) => c.id === id)?.value || undefined;
+const valueOf = (a: Answers, key: string) => {
+  const id = first(a, key);
+  return (FIELD[key] && optionsFor(FIELD[key], a).find((o) => o.id === id)?.value) || undefined;
 };
-const many = (step: Step, answers: Answers) =>
-  (answers[step] ?? []).map((id) => choicesFor(step).find((c) => c.id === id)?.value).filter((v): v is string => !!v);
+const valuesOf = (a: Answers, key: string) => {
+  const options = FIELD[key] ? optionsFor(FIELD[key], a) : [];
+  return (a[key] ?? []).map((id) => options.find((o) => o.id === id)?.value).filter((v): v is string => !!v);
+};
 
-/** 기본 통화: 한국어 화면이면 원화, 영어면 달러 (지금 폼은 손님이 고른다 — 예산 화면에서 바꿀 수 있다) */
+/**
+ * 같은 머리말로 시작하는 짧은 문장으로 묶는다: pack("Areas: ", [a, b, c]) → ["Areas: a, b", "Areas: c"].
+ * 서버는 styles 한 줄에 40자까지만 받는다 (lib/validate.ts) — 넘치면 다음 줄로
+ */
+export function pack(prefix: string, items: string[], max = 40): string[] {
+  const out: string[] = [];
+  let line = "";
+  for (const raw of items) {
+    const item = raw.trim().slice(0, max - prefix.length);
+    if (!item) continue;
+    if (line && `${line}, ${item}`.length <= max) line = `${line}, ${item}`;
+    else {
+      if (line) out.push(line);
+      line = prefix + item;
+    }
+  }
+  if (line) out.push(line);
+  return out;
+}
+
+/** 직접 적은 '꼭 가고 싶은 곳'을 쉼표 등으로 나눈다 ("경복궁, 성수동·광장시장") */
+const splitPlaces = (text: string) => text.split(/[,，、;·\n]+/).map((p) => p.trim()).filter(Boolean);
+
+/**
+ * 남은 줄을 목록들에 나눈다. 고른 게 있는 목록은 적어도 한 줄씩 받고, 남으면 앞의 목록부터 한 줄씩 더 받는다.
+ * 동네를 열 곳 고른 손님 때문에 '꼭 먹을 것'이 통째로 빠지는 일이 없게 — 길게 고른 목록의 뒤쪽이 잘린다
+ */
+function share(lists: string[][], room: number): string[][] {
+  const take = lists.map(() => 0);
+  for (let round = 0; room > 0; round++) {
+    let added = false;
+    for (let i = 0; i < lists.length && room > 0; i++) {
+      if (lists[i].length > round) {
+        take[i]++;
+        room--;
+        added = true;
+      }
+    }
+    if (!added) break;
+  }
+  return lists.map((l, i) => l.slice(0, take[i]));
+}
+
+/** 기본 통화: 한국어 화면이면 원화, 영어면 달러 (예산 화면에서 바꿀 수 있다) */
 export const defaultCurrency = (lang: Lang) => (lang === "ko" ? "KRW" : "USD");
 
-export function toPlanRequest(answers: Answers, lang: Lang): PlanRequest {
-  const [start, end] = answers.dates ?? [];
-  // 도시별로 고른 것은 "Seoul: palaces & hanok" 처럼 도시를 붙여 보낸다. 관심사는 지금 폼과 같은 값
-  const todo = pickedPlaces(answers).flatMap((place) =>
-    many(`do:${place}`, answers).map((ai) => `${place}: ${ai}`.slice(0, 40)));
-  const interestOther = (answers["interests:other"]?.[0] ?? "").trim();
-  const kids = pick("kids", answers);
-  const who = pick("who", answers);
-  const avoidOther = (answers["avoid:other"]?.[0] ?? "").trim();
-  const dietOther = (answers["diet:other"]?.[0] ?? "").trim();
+export function toPlanRequest(a: Answers, lang: Lang): PlanRequest {
+  const [start, end] = a.dates ?? [];
+  const who = first(a, "who");
+
+  // 도착·출발 시간은 한 줄로 ("Arrives late night, leaves early morning" 이 가장 긴데 딱 40자)
+  const arrival = valueOf(a, "arrive");
+  const departure = valueOf(a, "leave");
+  const timing = arrival && departure ? [`Arrives ${arrival}, leaves ${departure}`]
+    : arrival ? [`Arrives ${arrival}`] : departure ? [`Leaves ${departure}`] : [];
+
+  // 동네가 많으면 줄을 많이 먹는다 — 두 줄을 넘으면 짧은 이름으로 ("Bukchon/Seochon/Ikseon-dong" → "Bukchon")
+  const areas = valuesOf(a, "area");
+  const fullAreas = pack("Areas: ", [...areas, typed(a, "area")]);
+  const areaLines = has(a, "area", "unsure") ? ["Areas: please suggest"]
+    : fullAreas.length > 2 ? pack("Areas: ", [...areas.map((v) => v.split("/")[0]), typed(a, "area")]) : fullAreas;
+
+  const airport = first(a, "airport");
+  const ride = valueOf(a, "ride");
+  const must = valueOf(a, "must");
+  const vibe = valueOf(a, "vibe");
+  const spicy = first(a, "spicy");
+  const hanbok = valueOf(a, "hanbok");
+  const mode = first(a, "mode");
+
+  // 한 줄짜리 — 늘 다 들어간다 (가장 많아도 6줄)
+  const plan = mode ? [mode === "detail" ? "Plan: detailed, hour by hour" : "Plan: rough outline, key spots only"] : [];
+  const top = must ? [`Top priority: ${must}`] : [];
+  // 못 먹어요는 식단으로 간다. 맛·매운 정도는 어느 둘을 골라도 한 줄 안이다
+  const food = pack("Food: ", [...valuesOf(a, "adventure"), ...(spicy && spicy !== "none" ? valuesOf(a, "spicy") : [])]);
+  const mood = vibe ? [`Trip mood: ${vibe}`] : [];
+  const airportLine = airport === "icn" || airport === "gmp" ? [`Airport: ${valueOf(a, "airport")}${ride ? ` → ${ride}` : ""}`]
+    : airport === "none" ? ["No airport, arrives by train or ferry"]
+      : airport === "unknown" ? ["Airport: not sure yet (ICN or GMP)"] : [];
+  const wear = hanbok ? [hanbok] : [];
+  const singles = [plan, top, timing, food, mood, airportLine, wear];
+
+  // 서버는 13줄까지만 받는다. 남은 줄은 여러 개 고르는 목록에 나눈다 (share)
+  const [areaL, tasteL, intoL, visitL, eatL, shopL] = share([
+    areaLines,
+    pack("Taste: ", valuesOf(a, "famous").concat(valuesOf(a, "era"))),
+    pack("Into: ", valuesOf(a, "interests")),
+    pack("Must visit: ", splitPlaces(a.place?.[0] ?? "")),
+    pack("Must eat: ", valuesOf(a, "foods")),
+    pack("Shopping: ", valuesOf(a, "buy")),
+  ], 13 - singles.flat().length);
+  const styles = [...plan, ...top, ...areaL, ...tasteL, ...intoL, ...visitL, ...eatL, ...timing, ...food, ...mood, ...airportLine, ...wear, ...shopL];
+
+  const kids = valuesOf(a, "kids");
+  const whoValue = valueOf(a, "who");
+  const transport = valueOf(a, "transport");
+  const stay = first(a, "stay");
+  const stayNear = valueOf(a, "stayArea") ?? typed(a, "stayArea");
+  const dayStart = valueOf(a, "start");
+  const dayEnd = valueOf(a, "end");
+  const allergyOther = typed(a, "allergy");
+  const allergies = [...valuesOf(a, "allergy"), ...(allergyOther ? [`Allergy: ${allergyOther}`.slice(0, 40)] : [])];
+
   return {
-    destinations: pickedPlaces(answers),
+    destinations: [...OPEN_PLACES],
     startDate: start,
     durationDays: nights(start, end) + 1,
-    travelers: Number(answers.travelers?.[0]),
-    budgetRange: pick("budget", answers),
-    budgetCurrency: answers["budget:currency"]?.[0] ?? defaultCurrency(lang),
-    // 서버는 13개까지만 받는다 (lib/validate.ts). 도시별로 고른 것이 먼저 — 이 여행의 뼈대다
-    styles: [...todo, ...many("interests", answers), ...(interestOther ? [interestOther] : [])].slice(0, 13),
-    audience: who && kids ? `${who} (${kids})` : who,
-    pace: pick("pace", answers),
-    visitedBefore: pick("visited", answers),
-    transport: pick("transport", answers),
-    stayArea: pick("stay", answers),
-    dayRhythm: pick("rhythm", answers),
-    occasion: pick("occasion", answers),
-    avoid: [...many("avoid", answers), ...(avoidOther ? [avoidOther] : [])],
-    dietary: [...many("diet", answers), ...(dietOther ? [dietOther] : [])],
-    language: answers["review:language"]?.[0] ?? lang,
+    travelers: who === "solo" ? 1 : who === "couple" ? 2 : Number(a.travelers?.[0]),
+    budgetRange: valueOf(a, "budget"),
+    budgetCurrency: first(a, "currency") ?? defaultCurrency(lang),
+    styles,
+    audience: whoValue && kids.length ? `${whoValue} (${kids.join(", ")})` : whoValue,
+    pace: valueOf(a, "pace"),
+    visitedBefore: valueOf(a, "visited"),
+    transport: transport && first(a, "subway") === "new" ? `${transport}, new to the subway` : transport,
+    stayArea: stay === "booked" ? (stayNear ? `Booked near ${stayNear}`.slice(0, 40) : "Booked")
+      : stay === "open" ? "Not booked yet, suggest an area" : undefined,
+    dayRhythm: dayStart && dayEnd ? `Starts ${dayStart}, ends ${dayEnd}` : undefined,
+    occasion: undefined,
+    avoid: [...valuesOf(a, "avoid"), ...(typed(a, "avoid") ? [typed(a, "avoid")] : [])].slice(0, 8),
+    // 알레르기를 자세히 골랐으면 그쪽을 보낸다. 알레르기가 맨 앞 — 서버는 12개까지만 받는다
+    dietary: [
+      ...allergies,
+      ...valuesOf(a, "needs").filter((v) => !(v === "Food allergy" && allergies.length)),
+      ...(spicy === "none" ? [valueOf(a, "spicy") as string] : []),
+    ].slice(0, 12),
+    language: first(a, "language") ?? lang,
   };
 }

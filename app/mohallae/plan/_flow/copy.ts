@@ -1,9 +1,10 @@
 import type { Text } from "../flow";
 
 /**
- * 입력 흐름 화면에 나가는 글 (보기 글자는 flow.ts 에 있다).
+ * 입력 흐름 화면에 나가는 글 중 질문이 아닌 것 — 단추, 달력, 오른쪽 판, 기다림, 오류.
+ * 질문·도움말·보기 글자는 flow.ts 의 STEPS 에 질문과 같이 있다 (2026-10-13 질문을 새로 짜면서 한곳으로 모았다).
  *
- * 질문 문구는 베타(#82)의 말투를 이어받았다 — 숙제가 아니라 대화처럼 (PRODUCT.md 원칙 3).
+ * 말투는 숙제가 아니라 대화처럼 (PRODUCT.md 원칙 3).
  * 오류 문구는 지금 폼(app/plan)의 MESSAGES 와 같은 뜻이다: 서버 문장은 손님에게 보이지 않는다.
  * 규칙 3장(법적 경계): 대신 해 준다는 말을 쓰지 않는다. 초안은 프로그램이 쓰는 정보 문서다.
  */
@@ -19,39 +20,15 @@ export const flowCopy = {
   back: tx("이전", "Back"),
   next: tx("다음", "Next"),
   skip: tx("건너뛰기", "Skip"),
-  toReview: tx("바로 확인으로", "Skip to review"),
   backToReview: tx("확인 화면으로", "Back to review"),
   nextQuestion: tx("다음 질문", "Next question"),
   submit: tx("무료 초안 받기", "Get my free draft"),
 
   picked: { ko: (n: number) => `${n}개 골랐어요 · 다시 누르면 풀려요`, en: (n: number) => `${n} picked — tap again to remove` },
   pickedOne: tx("골랐어요", "Picked"),
-  optionalNote: tx("고르지 않아도 돼요.", "Optional — skip if it doesn't matter."),
-  other: tx("그 외", "Something else"),
-  otherPlace: tx("그 외 — 직접 적기", "Somewhere else"),
+  other: tx("그 외 — 직접 적기", "Something else"),
   otherPlaceholder: tx("적어 주세요", "Type it"),
-  closeOther: tx("닫기", "Close"),
 
-  // 질문 — 도시 이름이 들어가는 것은 함수
-  where: {
-    q: tx("어디로 가세요?", "Where are you going?"),
-    help: tx("여러 곳을 골라도 좋아요. 목록에 없으면 직접 적어 주세요.", "Pick as many as you like. Not listed? Type it."),
-    // 도시를 서울 하나만 열어 둔 동안 (flow.ts OPEN_PLACES)
-    helpOne: tx("지금은 서울 여행 초안을 만들 수 있어요.", "For now, we make drafts for trips to Seoul."),
-  },
-  todo: {
-    q: { ko: (city: string) => `${city}에서는 뭘 해볼까요?`, en: (city: string) => `What do you want to do in ${city}?` },
-    help: tx("끌리는 것을 다 골라 주세요 — 날짜에 맞춰 골라 담아 초안을 씁니다.", "Pick everything that pulls you in — the draft fits them to your days."),
-  },
-  interests: {
-    q: { ko: (places: string) => `${places}에서는 무엇이 끌리세요?`, en: (places: string) => `What are you into in ${places}?` },
-    help: tx("고르지 않아도 돼요. 여러 개 골라도 좋아요.", "Optional — pick as many as you like."),
-  },
-  // 하나만 고르는 질문의 첫 화면 — 고르면 바로 넘어간다는 것을 미리 알린다 (WCAG 3.2.2)
-  who: { q: tx("이 여행, 누구와 함께해요?", "Who's coming?"), help: tx("하나를 고르면 바로 다음 질문으로 넘어가요.", "Pick one — you'll go straight to the next question.") },
-  kids: { q: tx("아이는 몇 살쯤이에요?", "How old are the kids?"), help: tx("이동 거리와 쉬는 시간이 달라져요.", "It changes the distances and the breaks.") },
-  pace: { q: tx("이번 여행은 어떤 속도로?", "What pace suits this trip?"), help: tx("하루에 넣는 일정 수가 달라져요.", "It sets how much goes into each day.") },
-  dates: { q: tx("언제 떠나세요?", "When are you going?"), help: tx("가는 날과 오는 날을 골라 주세요. 최대 30일까지예요.", "Pick the day you arrive and the day you leave — up to 30 days.") },
   calendar: {
     arrive: tx("가는 날", "Arrive"),
     leave: tx("오는 날", "Leave"),
@@ -65,48 +42,41 @@ export const flowCopy = {
     prev: tx("이전 달", "Previous month"),
     next: tx("다음 달", "Next month"),
   },
-  travelers: { q: tx("모두 몇 명이에요?", "How many of you?"), help: tx("본인을 포함해서 세어 주세요.", "Count yourself in.") },
   travelersUnit: { ko: (n: number) => `${n}명`, en: (n: number) => (n === 1 ? "1 person" : `${n} people`) },
   minus: tx("한 명 줄이기", "One fewer"),
   plus: tx("한 명 늘리기", "One more"),
-  budget: {
-    q: tx("1인 예산은 어느 정도예요?", "Budget per person?"),
-    help: tx("여행 전체 기준이에요.", "For the whole trip."),
-    currency: tx("비용을 볼 통화", "Show costs in"),
-  },
-  visited: { q: tx("한국은 처음이세요?", "First time in Korea?") },
-  transport: { q: tx("어떻게 다니실 건가요?", "How will you get around?") },
-  stay: { q: tx("숙소는 어디쯤이 좋으세요?", "Where would you like to stay?") },
-  rhythm: { q: tx("하루를 언제 시작하세요?", "When do your days start?") },
-  occasion: { q: tx("특별한 날인가요?", "Is it a special occasion?") },
-  avoid: { q: tx("빼고 싶은 것이 있나요?", "Anything to leave out?") },
-  diet: {
-    q: tx("꼭 맞춰야 할 것이 있나요?", "Anything the plan must work around?"),
-    help: tx("식사나 이동에서 맞춰야 할 것을 골라 주세요. 고르지 않아도 돼요.", "Food or getting around — optional."),
-  },
-  review: {
-    q: tx("이대로 초안을 쓸까요?", "Ready for your draft?"),
-    help: tx("고칠 곳이 있으면 '지금까지의 여행'에서 눌러 바로 돌아갈 수 있어요.", "Want to change something? Tap it under “Your trip so far” to go back."),
-    language: tx("초안을 받을 언어", "Language of your draft"),
-    note: tx("가입도 카드도 필요 없어요. 보통 15초쯤 걸려요.", "No account, no card. Usually about 15 seconds."),
-  },
+  currency: tx("비용을 볼 통화", "Show costs in"),
+  language: tx("초안을 받을 언어", "Language of your draft"),
+  reviewNote: tx("가입도 카드도 필요 없어요. 보통 15초쯤 걸려요.", "No account, no card. Usually about 15 seconds."),
 
   postcardPause: tx("엽서 사진 멈추기", "Pause the photos"),
 
-  // 오른쪽 판
+  // 오른쪽 판 — 줄 하나에 질문 한두 개를 모아 적는다 (질문이 많아져서 판이 너무 길어지지 않게)
   panel: {
     title: tx("지금까지의 여행", "Your trip so far"),
     edit: tx("고치기", "Edit"),
-    where: tx("어디로", "Where"),
-    todo: tx("하고 싶은 것", "To do"),
-    interests: tx("끌리는 것", "Into"),
-    who: tx("누구와", "Who's coming"),
-    pace: tx("속도", "Your pace"),
-    dates: tx("날짜", "Your dates"),
-    travelers: tx("인원", "How many"),
-    budget: tx("예산", "Budget"),
-    details: tx("세부 (고르지 않아도 돼요)", "Details (optional)"),
+    place: tx("서울", "Seoul"),
+    plan: tx("이번 여행", "This trip"),
+    area: tx("서울 어디", "Where in Seoul"),
+    interests: tx("하고 싶은 것", "Into"),
+    top: tx("1순위", "top"),
+    wish: tx("꼭", "Must-dos"),
+    dates: tx("날짜", "Dates"),
+    arrive: { ko: (x: string) => `${x} 도착`, en: (x: string) => `arrive ${x.toLowerCase()}` },
+    leave: { ko: (x: string) => `${x} 출발`, en: (x: string) => `leave ${x.toLowerCase()}` },
     days: { ko: (n: number) => `${n}일`, en: (n: number) => (n === 1 ? "1 day" : `${n} days`) },
+    who: tx("누구와", "Who"),
+    visited: tx("서울은", "Seoul before?"),
+    stay: tx("숙소", "Stay"),
+    budget: tx("예산", "Budget"),
+    food: tx("먹는 것", "Food"),
+    spicy: tx("매운 음식", "Spicy"),
+    pace: tx("하루에", "Per day"),
+    avoid: tx("빼고 싶은 것", "Avoid"),
+    detail: tx("세부", "Details"),
+    subwayNew: tx("지하철 처음", "first time on the subway"),
+    hanbok: tx("한복 입기", "Wearing hanbok"),
+    none: tx("없어요", "None"),
   },
 
   // 기다림 — 초안을 쓰는 동안 랜딩의 고쳐 쓰기 장면을 보여 준다
