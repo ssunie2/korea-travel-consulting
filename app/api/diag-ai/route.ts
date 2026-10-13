@@ -17,6 +17,10 @@ const SAMPLE = {
   audience: 'Couple', pace: 'Balanced', avoid: [], dietary: [], language: 'ko',
 }
 
+/** 응답이 안 오면 기다리다 함수 전체가 60초에 끊긴다 — 모델마다 시간 제한을 둔다 */
+const within = <T,>(ms: number, p: Promise<T>) =>
+  Promise.race([p, new Promise<never>((_, reject) => setTimeout(() => reject(Object.assign(new Error(`no answer in ${ms}ms`), { status: 0 })), ms))])
+
 const fail = (e: unknown) => {
   const err = e as { status?: number; message?: string }
   return { ok: false, status: err.status, message: String(err.message ?? e).slice(0, 600) }
@@ -30,11 +34,11 @@ export async function GET(req: Request) {
   if (draftModel) {
     const started = Date.now()
     try {
-      const res = await ai.models.generateContent({
+      const res = await within(52_000, ai.models.generateContent({
         model: draftModel,
         contents: buildFreeDraftPrompt(SAMPLE),
         config: { responseMimeType: 'application/json', responseSchema: freeItinerarySchema, temperature: 0.7 },
-      })
+      }))
       const draft = JSON.parse(res.text ?? '{}')
       return Response.json({ model: draftModel, ok: true, ms: Date.now() - started, modelVersion: res.modelVersion, title: draft.tripTitle, days: draft.days?.length })
     } catch (e) {
@@ -46,7 +50,7 @@ export async function GET(req: Request) {
     MODELS.map(async (model) => {
       const started = Date.now()
       try {
-        const res = await ai.models.generateContent({ model, contents: 'Reply with the single word OK.' })
+        const res = await within(15_000, ai.models.generateContent({ model, contents: 'Reply with the single word OK.' }))
         return { model, ok: true, ms: Date.now() - started, text: (res.text ?? '').trim().slice(0, 20), modelVersion: res.modelVersion }
       } catch (e) {
         return { model, ms: Date.now() - started, ...fail(e) }
