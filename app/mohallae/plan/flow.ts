@@ -4,9 +4,12 @@
  * 2026-10-13 질문을 새로 짰다. 써니가 후보 300개(첫 질문 "러프하게? 디테일하게?" 아래로 이어지는 것)에서
  * ★★★ 41개만 골라 "일단 만들어서 줘, 확인해 볼게". 뮤조와 정한 방향: 손님 중심, 짧게, "딱 내가 원하는 스타일대로".
  * - 첫 질문은 "이번 여행 계획, 어떻게 짜고 싶으세요?" — 러프하게 / 디테일하게. 고른 쪽에 따라 뒤 질문이 달라진다
- *   (러프만: 여행을 한 단어로 / 디테일만: 하루 시간·이동·공항·한복·살 것)
+ * - 러프는 초안에 꼭 필요한 것만 10가지 안팎 (써니 2026-10-15: "러프하게인데 17가지나 더 물어보는 건 너무 많아"):
+ *   동네 → 하고 싶은 것 → 날짜 → 도착·출발 시간 → 누구와(아이 나이·인원) → 서울 처음인지 → 예산 → 맞춰야 할 것 → 하루 몇 곳
+ *   남긴 기준: 날짜·인원은 서버가 꼭 받아야 하고, 나머지는 빠지면 초안이 틀리거나(첫날·마지막 날, 식단) 손님과 안 맞는 것들이다.
+ *   이어서 묻는 건 고른 답에 따라서만 — 동네를 모르면 취향, 아이와 함께면 나이, 알레르기면 무엇인지, 셋 이상이면 인원
+ * - 디테일은 거기에 1순위·꼭 갈 곳·먹는 것·숙소·뺄 것·하루 시간·이동·공항·한복·살 것을 더 묻는다
  * - 도시는 서울만 연다. '어디로'는 서울 안의 동네를 묻는다 (써니: "서울도 넓고 할 거 구경할 거 먹을 거 많으니까")
- * - 재미있는 것부터 묻는다: 분위기 → 동네 → 하고 싶은 것 → 꼭 → 날짜·누구와 → 숙소·예산·식단 같은 사실은 뒤로
  * - 한 화면에 질문 하나. 줄이 둘인 질문(도착·출발 시간 등)은 줄마다 하나씩 고르면 넘어간다
  * - 고른 것을 풀면 **그 아래 답만** 지운다 (디테일 → 러프로 바꾸면 디테일 질문의 답만 지운다)
  * - 이전 화면의 늦은 클릭이 두 칸을 건너뛰지 않게 막는다 (next 의 from)
@@ -232,22 +235,10 @@ const choice = (id: string, value: string, ko: string, en: string, dko?: string,
   id, value, title: tx(ko, en), ...(dko && den ? { description: tx(dko, den) } : {}),
 });
 
-/** 첫 질문. 디테일을 고르면 하루 시간·이동·공항·한복·살 것을 더 묻는다 */
+/** 첫 질문. 러프는 초안에 꼭 필요한 것만, 디테일은 1순위·꼭 갈 곳·먹는 것·숙소·뺄 것·하루 시간·이동·공항·한복·살 것을 더 묻는다 */
 export const MODES: Choice[] = [
   choice("rough", "rough", "러프하게", "Keep it rough", "큰 틀만 — 하루 주제와 꼭 갈 곳", "The big picture — a theme and key spots each day"),
   choice("detail", "detailed", "디테일하게", "Go into detail", "시간 단위까지 — 이동·식사·예약할 곳까지", "Down to the hour — routes, meals, what to book"),
-];
-
-/** 러프만: 여행을 한 단어로. 초안 제목과 하루 분위기의 재료 */
-export const VIBES: Choice[] = [
-  choice("thrill", "excitement", "설렘", "Excitement", "처음 보는 장면에 두근두근", "Butterflies at every new sight"),
-  choice("heal", "healing & rest", "힐링", "Healing", "쉬어 가는 게 목적이에요", "Here to slow down"),
-  choice("eat", "eating everything", "먹방", "Eat everything", "하루 다섯 끼도 좋아요", "Five meals a day? Sure"),
-  choice("photo", "photo-worthy moments", "인생샷", "Photos", "어디서 찍어도 작품", "Every frame a keeper"),
-  choice("shop", "shopping", "쇼핑", "Shopping", "캐리어는 비워서 왔어요", "Came with an empty suitcase"),
-  choice("learn", "learning", "배움", "Learning", "알고 보면 더 재미있는 서울", "Seoul's better with the story"),
-  choice("romance", "romance", "로맨스", "Romance", "둘만의 장면을 남기러", "Scenes for just the two of you"),
-  choice("adventure", "adventure", "모험", "Adventure", "안 해 본 걸 해 보기", "Try what you've never tried"),
 ];
 
 /**
@@ -396,6 +387,8 @@ export const NEEDS: Choice[] = [
   choice("walk", "Hard to walk far", "오래 걷기 어려움", "Can't walk far"),
   choice("none", "", "없어요", "None"),
 ];
+/** 러프의 '맞춰야 할 것' — 매운 음식을 못 먹는 것도 여기서 (디테일은 '먹는 건 어때요?'에서 묻는다) */
+const NEEDS_ROUGH: Choice[] = [...NEEDS.slice(0, 3), choice("spicy", "No spicy food", "매운 음식은 못 먹어요", "No spicy food"), ...NEEDS.slice(3)];
 export const ALLERGIES: Choice[] = [
   choice("nut", "Nut allergy", "견과류", "Nuts"),
   choice("shellfish", "Shellfish allergy", "갑각류", "Shellfish"),
@@ -502,7 +495,7 @@ export type Field = {
 };
 
 export type StepId =
-  | "mode" | "vibe" | "area" | "taste" | "interests" | "must" | "wish" | "dates" | "times"
+  | "mode" | "area" | "taste" | "interests" | "must" | "wish" | "dates" | "times"
   | "who" | "kids" | "travelers" | "visited" | "stay" | "stayArea" | "budget" | "food" | "needs" | "allergy"
   | "pace" | "avoid" | "hours" | "move" | "airport" | "hanbok" | "buy" | "review";
 
@@ -521,7 +514,7 @@ export type StepDef = {
 const first = (a: Answers, key: string) => a[key]?.[0];
 const has = (a: Answers, key: string, id: string) => !!a[key]?.includes(id);
 
-/** 묻는 순서 그대로. 재미있는 것 먼저, 사실은 뒤로 */
+/** 묻는 순서 그대로. 고르는 재미가 있는 것(동네·하고 싶은 것) 먼저, 사실(예산·식단)은 뒤로 */
 export const STEPS: StepDef[] = [
   {
     id: "mode", kind: "choice",
@@ -529,12 +522,6 @@ export const STEPS: StepDef[] = [
     // 하나만 고르는 질문의 첫 화면 — 고르면 바로 넘어간다는 것을 미리 알린다 (WCAG 3.2.2)
     help: tx("하나를 고르면 바로 다음 질문으로 넘어가요.", "Pick one — you'll go straight to the next question."),
     fields: [{ key: "mode", options: MODES }],
-  },
-  {
-    id: "vibe", kind: "choice", mode: "rough",
-    q: tx("이번 서울 여행을 한 단어로 하면?", "Sum up this Seoul trip in one word."),
-    help: tx("초안의 제목과 하루하루의 분위기가 이 단어를 따라가요.", "Your draft's title and the feel of each day follow it."),
-    fields: [{ key: "vibe", options: VIBES }],
   },
   {
     id: "area", kind: "choice",
@@ -559,13 +546,13 @@ export const STEPS: StepDef[] = [
   },
   {
     // 관심사를 하나만 골랐으면 그게 1순위다 — 묻지 않는다
-    id: "must", kind: "choice", when: (a) => (a.interests?.length ?? 0) !== 1,
+    id: "must", kind: "choice", mode: "detail", when: (a) => (a.interests?.length ?? 0) !== 1,
     q: tx("이것만은 꼭! 하나만 고른다면?", "If you could only do one?"),
     help: tx("그걸 가장 좋은 시간에 넣고, 나머지를 그 주변으로 짜요.", "It gets the best time of day, and the rest is built around it."),
     fields: [{ key: "must", options: (a) => INTERESTS.filter((c) => has(a, "interests", c.id)) }],
   },
   {
-    id: "wish", kind: "choice",
+    id: "wish", kind: "choice", mode: "detail",
     q: tx("꼭 가고 싶은 곳이나 먹고 싶은 게 있어요?", "Anywhere you have to go, or anything you have to eat?"),
     help: tx("없으면 건너뛰어도 돼요.", "Nothing yet? Skip it."),
     fields: [
@@ -617,13 +604,13 @@ export const STEPS: StepDef[] = [
     fields: [{ key: "visited", options: VISITS }],
   },
   {
-    id: "stay", kind: "choice",
+    id: "stay", kind: "choice", mode: "detail",
     q: tx("숙소는 이미 정했어요?", "Have you booked your stay yet?"),
     help: tx("정했으면 그 동네를 하루의 시작점으로 삼아요.", "If you have, each day starts from there."),
     fields: [{ key: "stay", options: STAYS }],
   },
   {
-    id: "stayArea", kind: "choice", when: (a) => first(a, "stay") === "booked",
+    id: "stayArea", kind: "choice", mode: "detail", when: (a) => first(a, "stay") === "booked",
     q: tx("숙소가 어느 동네예요?", "Which area is your stay in?"),
     help: tx("매일 출발·도착 지점이 정해져서 이동 시간이 정확해져요.", "Each day starts and ends there, so travel times get accurate."),
     // 같은 12곳 — 여기서는 설명 없이 이름만 (어디 묵는지는 손님이 이미 안다)
@@ -636,7 +623,7 @@ export const STEPS: StepDef[] = [
     fields: [{ key: "budget", options: BUDGETS }],
   },
   {
-    id: "food", kind: "choice",
+    id: "food", kind: "choice", mode: "detail",
     q: tx("먹는 건 어때요?", "How do you like to eat?"),
     help: tx("줄마다 하나씩 고르면 넘어가요.", "One in each row and you'll move on."),
     fields: [
@@ -648,7 +635,8 @@ export const STEPS: StepDef[] = [
     id: "needs", kind: "choice",
     q: tx("꼭 맞춰야 할 게 있어요?", "Anything the plan must work around?"),
     help: tx("식단이나 이동에서 맞춰야 할 걸 골라 주세요. 고르지 않아도 돼요.", "Diet or getting around — optional."),
-    fields: [{ key: "needs", options: NEEDS, multiple: true, exclusive: ["none"], optional: true }],
+    // 러프는 '먹는 건 어때요?'(맛·매운 정도)를 묻지 않는다 — 매운 걸 못 먹는 것만 여기서 고른다
+    fields: [{ key: "needs", options: (a) => (first(a, "mode") === "detail" ? NEEDS : NEEDS_ROUGH), multiple: true, exclusive: ["none"], optional: true }],
   },
   {
     id: "allergy", kind: "choice", when: (a) => has(a, "needs", "allergy"),
@@ -663,7 +651,7 @@ export const STEPS: StepDef[] = [
     fields: [{ key: "pace", options: PACES }],
   },
   {
-    id: "avoid", kind: "choice",
+    id: "avoid", kind: "choice", mode: "detail",
     q: tx("빼고 싶은 게 있어요?", "Anything you'd rather avoid?"),
     help: tx("고른 건 일정에서 빼거나 줄여요. 고르지 않아도 돼요.", "Whatever you pick gets cut or kept short. Optional."),
     fields: [{ key: "avoid", options: AVOIDS, multiple: true, optional: true, other: true }],
@@ -1041,7 +1029,6 @@ export function toPlanRequest(a: Answers, lang: Lang): PlanRequest {
   const airport = first(a, "airport");
   const ride = valueOf(a, "ride");
   const must = valueOf(a, "must");
-  const vibe = valueOf(a, "vibe");
   const spicy = first(a, "spicy");
   const hanbok = valueOf(a, "hanbok");
   const mode = first(a, "mode");
@@ -1051,12 +1038,11 @@ export function toPlanRequest(a: Answers, lang: Lang): PlanRequest {
   const top = must ? [`Top priority: ${must}`] : [];
   // 못 먹어요는 식단으로 간다. 맛·매운 정도는 어느 둘을 골라도 한 줄 안이다
   const food = pack("Food: ", [...valuesOf(a, "adventure"), ...(spicy && spicy !== "none" ? valuesOf(a, "spicy") : [])]);
-  const mood = vibe ? [`Trip mood: ${vibe}`] : [];
   const airportLine = airport === "icn" || airport === "gmp" ? [`Airport: ${valueOf(a, "airport")}${ride ? ` → ${ride}` : ""}`]
     : airport === "none" ? ["No airport, arrives by train or ferry"]
       : airport === "unknown" ? ["Airport: not sure yet (ICN or GMP)"] : [];
   const wear = hanbok ? [hanbok] : [];
-  const singles = [plan, top, timing, food, mood, airportLine, wear];
+  const singles = [plan, top, timing, food, airportLine, wear];
 
   // 서버는 13줄까지만 받는다. 남은 줄은 여러 개 고르는 목록에 나눈다 (share)
   const [areaL, tasteL, intoL, visitL, eatL, shopL] = share([
@@ -1067,7 +1053,7 @@ export function toPlanRequest(a: Answers, lang: Lang): PlanRequest {
     pack("Must eat: ", valuesOf(a, "foods")),
     pack("Shopping: ", valuesOf(a, "buy")),
   ], 13 - singles.flat().length);
-  const styles = [...plan, ...top, ...areaL, ...tasteL, ...intoL, ...visitL, ...eatL, ...timing, ...food, ...mood, ...airportLine, ...wear, ...shopL];
+  const styles = [...plan, ...top, ...areaL, ...tasteL, ...intoL, ...visitL, ...eatL, ...timing, ...food, ...airportLine, ...wear, ...shopL];
 
   const kids = valuesOf(a, "kids");
   const whoValue = valueOf(a, "who");
@@ -1096,12 +1082,13 @@ export function toPlanRequest(a: Answers, lang: Lang): PlanRequest {
     dayRhythm: dayStart && dayEnd ? `Starts ${dayStart}, ends ${dayEnd}` : undefined,
     occasion: undefined,
     avoid: [...valuesOf(a, "avoid"), ...(typed(a, "avoid") ? [typed(a, "avoid")] : [])].slice(0, 8),
-    // 알레르기를 자세히 골랐으면 그쪽을 보낸다. 알레르기가 맨 앞 — 서버는 12개까지만 받는다
-    dietary: [
+    // 알레르기를 자세히 골랐으면 그쪽을 보낸다. 알레르기가 맨 앞 — 서버는 12개까지만 받는다.
+    // 매운 음식은 러프에서는 '맞춰야 할 것', 디테일에서는 '먹는 건 어때요?'에서 온다 — 겹치면 한 번만
+    dietary: [...new Set([
       ...allergies,
       ...valuesOf(a, "needs").filter((v) => !(v === "Food allergy" && allergies.length)),
       ...(spicy === "none" ? [valueOf(a, "spicy") as string] : []),
-    ].slice(0, 12),
+    ])].slice(0, 12),
     language: first(a, "language") ?? lang,
   };
 }

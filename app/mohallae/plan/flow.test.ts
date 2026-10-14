@@ -4,7 +4,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import {
-  AIRPORTS, AREAS, BUDGETS, BUYS, CHILDREN, COMPANIONS, CURATED, ENDS, FOODS, INITIAL_STATE, INTERESTS, OPEN_PLACES, RIDES, STARTS, STEPS, TRANSPORTS, VIBES,
+  AIRPORTS, AREAS, BUDGETS, BUYS, CHILDREN, COMPANIONS, CURATED, ENDS, FOODS, INITIAL_STATE, INTERESTS, OPEN_PLACES, RIDES, STARTS, STEPS, TRANSPORTS,
   autoAdvance, flowReducer, optionsFor, pack, panelPhotos, postcardPhotos, stepError, stepOrder, toPlanRequest, visibleFields,
 } from "./flow.ts";
 import type { Answers, FlowState, PlanRequest, StepId } from "./flow.ts";
@@ -21,18 +21,33 @@ const resume = (s: FlowState, from?: StepId) => flowReducer(s, { type: "resume",
 /** 한 줄짜리 질문: 고르고 다음으로 (화면에서는 고르면 저절로 넘어간다) */
 const pick = (s: FlowState, field: string, value: string) => next(choose(s, field, value));
 
-/** 러프로 확인 화면까지: 먹방, 성수, 먹거리·야경(1순위 야경), 3박 4일, 오후 도착·밤 출발, 친구 3명 … 고르지 않아도 되는 건 건너뛴다 */
+/** 러프로 확인 화면까지: 성수, 먹거리·야경, 3박 4일, 오후 도착·밤 출발, 친구 3명, 처음, 25–35만원, 하루 3–4곳. 맞춰야 할 것은 건너뛴다 */
 function roughToReview() {
   let s = pick(INITIAL_STATE, "mode", "rough");
-  s = pick(s, "vibe", "eat");
+  s = next(choose(s, "area", "seongsu"));
+  s = next(choose(choose(s, "interests", "food"), "interests", "night"));
+  s = next(dates(s, "2100-10-14", "2100-10-17"));
+  s = next(choose(choose(s, "arrive", "afternoon"), "leave", "night"));
+  s = pick(s, "who", "friends");
+  s = next(people(s, 3));
+  s = pick(s, "visited", "first");
+  s = pick(s, "budget", "250to350");
+  s = next(s); // 맞춰야 할 것 — 건너뛰기
+  s = pick(s, "pace", "balanced");
+  assert.equal(s.step, "review");
+  return s;
+}
+
+/** 디테일로 확인 화면까지 (혼자, 숙소 아직, 택시, 공항 아님, 한복 안 입음). 고르지 않아도 되는 건 건너뛴다 */
+function detailToReview() {
+  let s = pick(INITIAL_STATE, "mode", "detail");
   s = next(choose(s, "area", "seongsu"));
   s = next(choose(choose(s, "interests", "food"), "interests", "night"));
   s = pick(s, "must", "night");
   s = next(s); // 꼭 — 건너뛰기
   s = next(dates(s, "2100-10-14", "2100-10-17"));
   s = next(choose(choose(s, "arrive", "afternoon"), "leave", "night"));
-  s = pick(s, "who", "friends");
-  s = next(people(s, 3));
+  s = pick(s, "who", "solo");
   s = pick(s, "visited", "first");
   s = pick(s, "stay", "open");
   s = pick(s, "budget", "250to350");
@@ -40,6 +55,10 @@ function roughToReview() {
   s = next(s); // 맞춰야 할 것 — 건너뛰기
   s = pick(s, "pace", "balanced");
   s = next(s); // 빼고 싶은 것 — 건너뛰기
+  s = next(choose(choose(s, "start", "9"), "end", "21"));
+  s = pick(s, "transport", "taxi");
+  s = pick(s, "airport", "none");
+  s = pick(s, "hanbok", "no");
   assert.equal(s.step, "review");
   return s;
 }
@@ -62,22 +81,22 @@ function withinLimits(req: PlanRequest) {
   assert.deepEqual(req.destinations, ["Seoul"]);
 }
 
-test("첫 질문은 러프·디테일 — 러프만 '한 단어로', 디테일만 하루 시간·이동·공항·한복·살 것을 묻는다", () => {
-  const common = stepOrder({});
-  assert.equal(common[0], "mode");
-  assert.ok(!common.includes("vibe") && !common.includes("hours"), "고르기 전에는 둘 다에 있는 질문만");
+test("러프는 초안에 꼭 필요한 것만 10가지 — 디테일은 1순위·꼭 갈 곳·숙소·먹는 것·뺄 것·하루 시간·이동·공항·한복·살 것을 더", () => {
   const rough = stepOrder({ mode: ["rough"] });
+  assert.deepEqual(rough, ["mode", "area", "interests", "dates", "times", "who", "travelers", "visited", "budget", "needs", "pace", "review"]);
+  assert.deepEqual(stepOrder({}), rough, "고르기 전에는 둘 다에 있는 질문만 — 러프와 같다");
+  // 첫 질문과 확인 화면을 빼면 10개. 혼자·둘이는 인원을 묻지 않아서 9개
+  assert.equal(rough.length - 2, 10);
+  assert.equal(stepOrder({ mode: ["rough"], who: ["solo"] }).length - 2, 9);
+  assert.ok(!stepOrder({ mode: ["rough"], interests: ["food", "night"] }).includes("must"), "러프는 1순위를 묻지 않는다");
   const detail = stepOrder({ mode: ["detail"] });
-  assert.ok(rough.includes("vibe"));
-  for (const st of ["hours", "move", "airport", "hanbok"] as StepId[]) {
+  for (const st of ["must", "wish", "stay", "food", "avoid", "hours", "move", "airport", "hanbok"] as StepId[]) {
     assert.ok(!rough.includes(st), st);
     assert.ok(detail.includes(st), st);
   }
-  assert.ok(!detail.includes("vibe"));
   assert.ok(!detail.includes("buy"), "쇼핑을 고르지 않았으면 살 것은 묻지 않는다");
   assert.ok(stepOrder({ mode: ["detail"], interests: ["shopping"] }).includes("buy"));
   assert.ok(!stepOrder({ mode: ["rough"], interests: ["shopping"] }).includes("buy"));
-  assert.equal(rough.at(-1), "review");
 });
 
 test("러프 한 바퀴: 보내는 값", () => {
@@ -91,18 +110,15 @@ test("러프 한 바퀴: 보내는 값", () => {
     budgetCurrency: "USD",
     styles: [
       "Plan: rough outline, key spots only",
-      "Top priority: night views",
       "Areas: Seongsu/Seoul Forest",
       "Into: food, night views",
       "Arrives afternoon, leaves night",
-      "Food: tries a little, likes spicy",
-      "Trip mood: eating everything",
     ],
     audience: "Friends",
     pace: "Balanced: 3–4 stops a day",
     visitedBefore: "First time",
     transport: undefined,
-    stayArea: "Not booked yet, suggest an area",
+    stayArea: undefined,
     dayRhythm: undefined,
     occasion: undefined,
     avoid: [],
@@ -114,7 +130,7 @@ test("러프 한 바퀴: 보내는 값", () => {
 
 test("디테일 한 바퀴: 보내는 값", () => {
   let s = pick(INITIAL_STATE, "mode", "detail");
-  assert.equal(s.step, "area", "디테일은 '한 단어로'를 묻지 않는다");
+  assert.equal(s.step, "area");
   s = next(choose(choose(s, "area", "bukchon"), "area", "euljiro"));
   s = next(choose(choose(s, "interests", "shopping"), "interests", "history"));
   s = pick(s, "must", "history");
@@ -181,7 +197,7 @@ test("디테일 한 바퀴: 보내는 값", () => {
 });
 
 test("동네: '잘 모르겠어요'는 혼자 고른다 — 고르면 취향 두 줄을 묻고, 동네를 고르면 취향 답은 지운다", () => {
-  let s = pick(pick(INITIAL_STATE, "mode", "rough"), "vibe", "heal");
+  let s = pick(INITIAL_STATE, "mode", "rough");
   assert.equal(s.step, "area");
   s = choose(choose(s, "area", "seongsu"), "area", "unsure");
   assert.deepEqual(s.answers.area, ["unsure"]);
@@ -212,8 +228,8 @@ test("동네: '잘 모르겠어요'는 혼자 고른다 — 고르면 취향 두
   assert.equal(next(s).step, "interests");
 });
 
-test("1순위: 관심사가 하나면 묻지 않고, 둘 이상이면 고른 것 중에서 묻는다. 1순위를 빼면 다시 묻는다", () => {
-  let s = pick(pick(INITIAL_STATE, "mode", "rough"), "vibe", "photo");
+test("1순위(디테일만): 관심사가 하나면 묻지 않고, 둘 이상이면 고른 것 중에서 묻는다. 1순위를 빼면 다시 묻는다", () => {
+  let s = pick(INITIAL_STATE, "mode", "detail");
   s = next(choose(s, "area", "yeouido"));
   s = next(choose(s, "interests", "night"));
   assert.equal(s.step, "wish", "하나만 골랐으면 그게 1순위");
@@ -263,7 +279,7 @@ test("줄이 둘인 질문은 두 줄 다 골라야 넘어간다. 지하철·공
 
 test("고르면 넘어가는 질문과 '다음' 단추를 쓰는 질문", () => {
   const a: Answers = { mode: ["detail"], who: ["family"], interests: ["food", "shopping"], needs: ["allergy"], area: ["unsure"], stay: ["booked"] };
-  const auto: StepId[] = ["mode", "vibe", "taste", "must", "times", "who", "visited", "stay", "stayArea", "budget", "food", "pace", "hours", "move", "airport", "hanbok"];
+  const auto: StepId[] = ["mode", "taste", "must", "times", "who", "visited", "stay", "stayArea", "budget", "food", "pace", "hours", "move", "airport", "hanbok"];
   const withButton: StepId[] = ["area", "interests", "wish", "dates", "kids", "travelers", "needs", "allergy", "avoid", "buy", "review"];
   for (const st of auto) assert.equal(autoAdvance(st, a), true, st);
   for (const st of withButton) assert.equal(autoAdvance(st, a), false, st);
@@ -301,17 +317,16 @@ test("누구와: 혼자·둘이는 인원을 묻지 않고, 아이와 함께면 
 });
 
 test("러프 ↔ 디테일을 바꾸면 그쪽에만 있는 질문의 답만 지우고, 새로 생긴 질문에서 멈춘다", () => {
-  let s = roughToReview();
-  s = choose(goto(s, "mode"), "mode", "detail");
-  assert.equal(s.answers.vibe, undefined);
-  for (const key of ["area", "interests", "must", "dates", "arrive", "who", "travelers", "budget", "pace"]) assert.ok(s.answers[key]?.length, key);
+  // 러프 → 디테일: 답한 건 그대로, 디테일에만 있는 첫 필수 질문(1순위)에서 멈춘다
+  let s = choose(goto(roughToReview(), "mode"), "mode", "detail");
+  for (const key of ["area", "interests", "dates", "arrive", "who", "travelers", "visited", "budget", "pace"]) assert.ok(s.answers[key]?.length, key);
   s = resume(s, "mode");
-  assert.equal(s.step, "hours");
-  s = choose(choose(s, "start", "9"), "end", "18");
-  s = choose(goto(s, "mode"), "mode", "rough");
-  assert.equal(s.answers.start, undefined);
-  assert.equal(s.answers.end, undefined);
-  assert.equal(resume(s, "mode").step, "vibe");
+  assert.equal(s.step, "must");
+  // 디테일 → 러프: 디테일에만 있는 답은 지우고, 러프에 새로 생기는 필수 질문이 없으니 곧장 확인 화면
+  const d = choose(goto(detailToReview(), "mode"), "mode", "rough");
+  for (const key of ["must", "stay", "adventure", "spicy", "start", "end", "transport", "airport", "hanbok"]) assert.equal(d.answers[key], undefined, key);
+  for (const key of ["area", "interests", "dates", "who", "visited", "budget", "pace"]) assert.ok(d.answers[key]?.length, key);
+  assert.equal(resume(d, "mode").step, "review");
 });
 
 test("확인 화면을 본 뒤 고치러 가면 곧장 돌아오고, 비워 두면 못 간다", () => {
@@ -322,12 +337,12 @@ test("확인 화면을 본 뒤 고치러 가면 곧장 돌아오고, 비워 두�
   assert.equal(s.step, "review");
   s = goto(s, "dates");
   assert.equal(resume(dates(s, "2100-10-20", "")).step, "dates");
-  assert.equal(resume(pick(INITIAL_STATE, "mode", "rough")).step, "vibe", "확인 화면 전에는 아무 일도 없다");
+  assert.equal(resume(pick(INITIAL_STATE, "mode", "rough")).step, "area", "확인 화면 전에는 아무 일도 없다");
 });
 
 test("오른쪽 판에서 고치러 가기: 확인 화면 전에는 앞으로 못 건너뛰고, 본 뒤에는 앞쪽 질문으로도 간다", () => {
   const early = pick(INITIAL_STATE, "mode", "rough");
-  assert.equal(goto(early, "budget").step, "vibe", "확인 화면 전");
+  assert.equal(goto(early, "budget").step, "area", "확인 화면 전");
   assert.equal(goto(early, "mode").step, "mode", "뒤로는 언제나");
   const atArea = goto(roughToReview(), "area");
   assert.equal(goto(atArea, "budget").step, "budget", "확인 화면을 본 뒤");
@@ -338,8 +353,8 @@ test("오른쪽 판에서 고치러 가기: 확인 화면 전에는 앞으로 �
 
 test("늦게 들어온 이전 화면의 클릭은 두 칸을 건너뛰지 않는다 (next·resume 모두)", () => {
   const moved = next(choose(INITIAL_STATE, "mode", "rough"));
-  assert.equal(moved.step, "vibe");
-  assert.equal(flowReducer(moved, { type: "next", from: "mode" }).step, "vibe");
+  assert.equal(moved.step, "area");
+  assert.equal(flowReducer(moved, { type: "next", from: "mode" }).step, "area");
 
   let s = choose(goto(roughToReview(), "pace"), "pace", "full");
   // 고른 뒤 잠깐 사이에 '이전'을 눌렀다 — 속도 화면에서 걸어 둔 resume 은 지금 화면에서 아무 일도 안 한다
@@ -355,7 +370,7 @@ test("지금 화면에 없는 줄에는 답할 수 없다", () => {
   assert.equal(other(INITIAL_STATE, "mode", "x"), INITIAL_STATE, "'그 외'가 없는 줄");
 });
 
-test("식단: '없어요'는 혼자 고른다. 알레르기를 고르면 무엇인지 묻고(고르지 않아도 됨), 풀면 그 답도 지운다", () => {
+test("식단: '없어요'는 혼자 고른다. 알레르기를 고르면 무엇인지 묻고(고르지 않아도 됨), 풀면 그 답도 지운다. 매운 음식은 러프는 여기서", () => {
   let s = goto(roughToReview(), "needs");
   s = choose(choose(s, "needs", "vegan"), "needs", "none");
   assert.deepEqual(s.answers.needs, ["none"]);
@@ -370,15 +385,22 @@ test("식단: '없어요'는 혼자 고른다. 알레르기를 고르면 무엇�
   s = choose(goto(s, "needs"), "needs", "allergy");
   assert.equal(s.answers.allergy, undefined);
   assert.equal(s.answers["allergy:other"], undefined);
-  // 매운 걸 못 먹으면 식단으로 — Food 줄에는 넣지 않는다
-  s = choose(goto(s, "food"), "spicy", "none");
-  const req = toPlanRequest(s.answers, "en");
+  // 러프는 '먹는 건 어때요?'를 묻지 않으니 매운 걸 못 먹는 건 여기서 고른다
+  s = choose(s, "needs", "spicy");
+  assert.deepEqual(toPlanRequest(s.answers, "en").dietary, ["No spicy food"]);
+  assert.deepEqual(choose(goto(s, "mode"), "mode", "detail").answers.needs, [], "디테일로 바꾸면 지운다 — 디테일은 먹는 건 어때요?에서 다시 묻는다");
+  // 디테일: '맞춰야 할 것'에는 매운 음식이 없고, '먹는 건 어때요?'의 못 먹어요는 식단으로 — Food 줄에는 넣지 않는다
+  let d = detailToReview();
+  assert.ok(!optionsFor(visibleFields("needs", d.answers)[0], d.answers).some((o) => o.id === "spicy"));
+  d = choose(goto(d, "food"), "spicy", "none");
+  const req = toPlanRequest(d.answers, "en");
   assert.deepEqual(req.dietary, ["No spicy food"]);
   assert.ok(req.styles.includes("Food: tries a little"));
 });
 
-test("숙소: 정했으면 동네를 묻고(직접 적기도), 아직이면 묻지 않는다", () => {
-  let s = roughToReview();
+test("숙소(디테일만): 정했으면 동네를 묻고(직접 적기도), 아직이면 묻지 않는다", () => {
+  assert.equal(toPlanRequest(roughToReview().answers, "en").stayArea, undefined, "러프는 숙소를 묻지 않는다");
+  let s = detailToReview();
   assert.equal(toPlanRequest(s.answers, "en").stayArea, "Not booked yet, suggest an area");
   s = resume(choose(goto(s, "stay"), "stay", "booked"), "stay");
   assert.equal(s.step, "stayArea");
@@ -431,7 +453,7 @@ test("어떤 보기를 골라도 보내는 값은 서버 한도 안이다", () =
     for (const o of f.options) withinLimits(toPlanRequest({ ...max, [f.key]: [o.id] }, "en"));
   }
   for (const o of [...AREAS]) withinLimits(toPlanRequest({ ...max, stayArea: [o.id], "stayArea:other": undefined }, "en"));
-  for (const v of VIBES) withinLimits(toPlanRequest({ ...max, mode: ["rough"], vibe: [v.id] }, "en"));
+  withinLimits(toPlanRequest({ ...max, mode: ["rough"], needs: ["halal", "vegetarian", "vegan", "spicy", "allergy", "wheelchair", "stroller", "walk"] }, "en"));
   for (const o of INTERESTS) withinLimits(toPlanRequest({ ...max, must: [o.id] }, "en"));
   for (const a of STARTS) for (const b of ENDS) withinLimits(toPlanRequest({ ...max, start: [a.id], end: [b.id] }, "en"));
   for (const a of AIRPORTS) for (const r of RIDES) withinLimits(toPlanRequest({ ...max, airport: [a.id], ride: [r.id] }, "en"));
@@ -469,11 +491,17 @@ test("질문 글: 모든 질문·보기에 한국어·영어가 있고, 쓰지 �
     for (const f of st.fields) {
       if (f.label) texts.push(f.label.ko, f.label.en);
       if (f.text) texts.push(f.text.placeholder.ko, f.text.placeholder.en);
-      if (!Array.isArray(f.options)) continue;
-      assert.equal(new Set(f.options.map((o) => o.id)).size, f.options.length, `${f.key}: 같은 id`);
-      for (const o of f.options) {
-        assert.ok(o.title.ko && o.title.en, `${f.key}:${o.id}`);
-        texts.push(o.title.ko, o.title.en, o.description?.ko ?? "", o.description?.en ?? "", o.value);
+      // 답에 따라 보기가 바뀌는 줄(1순위, 맞춰야 할 것)은 러프·디테일 둘 다로 펼쳐 본다
+      const all = INTERESTS.map((c) => c.id);
+      const lists = typeof f.options === "function"
+        ? [optionsFor(f, { mode: ["rough"], interests: all }), optionsFor(f, { mode: ["detail"], interests: all })]
+        : [f.options ?? []];
+      for (const list of lists) {
+        assert.equal(new Set(list.map((o) => o.id)).size, list.length, `${f.key}: 같은 id`);
+        for (const o of list) {
+          assert.ok(o.title.ko && o.title.en, `${f.key}:${o.id}`);
+          texts.push(o.title.ko, o.title.en, o.description?.ko ?? "", o.description?.en ?? "", o.value);
+        }
       }
     }
   }

@@ -424,14 +424,18 @@ function panelLines(a: Answers, order: StepId[], step: StepId, reviewed: boolean
   const spicy = L("spicy")[0];
   const needs = labelsOf({ ...a, needs: (a.needs ?? []).filter((x) => x !== "none") }, "needs").map(t);
 
+  // 러프·디테일에 따라 묻는 질문이 다르다 — 지금 순서에 없는 질문의 줄은 그리지 않는다 (러프는 아홉 줄)
+  const asked = (st: StepId) => order.includes(st);
   const lines: Line[] = [
-    { key: "plan", label: t(p.plan), value: join([...L("mode"), ...L("vibe")]), to: "mode", steps: ["mode", "vibe"] },
+    { key: "plan", label: t(p.plan), value: join(L("mode")), to: "mode", steps: ["mode"] },
     { key: "area", label: t(p.area), value: join([L("area").join(", "), ...L("famous"), ...L("era")]), to: "area", steps: ["area", "taste"] },
     {
       key: "interests", label: t(p.interests), to: "interests", steps: ["interests", "must"],
       value: join([must && `${must} (${t(p.top)})`, ...L("interests").filter((x) => x !== must)], ", "),
     },
-    { key: "wish", label: t(p.wish), value: join([L("place")[0], L("foods").join(", ")]) ?? (passed("wish") ? "—" : null), to: "wish", steps: ["wish"] },
+    ...(asked("wish")
+      ? [{ key: "wish", label: t(p.wish), value: join([L("place")[0], L("foods").join(", ")]) ?? (passed("wish") ? "—" : null), to: "wish", steps: ["wish"] } as Line]
+      : []),
     {
       key: "dates", label: t(p.dates), to: "dates", steps: ["dates", "times"],
       value: start && end
@@ -441,17 +445,22 @@ function panelLines(a: Answers, order: StepId[], step: StepId, reviewed: boolean
     },
     {
       key: "who", label: t(p.who), to: "who", steps: ["who", "kids", "travelers"],
-      value: join([L("who")[0], L("kids").join(", "), order.includes("travelers") && n ? c.travelersUnit[lang](n) : null]),
+      value: join([L("who")[0], L("kids").join(", "), asked("travelers") && n ? c.travelersUnit[lang](n) : null]),
     },
     { key: "visited", label: t(p.visited), value: L("visited")[0] ?? null, to: "visited", steps: ["visited"] },
-    { key: "stay", label: t(p.stay), value: join([L("stay")[0], L("stayArea")[0]]), to: "stay", steps: ["stay", "stayArea"] },
+    ...(asked("stay") ? [{ key: "stay", label: t(p.stay), value: join([L("stay")[0], L("stayArea")[0]]), to: "stay", steps: ["stay", "stayArea"] } as Line] : []),
     { key: "budget", label: t(p.budget), value: L("budget")[0] ?? null, to: "budget", steps: ["budget"] },
-    {
-      key: "food", label: t(p.food), to: "food", steps: ["food", "needs", "allergy"],
-      value: join([L("adventure")[0], spicy && `${t(p.spicy)}: ${lang === "en" ? spicy.toLowerCase() : spicy}`, ...needs, ...L("allergy")]),
-    },
+    ...(asked("food")
+      ? [{
+          key: "food", label: t(p.food), to: "food", steps: ["food"],
+          value: join([L("adventure")[0], spicy && `${t(p.spicy)}: ${lang === "en" ? spicy.toLowerCase() : spicy}`]),
+        } as Line]
+      : []),
+    { key: "needs", label: t(p.needs), value: join([...needs, ...L("allergy")]) ?? (passed("needs") ? "—" : null), to: "needs", steps: ["needs", "allergy"] },
     { key: "pace", label: t(p.pace), value: L("pace")[0] ?? null, to: "pace", steps: ["pace"] },
-    { key: "avoid", label: t(p.avoid), value: join(L("avoid"), ", ") ?? (passed("avoid") ? "—" : null), to: "avoid", steps: ["avoid"] },
+    ...(asked("avoid")
+      ? [{ key: "avoid", label: t(p.avoid), value: join(L("avoid"), ", ") ?? (passed("avoid") ? "—" : null), to: "avoid", steps: ["avoid"] } as Line]
+      : []),
   ];
 
   if (id("mode") === "detail") {

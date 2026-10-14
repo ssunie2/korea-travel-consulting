@@ -70,6 +70,7 @@ export const flowCopy = {
     stay: tx("숙소", "Stay"),
     budget: tx("예산", "Budget"),
     food: tx("먹는 것", "Food"),
+    needs: tx("맞춰야 할 것", "Work around"),
     spicy: tx("매운 음식", "Spicy"),
     pace: tx("하루에", "Per day"),
     avoid: tx("빼고 싶은 것", "Avoid"),
