@@ -41,6 +41,13 @@ const card = (id: string) => `/mohallae/do/${id}.webp`;
 const postcard = (id: string) => `/mohallae/postcards/${id}.jpg`;
 
 /**
+ * 서울 동네 장면 — 동네 질문(AREAS)의 12곳마다 한 장, 모두 다른 장소다 (써니 2026-10-14: "같은 장면을 부분만 다르게 컷한 것
+ * 말고 아예 다른 장소의 장면들을 하나씩"). 남산타워는 남산 한 장에만 나온다. 원본은 .impeccable/plates/seoul (써니 맥)
+ */
+const SEOUL_SCENES = ["gwanghwamun", "bukchon", "myeongdong", "dongdaemun", "euljiro", "hongdae", "seongsu", "itaewon", "yongsan", "yeouido", "gangnam", "jamsil"];
+const seoulScene = (area: string) => postcard(`seoul-${area}`);
+
+/**
  * 도시별 '하고 싶은 것' — lib/places.ts 의 15개 도시 모두. 열쇠는 lib/places.ts 의 값(v)과 같은 영어 이름이다.
  * 서울·부산·제주·경주의 글은 베타 그대로(영어는 새로 옮김), 나머지 11곳은 새로 썼다.
  *
@@ -50,8 +57,8 @@ const postcard = (id: string) => `/mohallae/postcards/${id}.jpg`;
  */
 export const CURATED: Record<string, Curated> = {
   Seoul: {
-    // 서울 엽서: 북촌 골목(써니가 고름 — 원본 높이 그대로, 하늘부터 골목 바닥까지) → 노을 진 서울 → 남산
-    photos: ["/mohallae/postcard-seoul-bukchon.jpg", "/mohallae/panel-seoul-sunset.jpg", "/mohallae/panel-seoul-namsan.jpg"],
+    // 서울 엽서: 동네 12곳의 장면을 차례로 (동네를 고르면 고른 곳만 — postcardPhotos)
+    photos: SEOUL_SCENES.map(seoulScene),
     experiences: [
       { id: "heritage", title: tx("궁궐과 한옥", "Palaces & hanok"), description: tx("시간이 천천히 흐르는 서울", "Where time slows down"), image: "/landing/gyeongbokgung.webp", ai: "palaces & hanok" },
       { id: "neighbourhood", title: tx("골목과 카페", "Alleys & cafés"), description: tx("발길 닿는 대로 발견하는 취향", "Find your own corners"), image: "/landing/bukchon.webp", ai: "alleys & cafes" },
@@ -200,6 +207,15 @@ export const OPEN_PLACES: string[] = ["Seoul"];
  * (서울1 → 부산1 → 서울2 → 부산2 …) — 한 도시 사진만 이어지지 않게. 사진이 없는 곳(직접 적은 곳)은 건너뛴다.
  * 아무 데도 없으면 지금 열어 둔 도시(OPEN_PLACES)의 사진 — 빈 엽서는 어색하다 (써니 2026-10-12)
  */
+/**
+ * 오른쪽 판 엽서 — 고른 동네의 장면만, 고른 순서대로 번갈아. 아직 안 골랐거나 '잘 모르겠어요'·직접 적은 곳뿐이면
+ * 서울 12곳을 차례로 (써니 2026-10-14)
+ */
+export function postcardPhotos(a: Answers): string[] {
+  const picked = (a.area ?? []).map((id) => AREAS.find((c) => c.id === id)?.image).filter((x): x is string => !!x);
+  return picked.length ? picked : panelPhotos(OPEN_PLACES);
+}
+
 export function panelPhotos(places: string[]): string[] {
   if (!places.length) return OPEN_PLACES.length ? panelPhotos(OPEN_PLACES) : [];
   const lists = places.map((p) => CURATED[p]?.photos ?? []);
@@ -251,7 +267,7 @@ export const AREAS: Choice[] = [
   choice("yeouido", "Yeouido/Han River", "여의도·한강", "Yeouido & the Han River", "강변 공원의 피크닉과 노을", "Riverside picnics and sunsets"),
   choice("gangnam", "Gangnam/Apgujeong/Sinsa", "강남·압구정·신사", "Gangnam, Apgujeong & Sinsa", "가로수길 쇼핑과 세련된 밤", "Boutique streets and polished nights"),
   choice("jamsil", "Jamsil", "잠실", "Jamsil", "호수 공원과 높은 전망대", "A lake park and a sky-high lookout"),
-];
+].map((c) => ({ ...c, image: seoulScene(c.id) })); // 사진은 카드에 붙이지 않고 오른쪽 판 엽서에만 쓴다
 /** '잘 모르겠어요'는 동네와 같이 고를 수 없다. 고르면 취향 두 가지를 묻는다 */
 const UNSURE = choice("unsure", "", "잘 모르겠어요", "Not sure", "취향 두 가지만 더 물어볼게요", "Two quick taste questions instead");
 

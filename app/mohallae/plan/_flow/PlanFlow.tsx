@@ -9,8 +9,8 @@ import CorrectionStrip from "../../_components/CorrectionStrip";
 import Calendar from "./Calendar";
 import Postcard from "./Postcard";
 import {
-  CURRENCIES, INITIAL_STATE, LANGUAGES, OPEN_PLACES, STEP,
-  autoAdvance, defaultCurrency, flowReducer, labelsOf, nights, optionsFor, panelPhotos, stepError, stepOrder, toPlanRequest, visibleFields,
+  CURRENCIES, INITIAL_STATE, LANGUAGES, STEP,
+  autoAdvance, defaultCurrency, flowReducer, labelsOf, nights, optionsFor, postcardPhotos, stepError, stepOrder, toPlanRequest, visibleFields,
   type Action, type Answers, type Field, type Lang, type StepId, type Text,
 } from "../flow";
 import { flowCopy as c } from "./copy";
@@ -478,12 +478,14 @@ function TripPanel({ variant = "aside", answers, step, order, lang, reviewed, ca
   const t = (x: Text) => x[lang];
   const p = c.panel;
   const lines = panelLines(answers, order, step, reviewed, lang);
+  const photos = postcardPhotos(answers);
 
   return (
     <Frame variant={variant} className={variant === "inline" ? s.reviewInline : `${s.panel} ${step === "review" ? s.panelOnReview : ""}`} label={t(p.title)}>
       <p className={s.panelTitle}>{t(p.title)}</p>
-      {/* 지금은 서울만 — 서울 사진을 번갈아 (flow.ts OPEN_PLACES) */}
-      {variant === "aside" && <Postcard photos={panelPhotos(OPEN_PLACES)} lang={lang} label={t(p.place)} />}
+      {/* 고른 동네의 장면만 번갈아, 고르기 전에는 서울 12곳을 차례로 (flow.ts postcardPhotos).
+          고른 동네가 바뀌면 첫 장부터 — key 로 새로 그린다 */}
+      {variant === "aside" && <Postcard key={photos.join("|")} photos={photos} lang={lang} label={t(p.place)} />}
       <ol className={s.timeline}>
         {lines.map((l) => {
           const done = l.value !== null;

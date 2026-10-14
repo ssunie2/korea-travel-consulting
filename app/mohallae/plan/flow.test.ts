@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import {
   AIRPORTS, AREAS, BUDGETS, BUYS, CHILDREN, COMPANIONS, CURATED, ENDS, FOODS, INITIAL_STATE, INTERESTS, OPEN_PLACES, RIDES, STARTS, STEPS, TRANSPORTS, VIBES,
-  autoAdvance, flowReducer, optionsFor, pack, panelPhotos, stepError, stepOrder, toPlanRequest, visibleFields,
+  autoAdvance, flowReducer, optionsFor, pack, panelPhotos, postcardPhotos, stepError, stepOrder, toPlanRequest, visibleFields,
 } from "./flow.ts";
 import type { Answers, FlowState, PlanRequest, StepId } from "./flow.ts";
 
@@ -486,10 +486,24 @@ test("엽서 사진: 도시마다 번갈아, 사진 없는 곳은 건너뛰고, 
   const seoul = CURATED.Seoul.photos;
   const busan = CURATED.Busan.photos;
   assert.deepEqual(panelPhotos(["Seoul"]), seoul);
-  assert.deepEqual(panelPhotos(["Seoul", "Busan"]), [seoul[0], busan[0], seoul[1], busan[1], seoul[2]]);
+  assert.deepEqual(panelPhotos(["Seoul", "Busan"]).slice(0, 5), [seoul[0], busan[0], seoul[1], busan[1], seoul[2]]);
   assert.deepEqual(panelPhotos(["Ulsan", "Mokpo"]), CURATED.Mokpo.photos);
   assert.deepEqual(OPEN_PLACES, ["Seoul"]);
   assert.deepEqual(panelPhotos([]), seoul, "빈 엽서 없음");
+});
+
+test("서울 엽서: 동네 12곳마다 다른 장면 — 고른 동네만 고른 순서대로, 안 골랐으면 12곳을 차례로", () => {
+  const scenes = AREAS.map((a) => a.image);
+  assert.equal(new Set(scenes).size, 12, "동네마다 다른 사진");
+  for (const src of scenes) assert.ok(src && existsSync(new URL(`../../../public${src}`, import.meta.url)), `public${src} 이 없다`);
+  assert.deepEqual(CURATED.Seoul.photos, scenes, "서울 엽서 = 동네 장면 12장, 동네 순서대로");
+  assert.deepEqual(postcardPhotos({}), scenes, "아직 안 골랐으면 12곳");
+  assert.deepEqual(postcardPhotos({ area: ["seongsu", "hongdae"] }), [AREAS[6].image, AREAS[5].image], "고른 순서대로");
+  assert.deepEqual(postcardPhotos({ area: ["unsure"] }), scenes, "잘 모르겠어요");
+  assert.deepEqual(postcardPhotos({ area: [], "area:other": ["Mangwon market"] }), scenes, "직접 적은 곳뿐");
+  // 숙소 동네 보기에는 사진을 싣지 않는다 (같은 12곳이지만 이름만)
+  const stayOptions = optionsFor(visibleFields("stayArea", { stay: ["booked"] })[0], { stay: ["booked"] });
+  assert.ok(stayOptions.every((o) => !o.image && !o.description));
 });
 
 // lib/places.ts 의 DESTINATIONS 와 같은 목록 (그 파일은 확장자 없는 import 를 써서 node --test 로 바로 못 불러온다)
