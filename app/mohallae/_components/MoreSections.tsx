@@ -1,6 +1,6 @@
 import Link from "next/link";
 import styles from "../mohallae.module.css";
-import { ask, footer, nav, planHref, plans, steps, type Lang } from "../content";
+import { ask, footer, nav, planHref, plans, steps, withLang, type Lang } from "../content";
 
 /** 무료 초안 vs 전체 일정 ($25). 시안 ③ 아래쪽의 두 카드 자리 — 글은 실제 문구로 바꿨다. */
 export function Plans({ lang }: { lang: Lang }) {
@@ -85,7 +85,7 @@ export function Ask({ lang }: { lang: Lang }) {
         <div>
           <p className="text-[20px] leading-snug font-bold tracking-[-0.01em]">{ask.question[lang]}</p>
           <p className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[15.5px] text-[var(--m-ink-2)]">
-            <Link href="/faq" className={styles.textLink}>
+            <Link href={withLang("/mohallae/faq", lang)} className={styles.textLink}>
               {ask.faq[lang]}
             </Link>
             <Link href="/contact" className={styles.textLink}>
@@ -111,10 +111,10 @@ export function Footer({ lang }: { lang: Lang }) {
         </p>
         <p className="flex items-center gap-5">
           <span>{footer.place[lang]}</span>
-          <Link href="/faq" className={styles.textLink}>
+          <Link href={withLang("/mohallae/faq", lang)} className={styles.textLink}>
             {footer.faq[lang]}
           </Link>
-          <Link href="/privacy" className={styles.textLink}>
+          <Link href={withLang("/mohallae/privacy", lang)} className={styles.textLink}>
             {footer.privacy[lang]}
           </Link>
         </p>

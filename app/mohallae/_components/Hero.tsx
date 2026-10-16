@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import styles from "../mohallae.module.css";
-import { hero, nav, planHref, type Lang } from "../content";
+import { hero, nav, planHref, withLang, type Lang } from "../content";
 import heroPhoto from "@/public/mohallae/hero-bukchon.jpg";
 import CorrectionStrip from "./CorrectionStrip";
 
@@ -46,11 +46,11 @@ export default function Hero({ lang }: { lang: Lang }) {
           <a href="#samples" className={`${styles.navLink} ml-[21px] hidden md:inline`}>
             {nav.samples[lang]}
           </a>
-          <Link href="/faq" className={`${styles.navLink} ml-[20px] hidden md:inline`}>
+          <Link href={withLang("/mohallae/faq", lang)} className={`${styles.navLink} ml-[20px] hidden md:inline`}>
             {nav.faq[lang]}
           </Link>
           <span className="md:ml-[27px]">
-            <LangSwitch lang={lang} />
+            <LangSwitch lang={lang} path="/mohallae" tone="light" />
           </span>
           <Link
             href={planHref(lang)}
@@ -92,15 +92,26 @@ export default function Hero({ lang }: { lang: Lang }) {
   );
 }
 
-/** EN | 한국어. 주소 끝 `?lang=` 만 바꾼다. 지금 고른 쪽은 굵게, 다른 쪽은 흐리게. */
-function LangSwitch({ lang }: { lang: Lang }) {
+/**
+ * EN | 한국어. 지금 보는 주소(path)에서 끝의 `?lang=` 만 바꾼다. 지금 고른 쪽은 굵게, 다른 쪽은 흐리게.
+ * tone — "light": 사진 위(이 첫 화면), 흰 글자. "dark": 흰 막대 위(자주 묻는 것 등의 SubHeader), 잉크색 글자.
+ */
+export function LangSwitch({ lang, path, tone }: { lang: Lang; path: string; tone: "light" | "dark" }) {
+  const look =
+    tone === "light"
+      ? { on: "font-semibold text-white", off: "text-white/70", bar: "text-white/60" }
+      : {
+          on: `${styles.navLinkDark} font-semibold text-[var(--m-ink)]`,
+          off: `${styles.navLinkDark} text-[var(--m-ink-3)]`,
+          bar: "text-[var(--m-ink-3)]/60",
+        };
   const item = (code: Lang, label: string, hrefLang: string) => (
     <Link
-      href={code === "en" ? "/mohallae?lang=en" : "/mohallae?lang=ko"}
+      href={`${path}?lang=${code}`}
       hrefLang={hrefLang}
       lang={hrefLang}
       aria-current={lang === code ? "true" : undefined}
-      className={`${styles.navLink} ${lang === code ? "font-semibold text-white" : "text-white/70"}`}
+      className={`${styles.navLink} ${lang === code ? look.on : look.off}`}
     >
       {label}
     </Link>
@@ -108,7 +119,7 @@ function LangSwitch({ lang }: { lang: Lang }) {
   return (
     <span className="flex items-center gap-1.5" role="group" aria-label={nav.langLabel[lang]}>
       {item("en", "EN", "en")}
-      <span aria-hidden="true" className="text-white/60">
+      <span aria-hidden="true" className={look.bar}>
         |
       </span>
       {item("ko", "한국어", "ko")}

@@ -323,10 +323,23 @@
 .navLink { border-radius: 6px; }
 .navLink:hover { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
 .navLink:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+/* 흰 바탕 위의 내비 (작은 화면들의 위 막대 SubHeader · 목차). 사진이 없으니 초점 테두리를 잉크색으로.
+   .navLink 와 같이 붙여 쓰고, 이 줄이 .navLink 보다 아래에 있어야 이긴다 */
+.navLinkDark:focus-visible { outline-color: var(--m-ink); }
+/* 지금 보고 있는 화면의 메뉴는 밑줄을 늘 보여 준다 */
+.navLinkDark[aria-current="page"] { text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
 
 .textLink { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); }
 .textLink:hover { text-decoration-color: currentColor; }
 .textLink:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; border-radius: 4px; }
+
+/* ── 자주 묻는 것 (/mohallae/faq) ─────────────────────
+   details/summary 의 기본 삼각형을 지운다 (사파리는 따로 지워야 한다).
+   초점 테두리는 줄 안쪽에 그린다 — 바깥에 그리면 위아래 줄과 카드 둥근 모서리를 넘는다.
+   둥글기를 카드와 같게 두어서 첫 줄·끝 줄에서 카드 모서리와 나란히 휜다. */
+.faqSummary { border-radius: var(--m-radius); }
+.faqSummary::-webkit-details-marker { display: none; }
+.faqSummary:focus-visible { outline: 2px solid var(--m-ink); outline-offset: -4px; }
 
 @media (prefers-reduced-motion: reduce) {
   .card, .pillLight, .pillDark { transition: none; }

@@ -23,6 +23,12 @@ export function langFrom(value: string | string[] | undefined): Lang {
 /** '무료 초안 받기' 단추가 가는 곳 — 새 입력 흐름. 영어로 보던 손님은 영어로 이어서 묻는다 */
 export const planHref = (lang: Lang) => `/mohallae/plan${lang === "en" ? "?lang=en" : ""}`;
 
+/**
+ * 새 화면들 사이의 링크 주소. planHref 와 같은 규칙 — 영어로 보던 손님은 `?lang=en` 을 달고 간다.
+ * 자리 표시(#how)는 뒤에 붙인다: withLang("/mohallae", lang) + "#how"
+ */
+export const withLang = (path: string, lang: Lang) => `${path}${lang === "en" ? "?lang=en" : ""}`;
+
 export const nav = {
   how: { ko: "이용 방법", en: "How it works" },
   samples: { ko: "샘플", en: "Samples" },
