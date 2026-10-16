@@ -1,0 +1,63 @@
+import Link from "next/link";
+import type { FreeItinerary } from "@/lib/types";
+import base from "../../../mohallae.module.css";
+import styles from "../plan.module.css";
+import { draftCopy } from "../copy";
+import { nav, planHref, type Lang } from "../../../content";
+import CopyLink from "./CopyLink";
+import Facts from "./Facts";
+
+/**
+ * 닫는 띠 (시안 ③ 맨 아래). 왼쪽은 숙소·식당·예산, 오른쪽은 "팁 하나를 보셨습니다" 와 버튼 둘.
+ *
+ * '전체 일정 받기'는 **지금 쓰는 신청 화면(/plan/[id]/consult)** 으로 간다. 신청·결제 쪽은 이번 범위가 아니라
+ * 손대지 않는다. 먼저 초안을 다 보여 준 다음에 파는 자리라서 화면 맨 끝에 둔다 (PRODUCT.md 원칙 2).
+ */
+export default function ClosingBand({
+  planId,
+  trip,
+  lang,
+  isSample = false,
+}: {
+  planId: string;
+  trip: FreeItinerary;
+  lang: Lang;
+  isSample?: boolean;
+}) {
+  const facts = [
+    { label: draftCopy.stay[lang], value: trip.picks.stay },
+    { label: draftCopy.eat[lang], value: trip.picks.dining },
+    { label: draftCopy.total[lang], value: trip.totalEstimate },
+  ];
+
+  return (
+    <section className={styles.band} aria-label={draftCopy.fullPlan[lang]}>
+      <div className={`${styles.wrap} ${styles.bandInner}`}>
+        <Facts items={facts} lang={lang} />
+
+        <div className={styles.actions}>
+          <p className={styles.oneTip}>{draftCopy.oneTip[lang]}</p>
+          {isSample ? (
+            // 샘플은 남의 여행이다: 이 초안으로 신청하지 않고, 내 여행으로 무료 초안을 받으러 간다 (랜딩과 같은 글)
+            <div className={styles.buttons}>
+              <Link href={planHref(lang)} className={`${base.pillDark} ${styles.cta}`}>
+                {nav.cta[lang]}
+              </Link>
+            </div>
+          ) : (
+            <div className={styles.buttons}>
+              <Link href={`/plan/${planId}/consult`} className={`${base.pillDark} ${styles.cta}`}>
+                {draftCopy.fullPlan[lang]}
+                <span aria-hidden="true" className="mx-2">
+                  ·
+                </span>
+                {draftCopy.price}
+              </Link>
+              <CopyLink lang={lang} />
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
