@@ -1,120 +1,156 @@
 import Link from "next/link";
-import styles from "../mohallae.module.css";
+import base from "../mohallae.module.css";
+import styles from "../landing.module.css";
 import { ask, footer, nav, planHref, plans, steps, withLang, type Lang } from "../content";
 
-/** 무료 초안 vs 전체 일정 ($25). 시안 ③ 아래쪽의 두 카드 자리 — 글은 실제 문구로 바꿨다. */
+const Check = () => (
+  <svg viewBox="0 0 20 20" aria-hidden="true">
+    <path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+/** 무료 vs 원하는 날만 열기 (시안 21-5). 값은 기획 문서 그대로 — 첫 번째 날 $25 · 2–4번째 $15 · 5번째부터 $10 */
 export function Plans({ lang }: { lang: Lang }) {
+  const { free, days } = plans;
   return (
-    <section aria-labelledby="plans-heading" className="mt-20 bg-[var(--m-band)] py-16 md:mt-24 md:py-20">
-      <div className={styles.wrap}>
-        <h2 id="plans-heading" className="text-[clamp(26px,2.4vw,34px)] leading-tight font-bold tracking-[-0.015em]">
+    <section aria-labelledby="plans-heading" className={styles.wrap}>
+      <div className={styles.sh}>
+        <h2 id="plans-heading" className={styles.h2}>
           {plans.heading[lang]}
         </h2>
-        <div className="mt-8 grid gap-5 md:grid-cols-2 md:gap-6">
-          <article className={`${styles.panel} flex flex-col p-6 md:p-8`}>
-            <h3 className="text-[22px] font-bold tracking-[-0.01em]">
-              {plans.free.name[lang]} <span className="font-semibold text-[var(--m-ink-3)]">· {plans.free.price}</span>
-            </h3>
-            <CheckList items={plans.free.items[lang]} />
-            <div className="mt-auto pt-7">
-              <Link href={planHref(lang)} className={`${styles.pillDark} h-[48px] px-7 text-[16px]`}>
-                {nav.cta[lang]}
-              </Link>
-            </div>
-          </article>
-          <article className={`${styles.panel} flex flex-col p-6 md:p-8`}>
-            <h3 className="text-[22px] font-bold tracking-[-0.01em]">
-              {plans.full.name[lang]} <span className="font-semibold text-[var(--m-ink-3)]">· {plans.full.price}</span>
-            </h3>
-            <p className="mt-1 text-[14.5px] text-[var(--m-ink-2)]">{plans.full.priceNote[lang]}</p>
-            <CheckList items={plans.full.items[lang]} />
-            <p className="mt-auto pt-7 text-[15px] leading-relaxed text-[var(--m-ink-2)]">{plans.full.how[lang]}</p>
-          </article>
-        </div>
+      </div>
+      <div className={styles.grid}>
+        <article className={`${styles.t} ${styles.tPlan}`}>
+          <h3>
+            {free.name[lang]} <span className={styles.price}>{free.price}</span>
+          </h3>
+          <ul className={styles.checks}>
+            {free.items[lang].map((item) => (
+              <li key={item}>
+                <Check />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <div className={styles.pfoot}>
+            <Link href={planHref(lang)} className={`${styles.btn} ${styles.btnAcc} ${styles.btnLg}`}>
+              {nav.cta[lang]}
+            </Link>
+          </div>
+        </article>
+        <article className={`${styles.t} ${styles.tInk} ${styles.tPlan}`}>
+          <h3>
+            {days.name[lang]}{" "}
+            <span className={styles.price}>
+              {lang === "en" && <small className={styles.before}>{days.from.en}</small>}
+              {days.price}
+              {lang === "ko" && <small className={styles.after}>{days.from.ko}</small>}
+            </span>
+          </h3>
+          <ul className={styles.ladder}>
+            {days.ladder[lang].map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ul>
+          <p className={styles.pnote}>{days.example[lang]}</p>
+          <ul className={styles.checks}>
+            {days.items[lang].map((item) => (
+              <li key={item}>
+                <Check />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <div className={styles.pfoot}>
+            <p>{days.how[lang]}</p>
+          </div>
+        </article>
       </div>
     </section>
   );
 }
 
-function CheckList({ items }: { items: string[] }) {
-  return (
-    <ul className="mt-5 space-y-3">
-      {items.map((item) => (
-        <li key={item} className="flex gap-3 text-[15.5px] leading-snug">
-          <svg viewBox="0 0 20 20" aria-hidden="true" className="mt-[2px] size-[18px] shrink-0 text-[var(--m-ink)]">
-            <path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/** 이용 방법 3단계. 기존 랜딩의 steps 글 그대로 — 두 도막으로 나눠 든 것도 그대로 따른다. */
+/** 이용 방법 세 칸 + 먼저 물어보고 싶은 사람에게 (자주 묻는 것 / 문의) */
 export function HowItWorks({ lang }: { lang: Lang }) {
   return (
-    <section id="how" aria-labelledby="how-heading" className="scroll-mt-6 py-16 md:py-24">
-      <div className={styles.wrap}>
-        <h2 id="how-heading" className="text-[clamp(26px,2.4vw,34px)] leading-tight font-bold tracking-[-0.015em]">
+    <section id="how" aria-labelledby="how-heading" className={styles.wrap}>
+      <div className={styles.sh}>
+        <h2 id="how-heading" className={styles.h2}>
           {nav.how[lang]}
         </h2>
-        <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
-          {steps.map((s, i) => (
-            <li key={i} className="border-t border-[var(--m-line)] pt-6">
-              <h3 className="text-[20px] leading-snug font-bold tracking-[-0.01em]">
-                <span className="mr-2 text-[var(--m-ink-3)] tabular-nums">{i + 1}</span>
-                {s.title[lang]}
-              </h3>
-              <p className="mt-2.5 text-[15.5px] leading-relaxed text-[var(--m-ink-2)]">
-                {s.body[lang][0]} {s.body[lang][1]}
-              </p>
-            </li>
-          ))}
-        </ol>
+      </div>
+      <div className={styles.grid}>
+        {steps.map((s, i) => (
+          <div key={i} className={`${styles.t} ${styles.step}`}>
+            <header>
+              <span className={styles.icon} aria-hidden="true">
+                {i + 1}
+              </span>
+              <span>MOHALLAE</span>
+              <span>{s.tag[lang]}</span>
+            </header>
+            <h3>{s.title[lang]}</h3>
+            <p>{s.body[lang]}</p>
+          </div>
+        ))}
+        <Ask lang={lang} />
       </div>
     </section>
   );
 }
 
-/** 먼저 물어보고 싶은 사람에게 — 자주 묻는 것 / 문의 화면으로. 마지막 버튼. */
-export function Ask({ lang }: { lang: Lang }) {
+function Ask({ lang }: { lang: Lang }) {
   return (
-    <section aria-label={ask.question[lang]} className="pb-20 md:pb-28">
-      <div className={`${styles.wrap} flex flex-col items-start gap-6 rounded-[var(--m-radius)] bg-[var(--m-band)] p-7 md:flex-row md:items-center md:justify-between md:p-10`}>
-        <div>
-          <p className="text-[20px] leading-snug font-bold tracking-[-0.01em]">{ask.question[lang]}</p>
-          <p className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[15.5px] text-[var(--m-ink-2)]">
-            <Link href={withLang("/mohallae/faq", lang)} className={styles.textLink}>
-              {ask.faq[lang]}
-            </Link>
-            <Link href="/contact" className={styles.textLink}>
-              {ask.contact[lang]}
-            </Link>
-          </p>
-        </div>
-        <Link href={planHref(lang)} className={`${styles.pillDark} h-[50px] shrink-0 px-8 text-[16.5px]`}>
-          {ask.cta[lang]}
-        </Link>
+    <div className={`${styles.t} ${styles.tInk} ${styles.tAsk}`}>
+      <div>
+        <b>{ask.question[lang]}</b>
+        <p className={styles.l2}>
+          <Link href={withLang("/mohallae/faq", lang)}>{ask.faq[lang]}</Link>
+          <Link href="/contact">{ask.contact[lang]}</Link>
+        </p>
       </div>
-    </section>
+      <Link href={planHref(lang)} className={`${styles.btn} ${styles.btnAcc} ${styles.btnLg}`}>
+        {ask.cta[lang]}
+      </Link>
+    </div>
   );
 }
 
+/** 랜딩 꼬리말 (시안 21-5) */
+export function LandingFooter({ lang }: { lang: Lang }) {
+  return (
+    <footer className={`${styles.wrap} ${styles.foot}`}>
+      <p>
+        <span className={styles.icon} aria-hidden="true">
+          m
+        </span>
+        <b>mohallae</b>
+        <span>{footer.tagline}</span>
+      </p>
+      <nav aria-label={lang === "ko" ? "꼬리말" : "Footer"}>
+        <span>{footer.place[lang]}</span>
+        <Link href={withLang("/mohallae/faq", lang)}>{footer.faq[lang]}</Link>
+        <Link href={withLang("/mohallae/privacy", lang)}>{footer.privacy[lang]}</Link>
+      </nav>
+    </footer>
+  );
+}
+
+/** 자주 묻는 것 · 개인정보 처리방침 화면의 꼬리말 (그 화면들은 아직 이전 모양) */
 export function Footer({ lang }: { lang: Lang }) {
   return (
     <footer className="border-t border-[var(--m-line)]">
-      <div className={`${styles.wrap} flex flex-col gap-3 py-8 text-[13.5px] text-[var(--m-ink-3)] sm:flex-row sm:items-center sm:justify-between`}>
+      <div className={`${base.wrap} flex flex-col gap-3 py-8 text-[13.5px] text-[var(--m-ink-3)] sm:flex-row sm:items-center sm:justify-between`}>
         <p className="flex items-baseline gap-3">
           <span className="text-[18px] font-bold tracking-[-0.03em] text-[var(--m-ink)] lowercase">mohallae</span>
           <span>{footer.tagline}</span>
         </p>
         <p className="flex items-center gap-5">
           <span>{footer.place[lang]}</span>
-          <Link href={withLang("/mohallae/faq", lang)} className={styles.textLink}>
+          <Link href={withLang("/mohallae/faq", lang)} className={base.textLink}>
             {footer.faq[lang]}
           </Link>
-          <Link href={withLang("/mohallae/privacy", lang)} className={styles.textLink}>
+          <Link href={withLang("/mohallae/privacy", lang)} className={base.textLink}>
             {footer.privacy[lang]}
           </Link>
         </p>

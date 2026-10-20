@@ -1,5 +1,6 @@
 /*
-  새 랜딩(/mohallae) 전용 스타일. CSS Module 이라 이 화면 밖으로 새지 않는다.
+  /mohallae 의 입력 흐름 · 결과 · 자주 묻는 것 · 개인정보 화면이 같이 쓰는 스타일. CSS Module 이라 밖으로 새지 않는다.
+  랜딩(첫 화면)은 2026-10-20 부터 landing.module.css(시안 21-5)를 쓴다 — 여기 남은 고쳐 쓰기 띠는 입력 흐름의 기다리는 화면용이다.
   배치·글자 크기 대부분은 각 파일의 Tailwind 이름표에 있고, 여기에는
   ① 색 이름(토큰) ② 사진 위 어둡게 깔기 ③ 고쳐 쓰기 움직임 처럼 이름표로 쓰기 어려운 것만 둔다.
 
@@ -34,36 +35,6 @@
   width: min(100% - 2 * clamp(20px, 6.7vw, 160px), 1600px);
   margin-inline: auto;
 }
-
-/* ── 첫 화면 ───────────────────────────────────────── */
-
-.hero {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  min-height: max(480px, 70.5svh);
-  color: #fff;
-  background: #2b2622; /* 사진이 뜨기 전 */
-}
-.heroImg { z-index: -2; object-fit: cover; object-position: 62% 45%; }
-@media (min-width: 768px) { .heroImg { object-position: center 40%; } }
-
-/* 사진 위 흰 글자가 읽히도록 **글자가 있는 곳만** 어둡게 깐다 (접근성: 내비 4.5:1, 제목 3:1).
-   맨 위 띠 = 내비, 가운데 타원 = 제목·띠·버튼, 맨 아래 = 사진이 흰 바탕으로 끝나는 자리.
-   나머지 하늘과 골목은 시안처럼 밝게 둔다. */
-.heroScrim {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(180deg, rgb(10 12 24 / 0.62) 0%, rgb(10 12 24 / 0.52) 9%, rgb(10 12 24 / 0) 20%),
-    radial-gradient(44% 34% at 50% 40%, rgb(10 12 24 / 0.36), rgb(10 12 24 / 0) 100%),
-    linear-gradient(0deg, rgb(10 12 24 / 0.32) 0%, rgb(10 12 24 / 0) 30%);
-}
-.headline { text-shadow: 0 2px 28px rgb(10 12 24 / 0.28); }
-.heroNav { text-shadow: 0 1px 12px rgb(10 12 24 / 0.35); }
-.heroNote { text-shadow: 0 1px 10px rgb(10 12 24 / 0.45); }
 
 /* ── 고쳐 쓰기 띠 ───────────────────────────────────
    한 바퀴 24초 = 팁 4개 × 6초. 팁 i 는 i × 6초 늦게 같은 움직임을 탄다.
@@ -138,7 +109,7 @@
   text-transform: uppercase;
 }
 /* 한글에는 영문 대문자용 자간을 주지 않는다 */
-.tipLabel:lang(ko), .tipBadge:lang(ko) { letter-spacing: 0; }
+.tipLabel:lang(ko) { letter-spacing: 0; }
 .stripTip { margin: 0; color: var(--m-red); font-size: 14.5px; line-height: 1.32; font-weight: 600; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -195,129 +166,31 @@
   .stripFit .stripPlan, .stripFit .stripTip { font-size: 15px; }
 }
 
-/* ── 샘플 카드 ───────────────────────────────────── */
-
-.card {
-  position: relative; /* 안의 화면 낭독기용 글(sr-only)이 옆으로 넘치는 카드 줄 밖으로 새지 않게 */
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 1px 2px rgb(14 20 40 / 0.07), 0 8px 22px -12px rgb(14 20 40 / 0.3);
-  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s;
-}
-.card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgb(14 20 40 / 0.07), 0 16px 30px -14px rgb(14 20 40 / 0.35); }
-.card:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
-.cardPhoto { position: relative; aspect-ratio: 30 / 11; background: var(--m-band); }
-
-/* 폰: 옆으로 넘기는 줄. 다음 카드가 살짝 보여서 넘길 수 있다는 걸 알린다 */
-.cardRow {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: min(78%, 300px);
-  gap: 14px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: clamp(20px, 6.7vw, 90px);
-  padding: 6px clamp(20px, 6.7vw, 90px) 18px;
-  margin-inline: calc(-1 * clamp(20px, 6.7vw, 90px));
-  scrollbar-width: none;
-}
-.cardRow::-webkit-scrollbar { display: none; }
-.cardRow > * { scroll-snap-align: start; }
-@media (min-width: 640px) {
-  .cardRow {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-columns: auto;
-    overflow: visible;
-    padding: 6px 0 18px;
-    margin-inline: 0;
-    gap: 20px;
-  }
-}
-@media (min-width: 1024px) { .cardRow { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(18px, 1.56vw, 28px); } }
-
-/* ── 초안 속 하루 (시안 ③) ──────────────────────── */
+/* ── 흰 카드 (자주 묻는 것 등) ─────────────────────── */
 
 .panel {
   border-radius: var(--m-radius);
   background: #fff;
   box-shadow: var(--m-shadow);
 }
-.timeline { position: relative; --thumb: 64px; --gap: 14px; }
-@media (min-width: 640px) { .timeline { --thumb: 112px; --gap: 22px; } }
-.timeline::before {
-  content: "";
-  position: absolute;
-  left: calc(var(--thumb) + var(--gap) + 3.5px);
-  top: 14px;
-  bottom: 14px;
-  width: 1px;
-  background: var(--m-line);
-}
-.dot { width: 8px; height: 8px; border-radius: 9999px; background: var(--m-ink-3); box-shadow: 0 0 0 4px #fff; }
-/* 현지 팁 묶음. 시안 ③처럼 지운 계획 쪽을 가리키는 빨간 중괄호({)가 앞에 붙는다. */
-.bracket { position: relative; padding-left: 24px; }
-.brace {
-  position: absolute;
-  left: 0;
-  top: 2px;
-  width: 14px;
-  height: calc(100% - 4px);
-  color: var(--m-strike);
-  overflow: visible;
-}
-@media (min-width: 640px) {
-  .bracket { padding-left: 28px; }
-  .brace { width: 16px; }
-}
-/* 시안 ③의 빨간 'LOCAL TIP' 딱지. 흰 글자 / 빨강 4.7:1 */
-.tipBadge {
-  display: inline-block;
-  margin: 0;
-  padding: 3px 7px 2px;
-  border-radius: 6px;
-  background: var(--m-red);
-  color: #fff;
-  font-size: 10.5px;
-  line-height: 1.3;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* 패널이 화면에 들어올 때 한 번만 줄을 긋는다. 기본값은 고쳐 쓴 상태 —
-   스크립트(PlayOnView)가 '아직 안 보임' 을 확인했을 때만 처음 상태로 되돌려 둔다. */
-[data-motion="armed"] .panelStrike { background-size: 0% 2px; }
-[data-motion="armed"] .panelTip { opacity: 0; transform: translateX(-10px); }
-[data-motion="play"] .panelStrike { animation: panel-strike 0.9s 0.25s cubic-bezier(0.6, 0, 0.3, 1) both; }
-[data-motion="play"] .panelTip { animation: panel-tip 0.5s 1.05s ease-out both; }
-@keyframes panel-strike { from { background-size: 0% 2px; } to { background-size: 100% 2px; } }
-@keyframes panel-tip { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
 
 /* ── 버튼 ────────────────────────────────────────── */
 /* Tailwind 이름표(hidden, sm:inline-flex …)가 이기도록 components 층에 둔다.
    층에 넣지 않은 CSS 는 Tailwind 의 utilities 층보다 항상 이겨서, 폰에서 숨긴 버튼이 보였다. */
 @layer components {
-  .pillLight, .pillDark {
+  .pillDark {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
     font-weight: 600;
+    background: var(--m-ink);
+    color: #fff;
     transition: background-color 0.2s, color 0.2s, transform 0.2s;
   }
-  .pillLight { background: #fff; color: var(--m-ink); }
-  .pillLight:hover { background: #eef0f4; }
-  .pillDark { background: var(--m-ink); color: #fff; }
   .pillDark:hover { background: #262d45; }
-  .pillLight:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
   .pillDark:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
-  .pillLight:active, .pillDark:active { transform: scale(0.98); }
-  .pillHero { font-weight: 700; }
+  .pillDark:active { transform: scale(0.98); }
 }
 
 .navLink { border-radius: 6px; }
@@ -342,6 +215,5 @@
 .faqSummary:focus-visible { outline: 2px solid var(--m-ink); outline-offset: -4px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .card, .pillLight, .pillDark { transition: none; }
-  .card:hover { transform: none; }
+  .pillDark { transition: none; }
 }
