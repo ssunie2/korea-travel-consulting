@@ -2,22 +2,26 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import styles from "../landing.module.css";
 import { dayOne, nav, planHref, samples, tipLabel, type Lang } from "../content";
+import { photo } from "../photos";
 
-import cardSeoulSunset from "@/public/mohallae/card-seoul-sunset.jpg";
+// 서울 밖 샘플 카드 두 장(부산·경주)의 사진 — 아직 사진 대장 밖이다.
+// 서울만 도는 새 샘플 초안으로 바꾸면 대장에 자리(samples.s2 · samples.s4)를 만들어 그 사진으로 바꾸고 이 부분을 지운다.
 import postcardBusan from "@/public/mohallae/postcard-busan.jpg";
-import cardSeoulHanok from "@/public/mohallae/card-seoul-hanok.jpg";
 import postcardGyeongju from "@/public/mohallae/postcard-gyeongju.jpg";
-// 예시 칸의 작은 사진 — 다른 화면의 사진을 같이 쓴다 (파일은 그대로, 읽기만 한다)
-import seongsu from "@/public/mohallae/postcards/seoul-seongsu.jpg";
-import euljiro from "@/public/mohallae/postcards/seoul-euljiro.jpg";
-import bukchon from "@/public/landing/bukchon.webp";
-import hanRiver from "@/public/landing/han-river.webp";
 
-/**
- * 샘플 사진 4장. 칸 비율에 가까운 사진을 고른다 — 좁은 칸(s2)·큰 칸(s4)에는 가로가 긴 카드 사진 대신
- * 같은 장면의 엽서(3:2)를 써서 잘려 나가는 부분을 줄인다.
- */
-const CARD_PHOTOS: StaticImageData[] = [cardSeoulSunset, postcardBusan, cardSeoulHanok, postcardGyeongju];
+const NOT_YET_SEOUL: Record<string, StaticImageData> = {
+  "bb69139f-db3e-47fc-94f7-f7779df74f49": postcardBusan,
+  "5c297ae8-61fe-4b98-aae1-ac6476e8cade": postcardGyeongju,
+};
+
+/** 카드 사진 — 서울 사진은 사진 대장에서, 서울 밖 두 장은 위의 엽서에서 */
+function cardPhoto(item: (typeof samples.items)[number], lang: Lang) {
+  if (item.photo) return photo(item.photo, lang);
+  const src = NOT_YET_SEOUL[item.id];
+  if (!src) throw new Error(`샘플 카드 ${item.id} 에 사진이 없다`);
+  return { src, alt: item.alt?.[lang] ?? "", position: undefined };
+}
+
 const CARD_CLASS = [styles.s1, styles.s2, styles.s3, styles.s4];
 const CARD_SIZES = [
   "(min-width: 1001px) 640px, 100vw",
@@ -25,7 +29,6 @@ const CARD_SIZES = [
   "(min-width: 1001px) 320px, (min-width: 641px) 33vw, 100vw",
   "(min-width: 1001px) 540px, (min-width: 641px) 33vw, 100vw",
 ];
-const THUMBS = { bukchon, seongsu, hanRiver, euljiro };
 
 /**
  * 두 번째 섹션 — "초안은 이렇게 생겼습니다" (시안 21-5 배치).
@@ -42,13 +45,22 @@ export default function Samples({ lang }: { lang: Lang }) {
         </h2>
       </div>
       <div className={styles.grid}>
-        {samples.items.map((s, i) => (
+        {samples.items.map((s, i) => {
+          const card = cardPhoto(s, lang);
+          return (
           <Link
             key={s.id}
             href={`/mohallae/plan/${s.id}${lang === "en" ? "?lang=en" : ""}`}
             className={`${styles.t} ${styles.sample} ${CARD_CLASS[i]}`}
           >
-            <Image src={CARD_PHOTOS[i]} alt={s.alt[lang]} fill placeholder="blur" sizes={CARD_SIZES[i]} />
+            <Image
+              src={card.src}
+              alt={card.alt}
+              fill
+              placeholder="blur"
+              sizes={CARD_SIZES[i]}
+              style={card.position ? { objectPosition: card.position } : undefined}
+            />
             <span className={styles.sampleTag}>
               <i className={styles.icon} aria-hidden="true">
                 m
@@ -63,7 +75,8 @@ export default function Samples({ lang }: { lang: Lang }) {
               </svg>
             </span>
           </Link>
-        ))}
+          );
+        })}
 
         <div className={`${styles.t} ${styles.tLead}`}>
           <div>
@@ -103,6 +116,12 @@ const STOP_ICONS = {
   ),
 };
 
+/** 예시 칸의 작은 사진. 장식이라 alt 는 비운다 (안 제목이 바로 옆에 있다) */
+function Thumb({ slot, lang, size }: { slot: (typeof dayOne.variants)[number]["photo"]; lang: Lang; size: string }) {
+  const p = photo(slot, lang);
+  return <Image src={p.src} alt="" fill sizes={size} style={p.position ? { objectPosition: p.position } : undefined} />;
+}
+
 /** 예시 칸 — 1일차 안 4개. 무료로 연 안(보통)은 정거장·팁까지, 잠긴 셋은 제목·예산과 회색 줄만 */
 function DayExample({ lang }: { lang: Lang }) {
   const open = dayOne.variants.find((v) => v.open)!;
@@ -128,7 +147,7 @@ function DayExample({ lang }: { lang: Lang }) {
             <li key={stop.time} className={styles.row}>
               {stop.icon === "photo" ? (
                 <span className={styles.thumb}>
-                  <Image src={THUMBS[open.photo]} alt="" fill sizes="52px" />
+                  <Thumb slot={open.photo} lang={lang} size="52px" />
                 </span>
               ) : (
                 <span className={styles.ic} aria-hidden="true">
@@ -158,7 +177,7 @@ function DayExample({ lang }: { lang: Lang }) {
         {locked.map((v) => (
           <li key={v.title.ko} className={styles.lk}>
             <span className={styles.thumb}>
-              <Image src={THUMBS[v.photo]} alt="" fill sizes="44px" />
+              <Thumb slot={v.photo} lang={lang} size="44px" />
             </span>
             <div>
               <p className={styles.lt}>

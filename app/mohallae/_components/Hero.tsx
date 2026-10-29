@@ -3,7 +3,7 @@ import Link from "next/link";
 import base from "../mohallae.module.css";
 import styles from "../landing.module.css";
 import { commonPlan, dayOne, dayPrice, hero, nav, planHref, tipLabel, withLang, type Lang } from "../content";
-import bukchon from "@/public/landing/bukchon.webp";
+import { photo } from "../photos";
 
 /**
  * 첫 화면 — 시안 21-5 '결과 미리보기' + 날짜별 가격 막대 (2026-10-20 써니 결정).
@@ -73,10 +73,12 @@ const Lock = () => (
 /** 초안 결과 화면을 잠금 화면처럼 — 예시. 화면 낭독기에는 칸 전체를 한 문장(screenLabel)으로 읽어 준다 */
 function ResultPreview({ lang }: { lang: Lang }) {
   const first = dayOne.stops[0];
+  // 잠금화면 배경 — 사진 대장에서 이 자리에 정한 사진 (칸 전체를 한 문장으로 읽어 주므로 사진 alt 는 비운다)
+  const wall = photo("hero.lock", lang);
   return (
     <div className={`${styles.t} ${styles.tLock}`} role="img" aria-label={dayOne.screenLabel[lang]}>
       <Image
-        src={bukchon}
+        src={wall.src}
         alt=""
         fill
         loading="eager"
@@ -84,6 +86,7 @@ function ResultPreview({ lang }: { lang: Lang }) {
         placeholder="blur"
         sizes="(min-width: 1001px) 40vw, 100vw"
         className={styles.lockImg}
+        style={wall.position ? { objectPosition: wall.position } : undefined}
       />
       <span className={styles.sbar} aria-hidden="true">
         <svg viewBox="0 0 18 12">

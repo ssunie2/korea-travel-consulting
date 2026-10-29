@@ -13,6 +13,7 @@
  * 영어로 바뀐다(EN | 한국어 단추). 아무것도 안 붙이면 LANG 을 따른다.
  */
 import { LANG } from "@/lib/copy";
+import type { Slot } from "./photo-ledger";
 
 export type Lang = "ko" | "en";
 export type Pair<T> = { ko: T; en: T };
@@ -78,32 +79,33 @@ export const dayOne = {
       tier: { ko: "아끼는", en: "Budget" },
       title: { ko: "북촌 골목과 광장시장", en: "Bukchon lanes & Gwangjang Market" },
       cost: { ko: "1인 약 4만 원", en: "~₩40K pp" },
-      photo: "bukchon",
+      photo: "example.bukchon",
     },
     {
       tier: { ko: "보통", en: "Standard" },
       title: { ko: "성수 카페와 서울숲 노을", en: "Seongsu cafés, Seoul Forest sunset" },
       cost: { ko: "1인 약 9만 원", en: "~₩90K pp" },
-      photo: "seongsu",
+      photo: "example.seongsu",
       open: true,
     },
     {
       tier: { ko: "여유", en: "Comfort" },
       title: { ko: "여의도 한강과 남산 야경", en: "Yeouido riverside, Namsan at night" },
       cost: { ko: "1인 약 15만 원", en: "~₩150K pp" },
-      photo: "hanRiver",
+      photo: "example.hanRiver",
     },
     {
       tier: { ko: "밤 산책", en: "Night walk" },
       title: { ko: "을지로 골목과 오래된 술집", en: "Euljiro alleys & old pubs" },
       cost: { ko: "1인 약 8만 원", en: "~₩80K pp" },
-      photo: "euljiro",
+      photo: "example.euljiro",
     },
   ] as {
     tier: Pair<string>;
     title: Pair<string>;
     cost: Pair<string>;
-    photo: "bukchon" | "seongsu" | "hanRiver" | "euljiro";
+    /** 예시 칸에 붙는 작은 사진의 자리 (사진 대장 photo-ledger.ts) */
+    photo: Slot;
     open?: boolean;
   }[],
   // 무료로 연 안(성수)의 정거장. 첫 정거장만 흔한 계획에 줄을 긋는다.
@@ -240,6 +242,8 @@ export const samples = {
     en: "Tell us about your trip and we'll make 3–5 plans for each day. One Day 1 plan is free to see in full.",
   },
   // 기존 랜딩 SAMPLES 와 같은 네 개. 실제로 폼을 거쳐 만들어 저장된 초안이다.
+  // 사진: photo 는 사진 대장의 자리(서울 사진 20장 중 하나), alt 는 아직 대장 밖 사진을 쓰는 카드의 설명.
+  // 서울 밖 두 장(부산·경주)은 서울만 도는 새 샘플 초안으로 바꿀 때 대장의 사진으로 바꾼다.
   items: [
     {
       id: "afe82bca-e5d1-49d1-b0fb-2517d3a698ce",
@@ -248,10 +252,7 @@ export const samples = {
         ko: "처음 만나는 서울: 3일간의 문화와 미식 여정",
         en: "Seoul for the first time: three days of culture and food",
       },
-      alt: {
-        ko: "해 질 녘 한옥 지붕 너머로 보이는 N서울타워",
-        en: "N Seoul Tower beyond hanok rooftops at sunset",
-      },
+      photo: "samples.s1",
     },
     {
       id: "bb69139f-db3e-47fc-94f7-f7779df74f49",
@@ -269,10 +270,7 @@ export const samples = {
         ko: "첫 서울 여행을 위한 여유로운 가족 힐링 4일",
         en: "Four unhurried family days on a first trip to Seoul",
       },
-      alt: {
-        ko: "한옥 처마 사이로 보이는 남산과 N서울타워",
-        en: "Namsan and N Seoul Tower between hanok eaves",
-      },
+      photo: "samples.s3",
     },
     {
       id: "5c297ae8-61fe-4b98-aae1-ac6476e8cade",
@@ -289,7 +287,7 @@ export const samples = {
         en: "A stone pagoda in a temple yard under autumn hills",
       },
     },
-  ],
+  ] as { id: string; who: Pair<string>; title: Pair<string>; photo?: Slot; alt?: Pair<string> }[],
 };
 
 /** 이용 방법 세 칸. tag 는 칸 오른쪽 위 꼬리표 */
