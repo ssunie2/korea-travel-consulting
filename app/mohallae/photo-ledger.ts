@@ -1,7 +1,7 @@
 import type { Pair } from "./content";
 
 /**
- * 사진 대장 — 새 랜딩에 쓰는 서울 사진 20장과, 사진마다 쓰는 자리 (써니 2026-10-30).
+ * 사진 대장 — 새 랜딩에 쓰는 서울 사진(만든 20장 — 지금 18장, 다시 만든 2장은 받는 대로 더함)과, 사진마다 쓰는 자리 (써니 2026-10-30).
  *
  * 규칙 (photo-ledger.test.ts 가 지킨다)
  * - **같은 사진은 사이트에서 한 곳에만 쓴다.** 사진 하나에 자리 하나, 자리 하나에 사진 하나.
@@ -99,7 +99,8 @@ export const SEOUL_PHOTOS: LedgerPhoto[] = [
     id: "heunginjimun-night",
     area: "을지로·동대문",
     alt: { ko: "불 밝힌 흥인지문(동대문)", en: "Heunginjimun Gate lit up at dusk" },
-    slot: null,
+    // 밤하늘이 위에 있어 잠금화면의 흰 글씨가 잘 읽힌다. 세로로 잘려도 문 한가운데가 남는다
+    slot: "hero.lock",
   },
   // 성수·서울숲
   {
@@ -125,12 +126,6 @@ export const SEOUL_PHOTOS: LedgerPhoto[] = [
     id: "yeonnam-street",
     area: "홍대·연남",
     alt: { ko: "작은 가게가 늘어선 연남동 골목", en: "A Yeonnam-dong lane of small shops and cafés" },
-    slot: null,
-  },
-  {
-    id: "hongdae-busker",
-    area: "홍대·연남",
-    alt: { ko: "저녁 홍대 거리 공연", en: "A street musician in Hongdae in the evening" },
     slot: null,
   },
   // 이태원·한남
@@ -166,10 +161,7 @@ export const SEOUL_PHOTOS: LedgerPhoto[] = [
     alt: { ko: "올림픽공원 나홀로나무", en: "The lone tree in Olympic Park" },
     slot: "samples.s3",
   },
-  {
-    id: "olympic-peacegate",
-    area: "잠실",
-    alt: { ko: "올림픽공원 평화의 문", en: "The World Peace Gate in Olympic Park" },
-    slot: null,
-  },
 ];
+
+// 다시 만든 2장 — 써니 맥에서 받으면(.impeccable/plates/download-seoul-landing-2.sh) 대장에 더한다.
+// 홍대 거리 공연: 앞사람이 크게 나와서 사람을 작게 다시 만듦 · 몽촌토성: 평화의 문 사진에 오륜 마크(상표)가 보여서 바꿈

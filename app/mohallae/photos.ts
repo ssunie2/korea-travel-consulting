@@ -2,7 +2,7 @@ import type { StaticImageData } from "next/image";
 import type { Lang } from "./content";
 import { SEOUL_PHOTOS, type Slot } from "./photo-ledger";
 
-// 서울 사진 20장 (사진 대장 photo-ledger.ts). **이 파일에서만 불러온다** — 다른 파일이 직접 불러오면 검사가 막는다.
+// 서울 사진 (사진 대장 photo-ledger.ts). **이 파일에서만 불러온다** — 다른 파일이 직접 불러오면 검사가 막는다.
 import gyeonghoeru from "@/public/mohallae/seoul/gyeonghoeru.jpg";
 import seochonInwangsan from "@/public/mohallae/seoul/seochon-inwangsan.jpg";
 import bukchonLane from "@/public/mohallae/seoul/bukchon-lane.jpg";
@@ -16,13 +16,11 @@ import seoulforestGinkgo from "@/public/mohallae/seoul/seoulforest-ginkgo.jpg";
 import seongsuCourtyard from "@/public/mohallae/seoul/seongsu-courtyard.jpg";
 import seoulforestBridge from "@/public/mohallae/seoul/seoulforest-bridge.jpg";
 import yeonnamStreet from "@/public/mohallae/seoul/yeonnam-street.jpg";
-import hongdaeBusker from "@/public/mohallae/seoul/hongdae-busker.jpg";
 import hannamGallery from "@/public/mohallae/seoul/hannam-gallery.jpg";
 import itaewonRooftop from "@/public/mohallae/seoul/itaewon-rooftop.jpg";
 import banpoFountain from "@/public/mohallae/seoul/banpo-fountain.jpg";
 import ttukseomBike from "@/public/mohallae/seoul/ttukseom-bike.jpg";
 import olympicLonetree from "@/public/mohallae/seoul/olympic-lonetree.jpg";
-import olympicPeacegate from "@/public/mohallae/seoul/olympic-peacegate.jpg";
 
 /** 대장의 id → 사진 파일 */
 const FILES: Record<string, StaticImageData> = {
@@ -39,13 +37,11 @@ const FILES: Record<string, StaticImageData> = {
   "seongsu-courtyard": seongsuCourtyard,
   "seoulforest-bridge": seoulforestBridge,
   "yeonnam-street": yeonnamStreet,
-  "hongdae-busker": hongdaeBusker,
   "hannam-gallery": hannamGallery,
   "itaewon-rooftop": itaewonRooftop,
   "banpo-fountain": banpoFountain,
   "ttukseom-bike": ttukseomBike,
   "olympic-lonetree": olympicLonetree,
-  "olympic-peacegate": olympicPeacegate,
 };
 
 /**
