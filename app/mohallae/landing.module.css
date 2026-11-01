@@ -555,9 +555,12 @@
 .launchLater { margin: 0; display: flex; flex-direction: column; gap: 6px; }
 .launchNow small,
 .launchLater small { font-size: 15px; font-weight: 700; line-height: 1.2; color: rgb(255 255 255 / 0.7); }
-.launchLater small { color: #ff8a63; max-width: 9.5em; } /* 좁은 화면에서는 두 줄로 */
+.launchLater small { max-width: 9.5em; } /* 좁은 화면에서는 두 줄로 */
+/* 주황은 지금 값($25)에 — 손님이 지금 내는 값이 먼저 눈에 들어오게 (써니 2026-11-01). 12월부터 $40 은 흰색 */
+.launchNow small,
+.launchNow .price { color: #ff8a63; }
 .launchLater b {
-  font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: #ff8a63;
+  font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: rgb(255 255 255 / 0.88);
   padding-bottom: 4px; /* $25 와 바닥을 맞춘다 */
 }
 .launchArrow { align-self: flex-end; margin-bottom: 18px; color: rgb(255 255 255 / 0.45); }
