@@ -527,7 +527,16 @@
 .price .before { margin-right: 6px; } /* 영어: from $25 */
 /* 출시 기념가 — 위: 주황 표 + D-day, 가운데: 칸 이름, 아래: 지금 $25부터 → 12월 1일부터 첫날 $40 */
 .planHead { view-timeline-name: --launch; }
-.planHead h3 { margin-top: 18px; }
+.planName { margin-top: 18px !important; }
+/* 무료 칸 머리 — 옆 칸과 값 자리를 맞춘다: 회색 '가입 없이' 표 · '언제나' · $0 (높이는 출시 기념가 줄과 같다) */
+.freeTag {
+  display: inline-flex; align-items: center;
+  padding: 9px 17px; border-radius: 999px;
+  background: var(--soft); color: var(--ink-2);
+  font-size: 18px; font-weight: 800; line-height: 1.1; letter-spacing: -0.01em;
+}
+.freeNow { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.freeNow small { font-size: 15px; font-weight: 700; line-height: 1.2; color: var(--ink-3); }
 .launchBar { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .launchBadge {
   display: inline-flex; align-items: center; gap: 6px;

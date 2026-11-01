@@ -21,9 +21,19 @@ export function Plans({ lang }: { lang: Lang }) {
       </div>
       <div className={styles.grid}>
         <article className={`${styles.t} ${styles.tPlan}`}>
-          <h3>
-            {free.name[lang]} <span className={styles.price}>{free.price}</span>
-          </h3>
+          {/* 두 칸의 값을 같은 자리(왼쪽)에 — 옆 칸의 출시 기념가 줄 · '지금' 글자와 같은 높이로 '가입 없이' · '언제나' 를 둔다 (써니 2026-11-01) */}
+          <div>
+            <p className={styles.launchBar}>
+              <span className={styles.freeTag}>{free.tag[lang]}</span>
+            </p>
+            <h3 className={styles.planName}>{free.name[lang]}</h3>
+            <div className={styles.launchPrices}>
+              <p className={styles.freeNow}>
+                <small>{free.always[lang]}</small>
+                <span className={styles.price}>{free.price}</span>
+              </p>
+            </div>
+          </div>
           <ul className={styles.checks}>
             {free.items[lang].map((item) => (
               <li key={item}>
@@ -94,18 +104,28 @@ function LaunchHead({ lang }: { lang: Lang }) {
       </h3>
     );
   }
+  const bar = (
+    <p className={styles.launchBar}>
+      <span className={styles.launchBadge}>
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M8 1.2 9.6 6.4 14.8 8 9.6 9.6 8 14.8 6.4 9.6 1.2 8 6.4 6.4z" fill="currentColor" />
+        </svg>
+        {launch.badge[lang]}
+      </span>
+      <span className={styles.launchCount}>{lang === "ko" ? `D-${left}` : `${left} days left`}</span>
+    </p>
+  );
+  const arrow = (
+    <span className={styles.launchArrow} aria-hidden="true">
+      <svg viewBox="0 0 40 16">
+        <path d="M2 8h33M29 2.5 35.5 8 29 13.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
+  );
   return (
     <div className={styles.planHead}>
-      <p className={styles.launchBar}>
-        <span className={styles.launchBadge}>
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M8 1.2 9.6 6.4 14.8 8 9.6 9.6 8 14.8 6.4 9.6 1.2 8 6.4 6.4z" fill="currentColor" />
-          </svg>
-          {launch.badge[lang]}
-        </span>
-        <span className={styles.launchCount}>{lang === "ko" ? `D-${left}` : `${left} days left`}</span>
-      </p>
-      <h3>{days.name[lang]}</h3>
+      {bar}
+      <h3 className={styles.planName}>{days.name[lang]}</h3>
       <div className={styles.launchPrices}>
         <p className={styles.launchNow}>
           <small>{launch.now[lang]}</small>
@@ -115,11 +135,7 @@ function LaunchHead({ lang }: { lang: Lang }) {
             {lang === "ko" && <small className={styles.after}>{days.from.ko}</small>}
           </span>
         </p>
-        <span className={styles.launchArrow} aria-hidden="true">
-          <svg viewBox="0 0 40 16">
-            <path d="M2 8h33M29 2.5 35.5 8 29 13.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </span>
+        {arrow}
         <p className={styles.launchLater}>
           <small>{launch.later[lang]}</small>
           <b>{launch.laterPrice}</b>

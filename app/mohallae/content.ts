@@ -328,18 +328,19 @@ export const plans = {
   free: {
     name: { ko: "무료", en: "Free" },
     price: "$0",
+    // 두 칸의 값을 같은 자리에 맞추려고, 옆 칸의 '출시 기념가' 줄·'지금' 글자와 같은 높이로 둔다
+    tag: { ko: "가입 없이", en: "No sign-up" },
+    always: { ko: "언제나", en: "Always" },
     items: {
       ko: [
         "날마다 안 3–5개 요약 — 제목, 예산, 대략적인 동선",
         "첫날 안 하나는 팁, 식당, 숙소, 비용까지 전부",
         "숙소 추천 1곳",
-        "가입 없음",
       ],
       en: [
         "A summary of 3–5 plans for each day — title, budget, rough route",
         "One Day 1 plan in full — tips, restaurants, where to stay, costs",
         "One place-to-stay suggestion",
-        "No sign-up",
       ],
     },
   },
