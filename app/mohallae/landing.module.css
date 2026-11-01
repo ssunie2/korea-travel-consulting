@@ -525,26 +525,54 @@
 .price small { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
 .price .after { margin-left: 4px; }  /* 한국어: $25부터 */
 .price .before { margin-right: 6px; } /* 영어: from $25 */
-/* 출시 기념가 — 오른쪽에 '출시 기념가' 표 · 값 · 오르는 날을 세로로 쌓는다 */
-.planHead { display: flex; align-items: center; justify-content: space-between; gap: 16px; view-timeline-name: --launch; }
-.launch { margin: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; }
-.launchBadge { padding: 5px 11px; border-radius: 999px; background: var(--acc); color: #fff; font-size: 13px; font-weight: 700; line-height: 1.2; }
-.launchNote { font-size: 14px; font-weight: 600; line-height: 1.3; color: rgb(255 255 255 / 0.74); }
-/* 칸이 화면에 들어올 때 차례로: 값이 떠오르고 → 표가 톡 → 오르는 날이 밀려 나온다.
-   스크롤 연동을 못 하는 브라우저와 '움직임 줄이기' 에서는 처음부터 끝 상태(셋 다 보임) */
+/* 출시 기념가 — 위: 주황 표 + D-day, 가운데: 칸 이름, 아래: 지금 $25부터 → 12월 1일부터 첫날 $40 */
+.planHead { view-timeline-name: --launch; }
+.planHead h3 { margin-top: 18px; }
+.launchBar { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.launchBadge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 17px 9px 13px; border-radius: 999px;
+  background: var(--acc); color: #fff;
+  font-size: 18px; font-weight: 800; line-height: 1.1; letter-spacing: -0.01em;
+  box-shadow: 0 8px 22px -8px rgb(214 58 18 / 0.75);
+}
+.launchBadge svg { width: 16px; height: 16px; }
+.launchCount {
+  padding: 8px 14px; border-radius: 999px; border: 1.5px solid rgb(255 255 255 / 0.45);
+  font-size: 17px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: 0;
+}
+.launchPrices { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 18px; margin-top: 16px; }
+.launchNow,
+.launchLater { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.launchNow small,
+.launchLater small { font-size: 15px; font-weight: 700; line-height: 1.2; color: rgb(255 255 255 / 0.7); }
+.launchLater small { color: #ff8a63; max-width: 9.5em; } /* 좁은 화면에서는 두 줄로 */
+.launchLater b {
+  font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: #ff8a63;
+  padding-bottom: 4px; /* $25 와 바닥을 맞춘다 */
+}
+.launchArrow { align-self: flex-end; margin-bottom: 18px; color: rgb(255 255 255 / 0.45); }
+.launchArrow svg { display: block; width: 46px; height: 18px; }
+/* 칸이 화면에 들어올 때 차례로: 12월부터 $40 이 먼저 → 화살표 → 지금 $25 가 떠오르고 → 출시 기념가 표 · D-day 가 톡.
+   스크롤 연동을 못 하는 브라우저와 '움직임 줄이기' 에서는 처음부터 끝 상태(전부 보임) */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .launchPrice,
+    .launchLater,
+    .launchArrow,
+    .launchNow,
     .launchBadge,
-    .launchNote { animation-timeline: --launch; animation-fill-mode: both; animation-duration: auto; }
-    .launchPrice { animation-name: launchRise; animation-range: cover 4% cover 17%; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
-    .launchBadge { animation-name: launchPop; animation-range: cover 15% cover 24%; animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .launchNote { animation-name: launchSlide; animation-range: cover 22% cover 32%; animation-timing-function: ease-out; }
+    .launchCount { animation-timeline: --launch; animation-fill-mode: both; animation-duration: auto; }
+    .launchLater { animation-name: launchFade; animation-range: cover 2% cover 12%; animation-timing-function: ease-out; }
+    .launchArrow { animation-name: launchDraw; animation-range: cover 10% cover 17%; animation-timing-function: ease-out; }
+    .launchNow { animation-name: launchRise; animation-range: cover 15% cover 25%; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+    .launchBadge { animation-name: launchPop; animation-range: cover 23% cover 30%; animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .launchCount { animation-name: launchPop; animation-range: cover 27% cover 34%; animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
   }
 }
-@keyframes launchRise { from { opacity: 0; transform: translateY(18px); } }
-@keyframes launchPop { from { opacity: 0; transform: scale(0.6); } }
-@keyframes launchSlide { from { opacity: 0; transform: translateX(14px); } }
+@keyframes launchFade { from { opacity: 0; transform: translateY(10px); } }
+@keyframes launchDraw { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes launchRise { from { opacity: 0; transform: translateY(22px) scale(0.92); } }
+@keyframes launchPop { from { opacity: 0; transform: scale(0.5); } }
 .ladder { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 0; padding: 0; list-style: none; }
 .ladder li { padding: 6px 12px; border-radius: 999px; background: rgb(255 255 255 / 0.12); font-size: 14px; font-weight: 700; }
 .pnote { margin: 12px 0 0; font-size: 15px; line-height: 1.55; color: rgb(255 255 255 / 0.78); }
@@ -633,6 +661,11 @@
   .tPlan,
   .tAsk { padding: 30px 22px; }
   .price { font-size: 60px; }
+  .launchLater b { font-size: 44px; }
+  .launchPrices { column-gap: 12px; }
+  .launchBadge { font-size: 16px; padding: 8px 15px 8px 12px; }
+  .launchCount { font-size: 15px; }
+  .launchArrow svg { width: 34px; }
   .tAsk { flex-direction: column; align-items: flex-start; }
   .foot { flex-direction: column; align-items: flex-start; }
 }
