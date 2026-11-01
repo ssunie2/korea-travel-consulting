@@ -1,0 +1,289 @@
+/*
+  결과 화면(무료 초안, /mohallae/plan/[id]) 전용. 승인한 시안: result-comp-3 "날짜별 기둥".
+  색 이름(--m-ink, --m-red …)과 글꼴은 랜딩의 mohallae.module.css .page 에서 그대로 물려받는다.
+  빨강은 여기서도 **현지 팁에만** 쓴다.
+
+  치수는 시안(2688×1520)을 화면 폭 1344 기준으로 잰 값이다. 숫자 옆 주석은 그 기준.
+*/
+
+/* 가로 폭: 시안에서 내용은 1344 폭일 때 45~1300 사이. 아주 넓은 화면에서도 칸이 끝없이 넓어지지 않게 1440 에서 멈춘다 */
+.wrap {
+  width: min(100% - 2 * clamp(20px, 3.4vw, 64px), 1440px);
+  margin-inline: auto;
+}
+
+/* ── 위 막대 ─────────────────────────────────────── */
+.topbar { border-bottom: 1px solid var(--m-line); }
+.topbarInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 60px;
+}
+.wordmark {
+  border-radius: 6px;
+  font-size: 33px; /* 시안: 소문자 h·l 높이 24.5px */
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-transform: lowercase;
+}
+.wordmark:focus-visible, .langLink:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 4px; }
+.topbarRight { display: flex; align-items: center; gap: 32px; }
+.lang { display: flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 500; }
+.langLink { border-radius: 4px; color: var(--m-ink-2); }
+.langLink[aria-current] { color: var(--m-ink); font-weight: 700; }
+.langLink:hover { text-decoration: underline; text-underline-offset: 4px; }
+.langBar { width: 1.5px; height: 14px; background: var(--m-ink); }
+.freeDraft {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--m-ink-3);
+}
+.freeDraft:lang(ko) { letter-spacing: 0.04em; font-size: 12.5px; }
+@media (max-width: 479px) { .topbarRight { gap: 18px; } }
+@media (max-width: 379px) { .wordmark { font-size: 28px; } }
+
+/* ── 머리: 큰 제목, 그 아래 요약 ─────────────────────
+   써니 요청 (2026-10-11): 요약을 오른쪽 셋째 칸(4줄)에서 큰 제목 아래로 옮기고, 넓혀서 2줄로.
+   넓은 화면에서 제목과 요약은 아래 날짜 기둥 앞의 두 칸 폭을 같이 쓴다 (셋째 칸 위는 비워 둔다). 아래 @media 참고. */
+.head { display: grid; gap: 16px; padding-top: 40px; }
+/* 시안 글꼴은 Figtree 보다 폭이 좁다. 같은 한 줄에 들어가도록 크기를 40px 로 맞췄다 (시안 대문자 31.5px → 28px) */
+.title {
+  margin: 0;
+  font-size: clamp(30px, 2.98vw, 46px);
+  line-height: 1.2; /* 한글 제목이 두 줄로 넘어가도 줄끼리 붙지 않게 */
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+/* 써니 요청 (2026-10-11): 스크롤이 늘어도 좋으니 줄과 줄, 문장과 문장 사이를 넉넉히. 한글은 영문보다 줄 간격이 더 필요하다 */
+.summary { margin: 0; font-size: 15px; line-height: 1.7; letter-spacing: -0.005em; color: var(--m-ink-3); max-width: 60ch; text-wrap: pretty; }
+@media (min-width: 1024px) {
+  .head { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 14px; }
+  .headMain, .summary { grid-column: 1 / span 2; }
+  .summary { max-width: none; }
+}
+/* 머리줄·날짜 줄의 가운뎃점. 시안처럼 양옆을 넉넉히 띄운다 */
+.sep { margin-inline: 7px; }
+
+/* ── 날짜별 기둥 ─────────────────────────────────────
+   써니 요청 (2026-10-09): 4일 이상이어도 칸을 줄이지 않는다. 4일은 2×2, 5일부터 한 줄에 3개,
+   나머지는 아래로 이어서 스크롤로 본다. 태블릿은 2개, 폰은 1개씩. */
+.days {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  margin: 36px 0 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 768px) { .days { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) {
+  .days[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 768px) { .days[data-cols="1"] { grid-template-columns: minmax(0, 720px); } }
+
+.day {
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--m-shadow);
+  padding: 22px 26px 26px;
+}
+.dayLabel { display: block; font-size: 14px; line-height: 20px; font-weight: 400; color: var(--m-ink-3); }
+.dayLabel b { font-weight: 600; color: var(--m-ink); }
+.dayTheme {
+  display: block;
+  margin-top: 6px;
+  font-size: 24.5px; /* 시안 대문자 19.7px. 폭이 넓은 Figtree 라 시안처럼 한 줄에 들도록 24.5px */
+  line-height: 1.24;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--m-ink);
+  text-wrap: balance;
+}
+.dayHeading { margin: 0; }
+
+/* 일정: 점 하나에 한 정거장. 선은 점에서 다음 점까지만 긋는다 (마지막 점 아래로 새지 않게) */
+/* 한 줄에 놓인 기둥들은 키가 같다. 첫 정거장은 어느 날이든 주제 바로 아래 같은 높이에 두고(한 장의 표로 읽히게),
+   짧은 날은 남는 높이를 정거장 사이에 나눈다. 이동 시간 글은 두 정거장 사이 가운데에 온다.
+   맨 아래 여백(::after)은 정거장 사이 몫의 절반만 받는다. */
+.stops { flex: 1 0 auto; display: flex; flex-direction: column; margin: 26px 0 0; padding: 0; list-style: none; }
+.stops::after { content: ""; flex: 0.5 0 0; }
+.stop { position: relative; padding: 0 0 24px 30px; }
+.stop:not(:last-child) { flex: 1 0 auto; display: flex; flex-direction: column; }
+.stop:last-child { padding-bottom: 0; }
+.stop::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--m-ink);
+  box-shadow: 0 0 0 4px #fff; /* 선이 점에 닿지 않고 점 둘레에서 끊긴다 (시안) */
+}
+.stop:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 3.5px;
+  top: 10px;
+  bottom: -10px;
+  width: 1px;
+  background: #d5d9e1;
+}
+.time { margin: 0; font-size: 13px; line-height: 20px; color: var(--m-ink-3); font-variant-numeric: tabular-nums; }
+.name { margin: 3px 0 0; font-size: 17px; line-height: 1.4; font-weight: 600; letter-spacing: -0.005em; }
+.note { margin: 6px 0 0; font-size: 15px; line-height: 1.7; color: var(--m-ink-3); }
+.travel { margin-block: auto; padding-top: 18px; font-size: 13.5px; line-height: 20px; color: var(--m-ink-3); }
+
+/* ── 현지 팁 ─────────────────────────────────────────
+   랜딩 패널과 같은 표시: 빨간 중괄호 + 빨간 딱지 + 빨간 한 줄. 아래 두 줄은 남색 이름표 + 회색 글.
+   그 날의 그 정거장 바로 아래 붙는다. */
+.tip { position: relative; margin: 16px 0 0 -12px; padding-left: 24px; }
+.brace {
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 12px;
+  height: calc(100% - 2px);
+  color: var(--m-red); /* 딱지·빨간 줄과 같은 빨강 하나 (랜딩은 줄 그은 글을 가리켜서 줄 색을 쓴다) */
+  overflow: visible;
+}
+.badge {
+  display: block;
+  width: fit-content;
+  margin: 0;
+  padding: 2px 8px 1px;
+  border-radius: 9999px;
+  background: var(--m-red);
+  color: #fff;
+  font-size: 9.5px;
+  line-height: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.badge:lang(ko) { letter-spacing: 0.02em; font-size: 11px; line-height: 14px; padding: 3px 9px 2px; }
+.tipLine { margin: 9px 0 0; font-size: 15px; line-height: 1.5; font-weight: 600; letter-spacing: -0.01em; color: var(--m-red); }
+.tipText { margin: 10px 0 0; font-size: 14px; line-height: 1.7; color: var(--m-ink-3); }
+.tipText b { font-weight: 600; color: var(--m-ink); }
+.tipPlace { margin: 0 0 6px; font-size: 13px; color: var(--m-ink-3); }
+
+/* 가려 둔 팁 (LockedTip, 써니 요청 2026-10-11) — 팁이 없는 날의 기둥 맨 아래.
+   진짜 팁과 같은 짜임(중괄호·딱지·빨간 첫 줄·회색 두 줄)을 흐리게 그려서, 진짜 팁 하나가 여전히 가장 눈에 띈다. */
+.lockedSpot { margin: 24px 0 0 18px; } /* 진짜 팁과 같은 왼쪽 선: 정거장 글(30px)에서 중괄호 폭(12px)만큼 앞 */
+.tipLocked .brace { color: #f2a6a9; } /* 빨강을 흰 바탕에 40% 섞은 색 */
+.tipLocked .badge { display: flex; align-items: center; gap: 4px; }
+.lockGlyph { flex: none; width: 9px; height: 9px; margin-top: -1px; }
+.mosaic { display: block; width: 100%; max-width: 340px; height: auto; margin-top: 12px; }
+.mosaicRed { color: var(--m-red); }
+.mosaicInk { color: var(--m-ink); }
+.lockedNote { margin: 11px 0 0; font-size: 13px; line-height: 1.5; color: var(--m-ink-3); }
+
+/* 팁이 써지듯 나타나기 (TipReveal 이 data-reveal="play" 를 켠다. 써니 요청 2026-10-11)
+   중괄호가 위에서 아래로 그려지고 → 딱지가 뜨고 → 빨간 한 줄이 왼쪽부터 써지고 → 두 문단이 차례로 올라온다.
+   - 숨기는 건 '스크립트가 도는 브라우저'에서만 (scripting: enabled). 첫 화면이 그려질 때부터 숨겨서
+     보였다가 사라졌다가 다시 나타나는 깜빡임이 없다. 스크립트가 없으면 처음부터 다 보인다.
+   - '움직임 줄이기' 설정이면 숨기지도 움직이지도 않는다.
+   - 안전장치: 스크립트가 끝내 붙지 않으면(data-reveal 이 안 생기면) 8초 뒤 그냥 보인다. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .tipWrap:not([data-reveal="play"]) .tipReveal .brace { clip-path: inset(0 0 100% 0); }
+  .tipWrap:not([data-reveal="play"]) .tipReveal :is(.badge, .tipPlace) { opacity: 0; transform: scale(0.85); }
+  .tipWrap:not([data-reveal="play"]) .tipReveal .tipLine { clip-path: inset(0 100% 0 0); }
+  .tipWrap:not([data-reveal="play"]) .tipReveal .tipText { opacity: 0; transform: translateY(8px); }
+  .tipWrap:not([data-reveal]) .tipReveal :is(.brace, .badge, .tipPlace, .tipLine, .tipText) { animation: tip-show 0.3s 8s both; }
+
+  .tipWrap[data-reveal="play"] .tipReveal .brace { animation: tip-brace 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .tipWrap[data-reveal="play"] .tipReveal :is(.badge, .tipPlace) { animation: tip-pop 0.4s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: left center; }
+  .tipWrap[data-reveal="play"] .tipReveal .tipLine { animation: tip-write 0.7s 0.5s cubic-bezier(0.65, 0, 0.35, 1) both; }
+  .tipWrap[data-reveal="play"] .tipReveal .tipText { animation: tip-up 0.55s 1.05s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .tipWrap[data-reveal="play"] .tipReveal .tipText:last-of-type { animation-delay: 1.25s; }
+
+  /* 가려 둔 팁: 중괄호·딱지는 위와 같고, 모자이크 타일이 왼쪽부터 깜빡이며 채워진 뒤 한 줄이 올라온다 */
+  .tipWrap:not([data-reveal="play"]) .tipReveal .mosaic rect { opacity: 0; }
+  .tipWrap:not([data-reveal="play"]) .tipReveal .lockedNote { opacity: 0; transform: translateY(6px); }
+  .tipWrap:not([data-reveal]) .tipReveal .mosaic rect { animation: tip-show 0.3s 8s both; }
+  .tipWrap:not([data-reveal]) .tipReveal .lockedNote { animation: tip-show 0.3s 8s both; }
+  .tipWrap[data-reveal="play"] .tipReveal .mosaic rect { animation: tip-tile 0.3s var(--d, 0.5s) both; }
+  .tipWrap[data-reveal="play"] .tipReveal .lockedNote { animation: tip-up 0.5s 1.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+}
+@keyframes tip-tile { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tip-brace { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes tip-pop { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
+@keyframes tip-write { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes tip-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes tip-show { to { opacity: 1; transform: none; clip-path: inset(0 0 0 0); } }
+
+/* 걸릴 날을 못 찾은 팁(옛 초안·엉뚱한 날짜)은 기둥들 아래에 따로 한 번 */
+.looseTip { margin: 22px 0 0; max-width: 720px; }
+
+/* ── 닫는 띠 ─────────────────────────────────────────
+   왼쪽: 숙소·식당·예산 / 오른쪽 30%: 한 줄 + 버튼 둘. 띠는 화면 끝까지 꽉 찬다. */
+.band { flex-grow: 1; margin-top: 26px; background: var(--m-band); padding: 15px 0 48px; }
+.bandInner { display: grid; gap: 26px; }
+@media (min-width: 1024px) {
+  .bandInner { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: center; }
+  .facts { grid-column: span 2; }
+  .actions { position: relative; padding-left: 24px; }
+  .actions::before { content: ""; position: absolute; left: -12px; top: 0; bottom: 0; width: 1px; background: #d5d9e1; }
+}
+.facts { display: flex; flex-wrap: wrap; row-gap: 18px; margin: 0; padding-left: 24px; }
+.fact { min-width: 0; padding-right: 52px; }
+.fact + .fact { border-left: 1px solid #d5d9e1; padding-left: 42px; }
+.factLabel { font-size: 13px; line-height: 1.3; color: var(--m-ink-3); }
+/* 제목 아래 사실 줄: 제목과 같은 왼쪽 선에서 시작한다 (아래 띠는 날짜 칸 글자 선에 맞춘다) */
+.tripFacts { margin-top: 28px; padding-left: 0; }
+.factValue { margin: 3px 0 0; font-size: 19px; line-height: 1.25; font-weight: 600; letter-spacing: -0.01em; }
+/* 1024~1279: 띠의 왼쪽 두 칸이 좁아 세 번째 값이 다음 줄로 밀리며 세로줄을 달고 내려가던 것을 막는다 */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .fact { padding-right: 32px; }
+  .fact + .fact { padding-left: 28px; }
+}
+@media (max-width: 639px) {
+  .facts { flex-direction: column; padding-left: 0; }
+  .fact { padding-right: 0; }
+  .fact + .fact { border-left: 0; padding-left: 0; }
+}
+.oneTip { margin: 0; font-size: 15px; line-height: 1.35; color: var(--m-ink); }
+.buttons { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 13px; margin-top: 12px; }
+.cta { height: 38px; padding-inline: 34px; font-size: 15px; }
+.copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding-inline: 31px;
+  border-radius: 9999px;
+  border: 1px solid var(--m-ink);
+  background: #fff;
+  color: var(--m-ink);
+  font-size: 15px;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+}
+.copy:hover { background: var(--m-ink); color: #fff; }
+.copy:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
+/* 폰: 버튼 둘을 같은 폭으로 쌓고 손가락 크기(44px)로 키운다 */
+@media (max-width: 479px) {
+  .buttons { flex-direction: column; align-items: stretch; }
+  .cta, .copy { width: 100%; height: 44px; }
+}
+/* "이 링크를 보관하세요" — 늘 보인다. 버튼 줄에서 폭을 다 차지해 버튼 아래 줄로 내려간다 */
+.keepLink { flex-basis: 100%; margin: -3px 0 0; font-size: 12.5px; line-height: 1.35; color: var(--m-ink-3); }
+
+/* ── 끝까지 못 만든 초안 ─────────────────────────── */
+.failed { padding: 96px 0; text-align: center; }
+.failed h1 { margin: 0; font-size: clamp(26px, 3vw, 36px); font-weight: 800; letter-spacing: -0.02em; }
+.failed p { margin: 14px 0 0; color: var(--m-ink-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .copy { transition: none; }
+}

@@ -1,0 +1,360 @@
+/*
+  새 입력 흐름(/mohallae/plan) 전용. 승인 시안: input-comp-3 "초안이 자라나는 판".
+  색 이름(--m-ink …)과 글꼴은 mohallae.module.css 의 .page 에서 물려받는다.
+  빨강은 여기서도 현지 팁에만 — 질문 화면에는 쓰지 않는다 (기다림 화면의 고쳐 쓰기 띠만 빨갛다).
+*/
+
+.shell { display: flex; flex: 1; flex-direction: column; min-height: 100dvh; }
+.wrap { width: min(100% - 2 * clamp(20px, 3.4vw, 64px), 1440px); margin-inline: auto; }
+
+/* ── 위 막대 (결과 화면과 같은 모양) ─────────────────── */
+.topbar { border-bottom: 1px solid var(--m-line); }
+.topbarInner { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 60px; }
+.wordmark { border-radius: 6px; font-size: 33px; line-height: 1; font-weight: 800; letter-spacing: -0.04em; }
+.wordmark:focus-visible, .langBtn:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 4px; }
+.topbarRight { display: flex; align-items: center; gap: 32px; }
+.lang { display: flex; align-items: center; font-size: 14.5px; font-weight: 500; }
+.langItem { display: inline-flex; align-items: center; }
+.langBtn { border-radius: 4px; color: var(--m-ink-2); cursor: pointer; }
+.langBtn[aria-pressed="true"] { color: var(--m-ink); font-weight: 700; }
+.langBtn:hover { text-decoration: underline; text-underline-offset: 4px; }
+.langBar { width: 1.5px; height: 14px; margin-inline: 8px; background: var(--m-ink); }
+.freeDraft { margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--m-ink-3); }
+.freeDraft:lang(ko) { letter-spacing: 0.04em; font-size: 12.5px; }
+@media (max-width: 479px) { .topbarRight { gap: 18px; } }
+@media (max-width: 379px) { .wordmark { font-size: 28px; } }
+
+/* ── 진행 ──────────────────────────────────────────── */
+.main { display: flex; flex: 1; flex-direction: column; padding-bottom: 72px; }
+.progress { margin-top: 20px; }
+.stepCount { margin: 0; font-size: 13px; line-height: 20px; color: var(--m-ink-3); font-variant-numeric: tabular-nums; }
+.bar { position: relative; height: 2px; margin-top: 8px; background: var(--m-line); border-radius: 2px; overflow: hidden; }
+.bar > span { position: absolute; inset: 0 auto 0 0; background: var(--m-ink); border-radius: 2px; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* ── 두 칸: 왼쪽 질문, 오른쪽 지금까지의 여행 ────────── */
+.grid { display: grid; gap: 40px; margin-top: 30px; }
+@media (min-width: 1024px) {
+  .grid { grid-template-columns: minmax(0, 11fr) minmax(0, 8fr); column-gap: clamp(40px, 5vw, 96px); align-items: start; }
+}
+.ask { display: flex; flex-direction: column; min-width: 0; }
+.question {
+  margin: 0;
+  max-width: 15em;
+  font-size: clamp(30px, 3.3vw, 50px);
+  line-height: 1.14;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  outline: none;
+}
+.helper { margin: 14px 0 0; max-width: 60ch; font-size: 16px; line-height: 1.6; color: var(--m-ink-3); }
+
+/* ── 보기 ──────────────────────────────────────────── */
+/* 한 화면 안의 줄들. 줄이 여럿이면(도착·출발 시간 등) 줄마다 무엇을 묻는지 작은 제목을 단다 */
+.fields { display: grid; gap: 28px; margin-top: 26px; }
+.field { display: block; min-width: 0; }
+.fieldLabel { display: block; margin: 0 0 10px; font-size: 14.5px; line-height: 1.4; font-weight: 600; color: var(--m-ink-2); }
+.choices { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+.textGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* 카드가 많은 줄(서울 동네 12곳 + 잘 모르겠어요 + 그 외)은 넓은 화면에서 세 칸 — 한 화면에 다 들어오게 */
+@media (min-width: 1024px) { .wideGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } }
+.chipGrid { display: flex; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 379px) { .textGrid { grid-template-columns: minmax(0, 1fr); } }
+
+.choice {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--m-shadow);
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.choice:hover { box-shadow: 0 1px 2px rgb(14 20 40 / 0.08), 0 14px 34px -14px rgb(14 20 40 / 0.36); }
+.choice:active { transform: scale(0.985); }
+.choice:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
+/* 고른 것: 남색 2px 테두리 + 오른쪽 위 체크 (시안) */
+.choice.on { box-shadow: 0 0 0 2px var(--m-ink), var(--m-shadow); }
+.choiceText { display: flex; flex-direction: column; gap: 4px; padding: 16px 20px 18px; }
+.wideGrid .choiceText { padding: 14px 16px 16px; }
+.choiceTitle { font-size: 17px; line-height: 1.35; font-weight: 600; letter-spacing: -0.005em; color: var(--m-ink); }
+.choiceDesc { font-size: 14px; line-height: 1.5; color: var(--m-ink-3); }
+/* 글 카드: 고르면 오른쪽 위에 체크가 뜬다 — 제목이 그 밑으로 들어가지 않게 자리를 비워 둔다 (영어 예산 '₩250,000–350,000' 이 폰에서 겹쳤다) */
+.textGrid .choiceTitle { padding-right: 26px; }
+
+/* 작은 보기 (설명 없는 보기 — 관심사·음식·시간 등) — 그림자 대신 가는 테두리 하나 */
+.chipGrid .choice { width: auto; height: auto; flex-direction: row; align-items: center; border-radius: 12px; box-shadow: inset 0 0 0 1px #d5d9e1; }
+.chipGrid .choice:hover { box-shadow: inset 0 0 0 1px var(--m-ink-3); }
+.chipGrid .choice.on { box-shadow: inset 0 0 0 2px var(--m-ink); }
+.chipGrid .choiceText { padding: 11px 16px; }
+.chipGrid .choice.on .choiceText { padding-right: 40px; }
+.chipGrid .choiceTitle { font-size: 15.5px; font-weight: 500; }
+.otherChoice .choiceTitle { color: var(--m-ink-2); }
+.chipGrid .otherChoice { box-shadow: inset 0 0 0 1px #d5d9e1; border: 0; background-image: none; }
+/* '그 외 — 직접 적기'는 점선 — 고르는 보기가 아니라 적는 칸을 여는 단추 (칩·카드 모두) */
+.otherChoice:not(.on) { box-shadow: none; outline: 1px dashed #b9bfca; outline-offset: -1px; }
+.otherChoice:not(.on):hover { outline-color: var(--m-ink-3); box-shadow: none; }
+.textGrid .otherChoice .choiceText { justify-content: center; height: 100%; }
+
+.check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: var(--m-ink);
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.18s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.check svg { width: 14px; height: 14px; }
+.chipGrid .check { top: 50%; right: 10px; width: 20px; height: 20px; margin-top: -10px; }
+.chipGrid .check svg { width: 12px; height: 12px; }
+.on .check { opacity: 1; transform: none; }
+
+.otherField { display: block; margin-top: 12px; max-width: 420px; }
+/* 직접 적는 줄 ('꼭 가고 싶은 곳') — '그 외' 칸과 같은 모양 */
+.textBox { display: block; max-width: 520px; }
+.otherField input, .textBox input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid #c3c8d2;
+  background: #fff;
+  color: var(--m-ink);
+  font: inherit;
+  font-size: 16px;
+}
+.otherField input:focus, .textBox input:focus { outline: 2px solid var(--m-ink); outline-offset: 0; border-color: var(--m-ink); }
+.textBox input::placeholder, .otherField input::placeholder { color: #9aa0ad; }
+
+.count { margin: 16px 0 0; min-height: 20px; font-size: 13.5px; line-height: 20px; color: var(--m-ink-3); }
+
+/* 달력은 calendar.module.css (Calendar.tsx) */
+
+/* 인원 */
+.stepper { display: flex; align-items: center; gap: 22px; margin-top: 30px; }
+.stepBtn {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 9999px;
+  box-shadow: inset 0 0 0 1px #c3c8d2;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--m-ink);
+  cursor: pointer;
+}
+.stepBtn:hover:not(:disabled) { box-shadow: inset 0 0 0 1.5px var(--m-ink); }
+.stepBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+.stepBtn:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
+.stepValue { margin: 0; min-width: 4.5em; text-align: center; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+/* 예산 통화 */
+.currency { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 18px; font-size: 13.5px; color: var(--m-ink-3); }
+.currency > span { margin-right: 6px; }
+.cur { height: 30px; padding: 0 12px; border-radius: 9999px; box-shadow: inset 0 0 0 1px #d5d9e1; font-size: 13px; font-weight: 600; color: var(--m-ink-2); cursor: pointer; }
+.curOn { background: var(--m-ink); color: #fff; box-shadow: none; }
+.cur:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 2px; }
+
+/* 확인 화면: 초안 언어 */
+.languagePick { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 30px; font-size: 15px; color: var(--m-ink-2); }
+.languagePick select {
+  height: 44px;
+  padding: 0 40px 0 16px;
+  border-radius: 12px;
+  border: 1px solid #c3c8d2;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%230e1428' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 16px center / 12px 8px;
+  appearance: none;
+  color: var(--m-ink);
+  font: inherit;
+  font-size: 15.5px;
+}
+.languagePick select:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 2px; }
+
+/* ── 아래 단추 줄: 어느 질문에서나 같은 자리 ─────────────
+   써니 2026-10-12: "다음 표시가 일정한 위치에 있던가… 계속 다음 다음 다음 누르니까 번거로워".
+   PC 는 왼쪽 칸을 화면 맨 아래까지 늘리고(.grid flex, .ask stretch) 단추 줄을 칸 맨 아래에 둔다.
+   내용이 화면보다 길면 단추 줄이 화면 아래에 붙어 따라온다(sticky). 그래서 '다음'은 늘 같은 자리다.
+   노트북(세로 800px 안팎)에서 사진 카드 단계의 '다음'이 화면 밖으로 밀려나던 것도 함께 풀린다. */
+.push { flex: 1 0 28px; }
+.nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0 calc(18px + env(safe-area-inset-bottom));
+  background: rgb(255 255 255 / 0.96);
+  border-top: 1px solid var(--m-line);
+}
+@media (min-width: 1024px) {
+  .main { padding-bottom: 0; }
+  .grid { flex: 1; }
+  .ask { align-self: stretch; }
+  .panel { margin-bottom: 32px; }
+}
+/* 한 칸짜리 화면(폰·태블릿): 질문 칸이 첫 화면을 채워서 단추 줄이 늘 화면 맨 아래에 온다.
+   136px = 위 막대 61 + 진행 48 + 칸 위 여백 26 (조금 모자라게 — 넘치면 몇 px 스크롤이 생긴다).
+   svh: 주소창이 보일 때 기준이라 스크롤하며 주소창이 숨어도 단추 줄이 들썩이지 않는다.
+   '지금까지의 여행' 판은 그 아래로 스크롤하면 나온다. 단추 줄은 화면 끝까지 */
+@media (max-width: 1023px) {
+  .ask { min-height: calc(100svh - 136px); }
+  .nav { margin-inline: calc(-1 * clamp(20px, 3.4vw, 64px)); padding-inline: clamp(20px, 3.4vw, 64px); }
+}
+.navRight { display: flex; align-items: center; gap: 18px; }
+.back { display: inline-flex; gap: 6px; align-items: center; min-height: 44px; border-radius: 6px; font-size: 15px; font-weight: 500; color: var(--m-ink-2); cursor: pointer; }
+.back:hover { color: var(--m-ink); text-decoration: underline; text-underline-offset: 4px; }
+.back:focus-visible, .jump:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
+.jump { min-height: 44px; border-radius: 6px; font-size: 14.5px; color: var(--m-ink-3); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); cursor: pointer; }
+.jump:hover { color: var(--m-ink); }
+.jump:disabled { opacity: 0.4; cursor: not-allowed; }
+.next { gap: 8px; height: 48px; padding-inline: 30px; font-size: 15.5px; }
+.next:disabled { opacity: 0.32; cursor: not-allowed; }
+.next:disabled:active { transform: none; }
+.failure { margin: 20px 0 0; padding: 12px 16px; max-width: 46ch; border-radius: 12px; background: var(--m-band); font-size: 15px; line-height: 1.5; color: var(--m-ink); }
+.reviewNote { margin: 18px 0 0; font-size: 13.5px; color: var(--m-ink-3); }
+
+/* ── 오른쪽 판: 지금까지의 여행 ───────────────────── */
+.panel {
+  border-radius: var(--m-radius);
+  background: #fff;
+  box-shadow: var(--m-shadow);
+  padding: 22px 24px 26px;
+}
+@media (min-width: 1024px) { .panel { position: sticky; top: 24px; } }
+.panelTitle { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+/* 엽서: 흔히 쓰는 가로 엽서 148×100mm 비율 (써니 2026-10-12 "흔히 쓰는 엽서 비율로, 가로로 눕힌 엽서 크기로").
+   사진은 이 비율로 미리 잘라 둔 postcard-*.jpg. 넓은 한 칸 화면(태블릿)에서는 너무 커지지 않게 480px 까지 */
+.postcardFrame, .postcardBlank { width: 100%; aspect-ratio: 148 / 100; margin-top: 14px; border-radius: 14px; background: var(--m-band); }
+@media (max-width: 1023px) { .postcardFrame, .postcardBlank { max-width: 480px; } }
+/* 사진을 겹쳐 두고 한 장씩 천천히 겹쳐 바꾼다 (Postcard.tsx) */
+.postcardFrame { position: relative; overflow: hidden; }
+.postcard { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s ease; }
+.postcardOn { opacity: 1; }
+.postcardPause {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.88);
+  color: var(--m-ink);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.postcardPause svg { width: 14px; height: 14px; }
+/* 마우스일 때는 올렸을 때만, 손가락 화면·키보드·멈춘 상태에서는 늘 보인다 */
+.postcardFrame:hover .postcardPause, .postcardPause:focus-visible, .postcardPause[aria-pressed="true"] { opacity: 1; }
+@media (hover: none) { .postcardPause { opacity: 1; } }
+.postcardPause:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .postcard { transition: none; } }
+.postcardBlank {
+  display: grid;
+  place-items: center;
+  padding: 0 24px;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #b4bac6;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* 줄이 열두어 개라(질문을 새로 짠 2026-10-13) 이름과 답을 한 줄에 나란히 — 위아래로 쌓으면 1440×900 에서도
+   판 아래쪽(지금 묻는 줄)이 화면 밖으로 밀렸다 */
+.timeline { margin: 16px 0 0; padding: 0; list-style: none; }
+.line { position: relative; display: grid; grid-template-columns: 96px minmax(0, 1fr); column-gap: 14px; align-items: baseline; padding: 0 0 9px 24px; }
+.line:last-child { padding-bottom: 0; }
+/* 점 — 답한 것은 채우고, 아직은 비운다 */
+.line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  box-shadow: inset 0 0 0 1.5px #c3c8d2;
+  background: #fff;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+.line.done::before { background: var(--m-ink); box-shadow: 0 0 0 4px #fff; }
+/* 점과 점을 잇는 가는 선 (결과 화면과 같은 회색) */
+.line:not(:last-child)::after { content: ""; position: absolute; left: 4px; top: 19px; bottom: 1px; width: 1px; background: #e2e5eb; }
+.lineLabel { font-size: 13.5px; line-height: 21px; color: #9aa0ad; }
+.done .lineLabel { color: var(--m-ink-3); }
+.lineValue {
+  display: block;
+  font-size: 15px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--m-ink);
+  text-align: left;
+}
+@media (max-width: 479px) { .line { grid-template-columns: 84px minmax(0, 1fr); column-gap: 10px; } }
+button.lineValue { border-radius: 4px; cursor: pointer; }
+button.lineValue:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); }
+button.lineValue:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 3px; }
+
+/* 확인 화면: 화면이 좁으면 '지금까지의 여행'을 질문 바로 아래에 (판은 첫 화면 밖으로 밀려
+   고칠 곳이 안 보였다 — 써니 2026-10-12 "해당 항목 눌러서 수정하는 화면이 없어졌는데"). 넓으면 오른쪽 판 그대로 */
+.reviewInline { display: none; }
+@media (max-width: 1023px) {
+  .reviewInline { display: block; max-width: 560px; margin-top: 24px; padding: 18px 20px 20px; border-radius: 16px; background: #fff; box-shadow: var(--m-shadow); }
+  .panelOnReview { display: none; }
+}
+
+/* ── 기다림 ─────────────────────────────────────────── */
+.waiting { min-height: 360px; }
+.waitStrip { margin-top: 34px; }
+.dots::after { content: "…"; }
+
+/* ── 움직임: 고른 것이 판에 써지듯 들어온다 (이 화면의 서명) ── */
+@media (prefers-reduced-motion: no-preference) {
+  .done .lineValue { animation: write-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .dots::after { display: inline-block; animation: dots 1.4s steps(4, end) infinite; overflow: hidden; vertical-align: bottom; width: 0; }
+}
+@keyframes write-in { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
+@keyframes dots { to { width: 1.25em; } }
+
+/* 지금 묻고 있는 줄: 빈 점에 남색 테두리 */
+.line.current:not(.done)::before { box-shadow: inset 0 0 0 2px var(--m-ink); }
+.line.current .lineLabel { color: var(--m-ink); font-weight: 600; }
+.line.current.done .lineLabel { font-weight: 400; color: var(--m-ink-3); }
+
+@media (prefers-reduced-motion: reduce) {
+  .bar > span, .choice, .check, .line::before { transition: none; }
+}
+
+/* ── 폰·태블릿: 판은 질문 아래로 ─────────────────── */
+@media (max-width: 1023px) {
+  .main { padding-bottom: 48px; }
+  .progress { margin-top: 18px; }
+  .grid { margin-top: 26px; }
+}
+@media (max-width: 479px) {
+  .fields { gap: 24px; margin-top: 24px; }
+  .choices { gap: 12px; }
+  .choiceText, .wideGrid .choiceText { padding: 12px 14px 14px; }
+  .choiceTitle { font-size: 15.5px; }
+  .choiceDesc { font-size: 13px; }
+  .nav { padding-block: 12px calc(12px + env(safe-area-inset-bottom)); }
+  .next { height: 46px; padding-inline: 24px; }
+}
