@@ -39,14 +39,19 @@ export function Plans({ lang }: { lang: Lang }) {
           </div>
         </article>
         <article className={`${styles.t} ${styles.tInk} ${styles.tPlan}`}>
-          <h3>
-            {days.name[lang]}{" "}
-            <span className={styles.price}>
-              {lang === "en" && <small className={styles.before}>{days.from.en}</small>}
-              {days.price}
-              {lang === "ko" && <small className={styles.after}>{days.from.ko}</small>}
-            </span>
-          </h3>
+          {/* 출시 기념가: 값 → '출시 기념가' 표 → 언제부터 얼마로 오르는지, 차례로 나타난다 (줄 긋기 없음) */}
+          <div className={styles.planHead}>
+            <h3>{days.name[lang]}</h3>
+            <p className={styles.launch}>
+              <span className={styles.launchBadge}>{days.launch.badge[lang]}</span>
+              <span className={`${styles.price} ${styles.launchPrice}`}>
+                {lang === "en" && <small className={styles.before}>{days.from.en}</small>}
+                {days.price}
+                {lang === "ko" && <small className={styles.after}>{days.from.ko}</small>}
+              </span>
+              <span className={styles.launchNote}>{days.launch.note[lang]}</span>
+            </p>
+          </div>
           <ul className={styles.ladder}>
             {days.ladder[lang].map((step) => (
               <li key={step}>{step}</li>
