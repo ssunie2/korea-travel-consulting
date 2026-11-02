@@ -196,9 +196,6 @@ export function LandingFooter({ lang }: { lang: Lang }) {
   return (
     <footer className={`${styles.wrap} ${styles.foot}`}>
       <p>
-        <span className={styles.icon} aria-hidden="true">
-          m
-        </span>
         <b>mohallae</b>
         <span>{footer.tagline}</span>
       </p>

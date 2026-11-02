@@ -16,10 +16,8 @@ export default function Hero({ lang }: { lang: Lang }) {
   return (
     <header className={styles.wrap}>
       <nav aria-label={lang === "ko" ? "주 메뉴" : "Main"} className={styles.nav}>
+        {/* 로고는 글씨만 — 옆의 주황 m 칸은 뺐다 (써니 2026-11-03) */}
         <Link href={withLang("/mohallae", lang)} className={styles.brand}>
-          <span className={styles.icon} aria-hidden="true">
-            m
-          </span>
           mohallae
         </Link>
         <div className={styles.links}>
