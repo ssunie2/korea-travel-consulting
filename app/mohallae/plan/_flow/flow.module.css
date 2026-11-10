@@ -11,6 +11,8 @@
 .topbar { border-bottom: 1px solid var(--m-line); }
 .topbarInner { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 60px; }
 .wordmark { border-radius: 6px; font-size: 33px; line-height: 1; font-weight: 800; letter-spacing: -0.04em; }
+/* 컴퍼스 글자 로고 — 결과 화면 위 막대와 같은 높이 */
+.wordmarkSvg { height: 25.7px; }
 .wordmark:focus-visible, .langBtn:focus-visible { outline: 2px solid var(--m-ink); outline-offset: 4px; }
 .topbarRight { display: flex; align-items: center; gap: 32px; }
 .lang { display: flex; align-items: center; font-size: 14.5px; font-weight: 500; }
@@ -22,7 +24,7 @@
 .freeDraft { margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--m-ink-3); }
 .freeDraft:lang(ko) { letter-spacing: 0.04em; font-size: 12.5px; }
 @media (max-width: 479px) { .topbarRight { gap: 18px; } }
-@media (max-width: 379px) { .wordmark { font-size: 28px; } }
+@media (max-width: 379px) { .wordmark { font-size: 28px; } .wordmarkSvg { height: 22px; } }
 
 /* ── 진행 ──────────────────────────────────────────── */
 .main { display: flex; flex: 1; flex-direction: column; padding-bottom: 72px; }

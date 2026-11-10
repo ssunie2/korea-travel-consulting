@@ -2,6 +2,7 @@ import Link from "next/link";
 import styles from "../mohallae.module.css";
 import { nav, planHref, withLang, type Lang } from "../content";
 import { LangSwitch } from "./Hero";
+import Wordmark from "./Wordmark";
 
 /**
  * 작은 화면들(자주 묻는 것 · 개인정보 처리방침)의 위 막대.
@@ -22,9 +23,9 @@ export default function SubHeader({ lang, path }: { lang: Lang; path: string }) 
       >
         <Link
           href={withLang("/mohallae", lang)}
-          className={`${link} text-[27px] leading-none font-bold tracking-[-0.035em] lowercase md:ml-[10px] md:text-[34px]`}
+          className={`${link} md:ml-[10px]`}
         >
-          mohallae
+          <Wordmark className="h-[24px] md:h-[30px]" />
         </Link>
 
         <div className="flex items-center text-[13.5px] font-medium">

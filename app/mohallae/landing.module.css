@@ -73,6 +73,8 @@
 /* ── 내비 ───────────────────────────────────────────── */
 .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; font-size: 22px; letter-spacing: -0.035em; }
+/* 컴퍼스 글자 로고(Wordmark.tsx) — 로고 시안 페이지의 '사이트 맨 위 줄 실제 크기'와 같은 높이 */
+.brandMark { height: 21px; }
 .links {
   display: flex;
   align-items: center;
@@ -606,6 +608,7 @@
 .foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 34px 0 46px; font-size: 13.5px; color: var(--ink-3); }
 .foot p { margin: 0; display: flex; align-items: center; gap: 10px; }
 .foot p b { color: var(--ink); font-size: 17px; letter-spacing: -0.03em; }
+.footMark { height: 16px; }
 .foot nav { display: flex; flex-wrap: wrap; gap: 20px; }
 
 /* ── 좁은 화면 ─────────────────────────────────────── */

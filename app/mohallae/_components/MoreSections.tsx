@@ -2,6 +2,7 @@ import Link from "next/link";
 import base from "../mohallae.module.css";
 import styles from "../landing.module.css";
 import { ask, footer, nav, planHref, plans, steps, withLang, type Lang } from "../content";
+import Wordmark from "./Wordmark";
 
 const Check = () => (
   <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -196,7 +197,7 @@ export function LandingFooter({ lang }: { lang: Lang }) {
   return (
     <footer className={`${styles.wrap} ${styles.foot}`}>
       <p>
-        <b>mohallae</b>
+        <Wordmark className={styles.footMark} />
         <span>{footer.tagline}</span>
       </p>
       <nav aria-label={lang === "ko" ? "꼬리말" : "Footer"}>
@@ -214,7 +215,7 @@ export function Footer({ lang }: { lang: Lang }) {
     <footer className="border-t border-[var(--m-line)]">
       <div className={`${base.wrap} flex flex-col gap-3 py-8 text-[13.5px] text-[var(--m-ink-3)] sm:flex-row sm:items-center sm:justify-between`}>
         <p className="flex items-baseline gap-3">
-          <span className="text-[18px] font-bold tracking-[-0.03em] text-[var(--m-ink)] lowercase">mohallae</span>
+          <Wordmark className="h-[17px] self-center" />
           <span>{footer.tagline}</span>
         </p>
         <p className="flex items-center gap-5">

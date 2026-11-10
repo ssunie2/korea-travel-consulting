@@ -2,6 +2,7 @@ import Link from "next/link";
 import styles from "../plan.module.css";
 import { draftCopy } from "../copy";
 import type { Lang } from "../../../content";
+import Wordmark from "../../../_components/Wordmark";
 
 /**
  * 위 막대 (시안 ③). 왼쪽 글자 로고, 오른쪽 EN | 한국어 와 '무료 초안'(샘플이면 '샘플 초안') 표시. 다른 메뉴는 없다.
@@ -29,7 +30,7 @@ export default function TopBar({ lang, planId, isSample = false }: { lang: Lang;
           className={styles.wordmark}
           aria-label={draftCopy.home[lang]}
         >
-          mohallae
+          <Wordmark label={null} className={styles.wordmarkSvg} />
         </Link>
         <div className={styles.topbarRight}>
           <span className={styles.lang} role="group" aria-label={draftCopy.langLabel[lang]}>

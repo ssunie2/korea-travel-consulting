@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import base from "../../mohallae.module.css";
 import s from "./flow.module.css";
 import CorrectionStrip from "../../_components/CorrectionStrip";
+import Wordmark from "../../_components/Wordmark";
 import Calendar from "./Calendar";
 import Postcard from "./Postcard";
 import {
@@ -132,7 +133,7 @@ export default function PlanFlow({ initialLang }: { initialLang: Lang }) {
       <header className={s.topbar}>
         <div className={`${s.wrap} ${s.topbarInner}`}>
           <Link href={`/mohallae${lang === "en" ? "?lang=en" : ""}`} className={s.wordmark} aria-label={t(c.home)}>
-            mohallae
+            <Wordmark label={null} className={s.wordmarkSvg} />
           </Link>
           <div className={s.topbarRight}>
             <span className={s.lang} role="group" aria-label={t(c.langLabel)}>
