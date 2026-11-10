@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { FreeItinerary } from "@/lib/types";
+import { PAID_ORDERS_OPEN } from "@/lib/orders";
 import base from "../../../mohallae.module.css";
 import styles from "../plan.module.css";
 import { draftCopy } from "../copy";
@@ -46,13 +47,18 @@ export default function ClosingBand({
             </div>
           ) : (
             <div className={styles.buttons}>
-              <Link href={`/plan/${planId}/consult`} className={`${base.pillDark} ${styles.cta}`}>
-                {draftCopy.fullPlan[lang]}
-                <span aria-hidden="true" className="mx-2">
-                  ·
-                </span>
-                {draftCopy.price}
-              </Link>
+              {PAID_ORDERS_OPEN ? (
+                <Link href={`/plan/${planId}/consult`} className={`${base.pillDark} ${styles.cta}`}>
+                  {draftCopy.fullPlan[lang]}
+                  <span aria-hidden="true" className="mx-2">
+                    ·
+                  </span>
+                  {draftCopy.price}
+                </Link>
+              ) : (
+                // 신청을 닫아 둔 동안 (lib/orders.ts, #89). 옛 결과 화면과 같은 글을 누를 수 없는 글로만 둔다
+                <p className={styles.oneTip}>{draftCopy.fullPlanClosed[lang]}</p>
+              )}
               <CopyLink lang={lang} />
             </div>
           )}

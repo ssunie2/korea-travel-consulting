@@ -35,6 +35,8 @@ export const draftCopy = {
     en: "That’s one tip. Every stop has one.",
   },
   fullPlan: { ko: "전체 일정 받기", en: "Get the full plan" },
+  // 유료 신청을 닫아 둔 동안 버튼 자리에 (lib/orders.ts) — 옛 결과 화면과 같은 글
+  fullPlanClosed: { ko: "전체 일정은 준비 중입니다", en: "The full plan isn’t open yet" },
   price: "$25",
   copyLink: { ko: "링크 복사", en: "Copy link" },
   copied: { ko: "복사했습니다", en: "Copied" },
