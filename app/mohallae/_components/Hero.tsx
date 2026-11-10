@@ -104,7 +104,6 @@ function ResultPreview({ lang }: { lang: Lang }) {
       </span>
       <span className={styles.island} aria-hidden="true">
         <span className={styles.act}>
-          <span className={styles.icon}>m</span>
           <span>
             <b>{dayOne.opened[lang]}</b>
             <em>{dayOne.variants.find((v) => v.open)?.title[lang]}</em>
@@ -118,13 +117,11 @@ function ResultPreview({ lang }: { lang: Lang }) {
       </div>
       <div className={styles.stack} aria-hidden="true">
         <span className={styles.pill}>
-          <span className={styles.icon}>m</span>
           {dayOne.pill[lang]}
         </span>
         {dayOne.variants.map((v) => (
           <div key={v.title.ko} className={`${styles.vn} ${v.open ? styles.vnOpen : ""}`}>
             <header>
-              <span className={styles.icon}>m</span>
               <span className={styles.bud}>{v.tier[lang]}</span>
               <b>{v.title[lang]}</b>
               <span className={styles.won}>{v.cost[lang]}</span>
@@ -152,7 +149,6 @@ function ResultPreview({ lang }: { lang: Lang }) {
                     </s>
                     <div className={styles.tipb}>
                       <span>
-                        <i className={styles.icon}>m</i>
                         {tipLabel[lang]}
                       </span>
                       <p>{(first.tipShort ?? first.tip)[lang]}</p>

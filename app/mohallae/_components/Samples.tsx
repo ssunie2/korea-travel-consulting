@@ -62,9 +62,6 @@ export default function Samples({ lang }: { lang: Lang }) {
               style={card.position ? { objectPosition: card.position } : undefined}
             />
             <span className={styles.sampleTag}>
-              <i className={styles.icon} aria-hidden="true">
-                m
-              </i>
               {s.who[lang]}
               <span className="sr-only">
                 {" — "}
@@ -160,9 +157,6 @@ function DayExample({ lang }: { lang: Lang }) {
                 {stop.plan && <s>{stop.plan[lang]}</s>}
                 <div className={styles.tip}>
                   <header>
-                    <span className={styles.icon} aria-hidden="true">
-                      m
-                    </span>
                     <span>{tipLabel[lang]}</span>
                   </header>
                   <p>{stop.tip[lang]}</p>
