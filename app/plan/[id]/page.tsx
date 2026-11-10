@@ -6,6 +6,7 @@ import type { FreeItinerary, Plan } from "@/lib/types";
 import { t } from "@/lib/copy";
 import { placeLabel } from "@/lib/places";
 import { dayLabel, dateRange } from "@/lib/date";
+import { PAID_ORDERS_OPEN } from "@/lib/orders";
 import CopyLinkButton from "@/components/CopyLinkButton";
 
 // 표제용 서체. 랜딩(app/page.tsx)과 같은 방식으로 이 화면에서만 불러온다.
@@ -237,12 +238,19 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
               en: "The draft above is the shape of your trip. The full plan fills it in — a tip at every stop, five stays and five restaurants chosen for your budget, costs broken down, and exactly what to book and when, including the places that only take Korean phone reservations.",
             })}
           </p>
-          <Link
-            href={`/plan/${plan.id}/consult`}
-            className="mt-8 inline-flex items-center rounded-full bg-[var(--c-accent)] px-8 py-3.5 text-base text-white transition-colors hover:bg-[var(--c-text)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
-          >
-            {t({ ko: "전체 일정 받기", en: "Get the full plan" })}
-          </Link>
+          {PAID_ORDERS_OPEN ? (
+            <Link
+              href={`/plan/${plan.id}/consult`}
+              className="mt-8 inline-flex items-center rounded-full bg-[var(--c-accent)] px-8 py-3.5 text-base text-white transition-colors hover:bg-[var(--c-text)] hover:text-[var(--c-bg)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[var(--c-focus)]"
+            >
+              {t({ ko: "전체 일정 받기", en: "Get the full plan" })}
+            </Link>
+          ) : (
+            // 신청을 닫아 둔 동안 (lib/orders.ts). 버튼처럼 보이지 않게, 누를 수 없는 글로만 둔다
+            <p className="mt-8 text-base font-medium text-[var(--c-text)]">
+              {t({ ko: "전체 일정은 준비 중입니다", en: "The full plan isn’t open yet" })}
+            </p>
+          )}
           <CopyLinkButton />
         </section>
       </main>

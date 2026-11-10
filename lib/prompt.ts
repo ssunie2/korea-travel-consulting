@@ -1,5 +1,5 @@
 import { Type } from '@google/genai'
-import type { PlanInput } from './types'
+import type { FreeItinerary, PlanInput } from './types'
 
 /**
  * 결과의 모양을 API에게 강제한다. 글로 "이 형식으로 줘"라고 부탁만 하면
@@ -206,8 +206,8 @@ const place = {
 
 const fivePlaces = { type: Type.ARRAY, minItems: 5, maxItems: 5, items: place }
 
-/** 유료 결과의 모양. 여기 없는 항목은 AI가 만들어낼 수 없다 */
-export const fullItinerarySchema = {
+/** 유료 결과의 모양. 여기 없는 항목은 AI가 만들어낼 수 없다. 날 수는 아래 fullItinerarySchema() 가 정한다 */
+const fullItineraryShape = {
   type: Type.OBJECT,
   properties: {
     tripTitle: { type: Type.STRING },
@@ -294,13 +294,60 @@ export const fullItinerarySchema = {
 }
 
 /**
+ * 유료 결과의 모양 + **날 수를 여행 길이로 못 박는다.**
+ * 전에는 날 수 제한이 없어서 4일 여행에 3일치가 와도 그대로 저장될 수 있었다 — 그러면 넷째 날의 팁이 통째로 없다.
+ * 무료 초안 화면이 팁 없는 날마다 "이 날의 현지 팁은 전체 일정에서 볼 수 있습니다"라고 약속하므로 날이 빠지면 안 된다.
+ */
+export function fullItinerarySchema(dayCount: number) {
+  return {
+    ...fullItineraryShape,
+    properties: {
+      ...fullItineraryShape.properties,
+      days: { ...fullItineraryShape.properties.days, minItems: dayCount, maxItems: dayCount },
+    },
+  }
+}
+
+/**
+ * 손님이 이미 본 무료 초안을 유료 지시문에 붙인다 (써니 요청 2026-10-11).
+ *
+ * 전에는 유료 일정을 폼 값만으로 **새로** 만들었다. 그래서 초안에서 본 장소가 유료 일정에 아예 없을 수 있었다 —
+ * 손님은 그 초안의 자세한 버전을 산 것인데. 무료 초안 화면은 팁 없는 날의 팁 자리를 가려 두고
+ * "전체 일정에서 볼 수 있습니다"라고 약속한다. 그 약속은 **초안의 장소가 유료 일정에 빠짐없이(되도록 같은 날에) 있고,
+ * 장소마다 팁이 붙어야** 지켜진다. 실제로 지켜졌는지는 만든 뒤에 lib/check-full-plan.ts 가 확인한다.
+ *
+ * 하루 안에서 순서는 바꿔도 된다(동선이 유료의 핵심이다). 빼는 것은 안 된다.
+ * 다른 날로 옮기는 것은 **그 날 문을 닫을 때만** — 초안은 무료라 휴무일을 덜 따졌을 수 있다. 그때도 빼지는 않는다.
+ */
+function draftSection(draft: FreeItinerary, dayCount: number): string {
+  const days = draft.days
+    .filter((d) => d.dayNumber >= 1 && d.dayNumber <= dayCount && d.activities.length > 0)
+    .map((d) => `Day ${d.dayNumber} — ${d.theme}: ${d.activities.map((a) => a.name).join(' / ')}`)
+  if (days.length === 0) return ''
+
+  return `## 0. Build on the free draft they already read
+
+They paid after reading the draft below. The full plan is the detailed version of THIS trip, not a new one.
+- Keep every stop from the draft. Write its name exactly as it appears below.
+- Keep it on the same day. Move it only if it is closed that day — then put it on a day it is open
+  and say so in that day's "routeNote". Never drop a draft stop.
+- You may add stops and reorder a day for a better route.
+- Every stop gets its own tips — the draft's stops included.
+
+The free draft:
+${days.join('\n')}
+
+`
+}
+
+/**
  * 유료 전체 일정.
  *
  * 무료와의 차이는 분량이 아니라 **분석**이다.
  * 손님이 돈을 내는 이유는 정보가 많아서가 아니라, 같은 예산으로 덜 헤매고 더 좋은 걸 하기 위해서다.
  * 그래서 지시문의 절반이 동선과 예산에 대한 것이다.
  */
-export function buildFullPlanPrompt(input: PlanInput): string {
+export function buildFullPlanPrompt(input: PlanInput, draft?: FreeItinerary | null): string {
   const budget = input.budgetRange
     ? `${input.budgetRange} per person`
     : input.budgetPerPerson
@@ -325,8 +372,9 @@ Trip:
 - Styles: ${input.styles.length ? input.styles.join(', ') : 'no preference'}
 ${shape(input)}${input.dietary?.length ? `- MUST WORK AROUND: ${input.dietary.join(', ')}\n  Every food recommendation must respect this. Do not suggest anything they cannot eat or reach.` : ''}
 
-## 1. Route — this is the main thing
+${draft ? draftSection(draft, input.durationDays) : ''}## 1. Route — this is the main thing
 
+- Write exactly ${input.durationDays} days, dayNumber 1 to ${input.durationDays}. Every day needs its own stops.
 - Group each day by AREA. A day should stay in one part of the city or region.
 - Never send them back to a neighbourhood they already finished.
 - Order stops so travel between them is short. Say how to get from the previous stop
