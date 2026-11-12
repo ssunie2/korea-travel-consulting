@@ -7,6 +7,7 @@
   - 회색 바탕 #F1F2F4 위에 흰 칸(벤토). 강조색은 --acc 하나 — 흰 글자와 4.7:1.
   - 제목 위 작은 머리글 없음, 자간은 -0.04em 보다 좁히지 않는다, 색 있는 그림자 없음.
   - 움직임은 첫 화면 하나뿐이고 CSS 만 쓴다. 움직임 줄이기 설정이면 처음부터 끝 상태로 그린다.
+    예외: 머리줄 로고 인트로(다람쥐가 e 가 됨)만 자바스크립트로 움직인다 — WordmarkIntro.tsx (써니 2026-11-13)
 */
 
 .page {
@@ -75,6 +76,15 @@
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; font-size: 22px; letter-spacing: -0.035em; }
 /* 컴퍼스 글자 로고(Wordmark.tsx) — 로고 시안 페이지의 '사이트 맨 위 줄 실제 크기'와 같은 높이 */
 .brandMark { height: 21px; }
+/* 로고 인트로(WordmarkIntro.tsx) — 다람쥐가 로고 칸 밖(왼쪽 · 위)까지 뛰어다니므로 그림이 칸 밖으로 나와도 보이게.
+   자바스크립트가 시작하기 전(pending)에는 글자를 숨겨 두고, 1.6초 안에 시작하지 못하면 그냥 보여준다 */
+.intro { display: contents; }
+.intro svg { overflow: visible; }
+.intro[data-intro="pending"] svg > g { opacity: 0; animation: introFallback 0.4s ease-out 1.6s forwards; }
+@keyframes introFallback { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .intro[data-intro="pending"] svg > g { opacity: 1; animation: none; }
+}
 .links {
   display: flex;
   align-items: center;

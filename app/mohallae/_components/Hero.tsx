@@ -5,6 +5,7 @@ import styles from "../landing.module.css";
 import { commonPlan, dayOne, dayPrice, hero, nav, planHref, tipLabel, withLang, type Lang } from "../content";
 import { photo } from "../photos";
 import Wordmark from "./Wordmark";
+import WordmarkIntro from "./WordmarkIntro";
 
 /**
  * 첫 화면 — 시안 21-5 '결과 미리보기' + 날짜별 가격 막대 (2026-10-20 써니 결정).
@@ -17,9 +18,12 @@ export default function Hero({ lang }: { lang: Lang }) {
   return (
     <header className={styles.wrap}>
       <nav aria-label={lang === "ko" ? "주 메뉴" : "Main"} className={styles.nav}>
-        {/* 로고는 글씨만 — 옆의 주황 m 칸은 뺐다 (써니 2026-11-03). 컴퍼스로 그린 글자 로고로 바꿈 (써니 2026-11-10) */}
+        {/* 로고는 글씨만 — 옆의 주황 m 칸은 뺐다 (써니 2026-11-03). 컴퍼스로 그린 글자 로고로 바꿈 (써니 2026-11-10).
+            처음 열 때 다람쥐가 달려가며 글자를 남기고 e 가 되는 인트로를 한 번 (써니 2026-11-13) */}
         <Link href={withLang("/mohallae", lang)} className={styles.brand}>
-          <Wordmark className={styles.brandMark} />
+          <WordmarkIntro>
+            <Wordmark className={styles.brandMark} />
+          </WordmarkIntro>
         </Link>
         <div className={styles.links}>
           <a href="#how">{nav.how[lang]}</a>
