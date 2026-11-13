@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
 import { t } from "@/lib/copy";
+import cursor from "./cursor.module.css";
 
 /**
  * 새 버전(/mohallae)의 바깥 틀. 기존 사이트와 **나란히 비교하려고** 따로 만든다 (이슈 #86).
@@ -25,5 +26,6 @@ export const metadata: Metadata = {
 };
 
 export default function MohallaeLayout({ children }: LayoutProps<"/mohallae">) {
-  return <div className={`${figtree.variable} flex flex-1 flex-col`}>{children}</div>;
+  // cursor.squirrel: 누를 수 있는 곳에 마우스를 올리면 다람쥐 얼굴이 뜸 (cursor.module.css)
+  return <div className={`${figtree.variable} ${cursor.squirrel} flex flex-1 flex-col`}>{children}</div>;
 }

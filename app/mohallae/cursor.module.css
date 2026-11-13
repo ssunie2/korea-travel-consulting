@@ -1,0 +1,13 @@
+/*
+  다람쥐 얼굴 마우스 (써니 2026-11-14)
+  - 평소엔 원래 화살표 그대로. 누를 수 있는 곳(링크 · 버튼 등)에 올렸을 때만 손 모양 대신 다람쥐 얼굴이 뜬다
+  - 누르는 지점은 얼굴 한가운데 (16, 18)
+  - 마우스를 쓰는 기기에서만. 휴대폰 · 태블릿 손가락 터치에는 영향 없음
+  - 그림이 안 뜨는 브라우저는 원래 손 모양(pointer)으로 돌아간다
+*/
+@media (hover: hover) and (pointer: fine) {
+  .squirrel :is(a[href], button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary, select, label[for], input[type="checkbox"], input[type="radio"]) {
+    cursor: url("/mohallae/cursor-squirrel.png") 16 18, pointer;
+    cursor: image-set(url("/mohallae/cursor-squirrel.png") 1x, url("/mohallae/cursor-squirrel@2x.png") 2x) 16 18, pointer;
+  }
+}
