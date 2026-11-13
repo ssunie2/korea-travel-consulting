@@ -75,6 +75,8 @@
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; font-size: 22px; letter-spacing: -0.035em; }
 /* 컴퍼스 글자 로고(Wordmark.tsx) — 로고 시안 페이지의 '사이트 맨 위 줄 실제 크기'와 같은 높이 */
 .brandMark { height: 21px; }
+/* PC(1001px 이상)에서는 130% — 오른쪽 메뉴 칸과 무게를 맞춤 (써니 2026-11-13). 메뉴 칸보다 낮아서 머리줄 높이는 그대로 */
+@media (min-width: 1001px) { .brandMark { height: 27.3px; } }
 .links {
   display: flex;
   align-items: center;
