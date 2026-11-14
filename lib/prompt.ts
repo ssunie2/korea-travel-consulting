@@ -188,7 +188,6 @@ The English examples in this prompt only show the shape. Never copy their Englis
     : (input.travelers > 1 ? `"1인 320 ${input.budgetCurrency} · 2명 640 ${input.budgetCurrency}"` : `"1인 약 320 ${input.budgetCurrency}"`)})` : ''}
 Tone: warm, specific, confident. Never salesy.
 Never put the words "teaser", "draft", "sample" or "free" in the title or summary — the reader sees a trip, not our internal labels.
-Korean words that look alike: hanbok = traditional clothing (you wear it); hanok = traditional house (you visit it). Never mix them up.
 
 Field notes:
 - summary: 2-3 sentences on how this trip will feel

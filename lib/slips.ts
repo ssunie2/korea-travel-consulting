@@ -4,7 +4,9 @@
  * 지시문에 "한복(hanbok)과 한옥(hanok)을 헷갈리지 마라"고 적어도, 영어 초안에서
  * "Wear a traditional hanok costume" · "Rent traditional hanok attire" 를 세 번 연속 썼다.
  * 경복궁에 한복을 입고 가면 무료라는 팁을 거의 매번 고르는데, 그때마다 옷을 '한옥'이라고 부른다.
- * 손님에게는 "이 사람들 한국 모르네"로 보이는 실수라, 지시문만 믿지 않고 저장 전·화면에 보이기 전에 한 번 더 고친다.
+ * 손님에게는 "이 사람들 한국 모르네"로 보이는 실수라 저장 전·화면에 보이기 전에 코드로 고친다.
+ * 지시문에 넣었던 구분 문장은 뺐다 — 가벼운 모델이 그 문장을 그대로 팁으로 옮겨 적었다
+ * ("Do not confuse hanok historical houses with hanbok traditional clothing rentals.")
  *
  * 고치는 건 '입는 것'이 분명할 때뿐이다. "stay in a hanok"(한옥에 묵기) 같은 맞는 말은 건드리지 않는다.
  */
