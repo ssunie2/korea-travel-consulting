@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useReducer, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import base from "../../mohallae.module.css";
 import s from "./flow.module.css";
@@ -132,9 +131,10 @@ export default function PlanFlow({ initialLang }: { initialLang: Lang }) {
     <div lang={lang} className={`${base.page} ${s.shell}`}>
       <header className={s.topbar}>
         <div className={`${s.wrap} ${s.topbarInner}`}>
-          <Link href={`/mohallae${lang === "en" ? "?lang=en" : ""}`} className={s.wordmark} aria-label={t(c.home)}>
+          {/* 로고는 <a> — 첫 화면을 새로 불러와 모션이 처음부터 돈다 (써니 2026-11-14, Hero.tsx 와 같음) */}
+          <a href={`/mohallae${lang === "en" ? "?lang=en" : ""}`} className={s.wordmark} aria-label={t(c.home)}>
             <Wordmark label={null} className={s.wordmarkSvg} />
-          </Link>
+          </a>
           <div className={s.topbarRight}>
             <span className={s.lang} role="group" aria-label={t(c.langLabel)}>
               {(["en", "ko"] as const).map((code, i) => (

@@ -21,12 +21,13 @@ export default function SubHeader({ lang, path }: { lang: Lang; path: string }) 
         aria-label={lang === "ko" ? "주 메뉴" : "Main"}
         className={`${styles.wrap} flex items-center justify-between gap-4 py-4 md:py-5`}
       >
-        <Link
+        {/* 로고는 <a> — 첫 화면을 새로 불러와 모션이 처음부터 돈다 (써니 2026-11-14, Hero.tsx 와 같음) */}
+        <a
           href={withLang("/mohallae", lang)}
           className={`${link} md:ml-[10px]`}
         >
           <Wordmark className="h-[24px] md:h-[30px]" />
-        </Link>
+        </a>
 
         <div className="flex items-center text-[13.5px] font-medium">
           <Link href={withLang("/mohallae", lang) + "#how"} className={`${link} hidden md:inline`}>

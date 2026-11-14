@@ -18,10 +18,12 @@ export default function Hero({ lang }: { lang: Lang }) {
     <header className={styles.wrap}>
       <nav aria-label={lang === "ko" ? "주 메뉴" : "Main"} className={styles.nav}>
         {/* 로고는 글씨만 — 옆의 주황 m 칸은 뺐다 (써니 2026-11-03). 컴퍼스로 그린 글자 로고로 바꿈 (써니 2026-11-10).
-            o 에 다람쥐 귀 · 눈을 넣음 — 인트로 모션은 뺌 (써니 2026-11-13) */}
-        <Link href={withLang("/mohallae", lang)} className={styles.brand}>
+            o 에 다람쥐 귀 · 눈을 넣음 — 인트로 모션은 뺌 (써니 2026-11-13)
+            로고는 <a> — 누르면 첫 화면을 새로 불러와서 맨 위부터, 잠금화면 모션도 처음부터 다시 돈다 (써니 2026-11-14).
+            Link 로 두면 같은 화면이라 아무 일도 안 일어난다 */}
+        <a href={withLang("/mohallae", lang)} className={styles.brand}>
           <Wordmark className={styles.brandMark} />
-        </Link>
+        </a>
         <div className={styles.links}>
           <a href="#how">{nav.how[lang]}</a>
           <a href="#samples">{nav.samples[lang]}</a>

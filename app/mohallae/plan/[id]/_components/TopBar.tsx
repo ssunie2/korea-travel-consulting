@@ -25,13 +25,14 @@ export default function TopBar({ lang, planId, isSample = false }: { lang: Lang;
   return (
     <header className={styles.topbar}>
       <div className={`${styles.wrap} ${styles.topbarInner}`}>
-        <Link
+        {/* 로고는 <a> — 첫 화면을 새로 불러와 모션이 처음부터 돈다 (써니 2026-11-14, Hero.tsx 와 같음) */}
+        <a
           href={`/mohallae${lang === "en" ? "?lang=en" : ""}`}
           className={styles.wordmark}
           aria-label={draftCopy.home[lang]}
         >
           <Wordmark label={null} className={styles.wordmarkSvg} />
-        </Link>
+        </a>
         <div className={styles.topbarRight}>
           <span className={styles.lang} role="group" aria-label={draftCopy.langLabel[lang]}>
             {item("en", "EN")}
