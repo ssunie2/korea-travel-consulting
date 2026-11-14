@@ -242,8 +242,8 @@ export const samples = {
     en: "Tell us about your trip and we'll make 3–5 plans for each day. One Day 1 plan is free to see in full.",
   },
   // 기존 랜딩 SAMPLES 와 같은 네 개. 실제로 폼을 거쳐 만들어 저장된 초안이다.
-  // 사진: photo 는 사진 대장의 자리(서울 사진 20장 중 하나), alt 는 아직 대장 밖 사진을 쓰는 카드의 설명.
-  // 서울 밖 두 장(부산·경주)은 서울만 도는 새 샘플 초안으로 바꿀 때 대장의 사진으로 바꾼다.
+  // 사진: 사진 대장의 자리(서울 사진 20장 중 하나).
+  // 2·4번은 서울 밖(부산·경주) 초안이던 것을 서울만 도는 새 초안으로 바꿨다 (써니 2026-11-14, 새 입력 폼으로 만듦)
   items: [
     {
       id: "afe82bca-e5d1-49d1-b0fb-2517d3a698ce",
@@ -255,13 +255,13 @@ export const samples = {
       photo: "samples.s1",
     },
     {
-      id: "bb69139f-db3e-47fc-94f7-f7779df74f49",
-      who: { ko: "둘이 · 서울과 부산 5일", en: "Two of you · 5 days, Seoul and Busan" },
+      id: "738b4e05-9ec0-4e0f-af30-7415970da0da",
+      who: { ko: "친구들끼리 · 서울 3일", en: "With friends · 3 days in Seoul" },
       title: {
-        ko: "서울과 부산에서 맞이하는 로맨틱 5일간의 여정",
-        en: "Five romantic days across Seoul and Busan",
+        ko: "서울 첫 방문 알뜰 3일 친구 여행",
+        en: "Three thrifty days in Seoul with friends, first time",
       },
-      alt: { ko: "부산의 해변과 광안대교", en: "A Busan beach and the Gwangan Bridge" },
+      photo: "samples.s2",
     },
     {
       id: "e45be288-0b7a-438a-9e02-176eafce1ee4",
@@ -273,21 +273,15 @@ export const samples = {
       photo: "samples.s3",
     },
     {
-      id: "5c297ae8-61fe-4b98-aae1-ac6476e8cade",
-      who: {
-        ko: "다시 온 여행 · 경주와 안동 4일",
-        en: "Been before · 4 days, Gyeongju and Andong",
-      },
+      id: "9fb020bd-0460-4579-8465-0853244f1d73",
+      who: { ko: "부모님과 함께 · 서울 4일", en: "With parents · 4 days in Seoul" },
       title: {
-        ko: "경주와 안동, 숨은 옛 자취를 따라가는 4일간의 여정",
-        en: "Gyeongju and Andong: four days along the old quiet trails",
+        ko: "부모님과 함께하는 편안한 서울 고궁과 산책 여행",
+        en: "Easy palace and walking days in Seoul with your parents",
       },
-      alt: {
-        ko: "단풍 든 산 아래 절 마당의 석탑",
-        en: "A stone pagoda in a temple yard under autumn hills",
-      },
+      photo: "samples.s4",
     },
-  ] as { id: string; who: Pair<string>; title: Pair<string>; photo?: Slot; alt?: Pair<string> }[],
+  ] as { id: string; who: Pair<string>; title: Pair<string>; photo: Slot }[],
 };
 
 /** 이용 방법 세 칸. tag 는 칸 오른쪽 위 꼬리표 */

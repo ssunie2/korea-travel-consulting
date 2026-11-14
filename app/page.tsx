@@ -352,14 +352,11 @@ const SAMPLES = [
     }),
   },
   {
-    id: "bb69139f-db3e-47fc-94f7-f7779df74f49",
-    who: t({
-      ko: "둘이 · 서울과 부산 5일",
-      en: "Two of you · 5 days, Seoul and Busan",
-    }),
+    id: "738b4e05-9ec0-4e0f-af30-7415970da0da",
+    who: t({ ko: "친구들끼리 · 서울 3일", en: "With friends · 3 days in Seoul" }),
     title: t({
-      ko: "서울과 부산에서 맞이하는 로맨틱 5일간의 여정",
-      en: "Five romantic days across Seoul and Busan",
+      ko: "서울 첫 방문 알뜰 3일 친구 여행",
+      en: "Three thrifty days in Seoul with friends, first time",
     }),
   },
   {
@@ -371,14 +368,11 @@ const SAMPLES = [
     }),
   },
   {
-    id: "5c297ae8-61fe-4b98-aae1-ac6476e8cade",
-    who: t({
-      ko: "다시 온 여행 · 경주와 안동 4일",
-      en: "Been before · 4 days, Gyeongju and Andong",
-    }),
+    id: "9fb020bd-0460-4579-8465-0853244f1d73",
+    who: t({ ko: "부모님과 함께 · 서울 4일", en: "With parents · 4 days in Seoul" }),
     title: t({
-      ko: "경주와 안동, 숨은 옛 자취를 따라가는 4일간의 여정",
-      en: "Gyeongju and Andong: four days along the old quiet trails",
+      ko: "부모님과 함께하는 편안한 서울 고궁과 산책 여행",
+      en: "Easy palace and walking days in Seoul with your parents",
     }),
   },
 ];

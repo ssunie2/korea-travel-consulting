@@ -80,10 +80,9 @@ test("남산타워가 보이는 사진은 한 장까지", () => {
 
 /**
  * 새 랜딩(/mohallae 첫 화면)이 쓰는 사진 파일은 랜딩 안에서 한 번만, 다른 화면과도 겹치지 않게.
- * 아직 남은 예외: 서울 밖 샘플 카드 두 장(부산·경주) — 입력 흐름의 엽서와 같은 파일이다.
- * 서울만 도는 새 샘플 초안으로 바꾸면 이 두 줄을 지운다.
+ * (서울 밖 샘플 카드 두 장의 예외는 서울 샘플로 바꾸면서 없앴다, 2026-11-14)
  */
-const KNOWN_SHARED = new Set(["/mohallae/postcard-busan.jpg", "/mohallae/postcard-gyeongju.jpg"]);
+const KNOWN_SHARED = new Set<string>();
 
 test("새 랜딩의 사진은 랜딩 안에서 한 번만, 다른 화면과 겹치지 않는다", () => {
   const isLanding = (p: string) =>

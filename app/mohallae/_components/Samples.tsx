@@ -1,26 +1,8 @@
-import Image, { type StaticImageData } from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import styles from "../landing.module.css";
 import { dayOne, nav, planHref, samples, tipLabel, type Lang } from "../content";
 import { photo } from "../photos";
-
-// 서울 밖 샘플 카드 두 장(부산·경주)의 사진 — 아직 사진 대장 밖이다.
-// 서울만 도는 새 샘플 초안으로 바꾸면 대장에 자리(samples.s2 · samples.s4)를 만들어 그 사진으로 바꾸고 이 부분을 지운다.
-import postcardBusan from "@/public/mohallae/postcard-busan.jpg";
-import postcardGyeongju from "@/public/mohallae/postcard-gyeongju.jpg";
-
-const NOT_YET_SEOUL: Record<string, StaticImageData> = {
-  "bb69139f-db3e-47fc-94f7-f7779df74f49": postcardBusan,
-  "5c297ae8-61fe-4b98-aae1-ac6476e8cade": postcardGyeongju,
-};
-
-/** 카드 사진 — 서울 사진은 사진 대장에서, 서울 밖 두 장은 위의 엽서에서 */
-function cardPhoto(item: (typeof samples.items)[number], lang: Lang) {
-  if (item.photo) return photo(item.photo, lang);
-  const src = NOT_YET_SEOUL[item.id];
-  if (!src) throw new Error(`샘플 카드 ${item.id} 에 사진이 없다`);
-  return { src, alt: item.alt?.[lang] ?? "", position: undefined };
-}
 
 const CARD_CLASS = [styles.s1, styles.s2, styles.s3, styles.s4];
 const CARD_SIZES = [
@@ -46,7 +28,7 @@ export default function Samples({ lang }: { lang: Lang }) {
       </div>
       <div className={styles.grid}>
         {samples.items.map((s, i) => {
-          const card = cardPhoto(s, lang);
+          const card = photo(s.photo, lang);
           return (
           <Link
             key={s.id}

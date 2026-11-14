@@ -18,7 +18,9 @@ import type { Pair } from "./content";
 export const SLOTS = [
   "hero.lock", // 첫 화면 오른쪽 — 잠금화면 배경
   "samples.s1", // 샘플 카드 1 — 혼자 · 서울 3일
+  "samples.s2", // 샘플 카드 2 — 친구들끼리 · 서울 3일 (첫날 홍대·연남)
   "samples.s3", // 샘플 카드 3 — 아이와 함께 · 서울 4일
+  "samples.s4", // 샘플 카드 4 — 부모님과 함께 · 서울 4일 (둘째 날 북촌·삼청동)
   "example.bukchon", // 예시 칸 — '북촌 골목과 광장시장' 안의 작은 사진
   "example.seongsu", // 예시 칸 — 무료로 연 '성수 카페와 서울숲 노을' 안, 첫 정거장 사진
   "example.hanRiver", // 예시 칸 — '여의도 한강과 남산 야경' 안의 작은 사진
@@ -67,7 +69,7 @@ export const SEOUL_PHOTOS: LedgerPhoto[] = [
     id: "samcheong-wall",
     area: "북촌·삼청동",
     alt: { ko: "은행나무가 물든 삼청동 돌담길", en: "Yellow ginkgo trees along a stone wall in Samcheong-dong" },
-    slot: null,
+    slot: "samples.s4",
   },
   {
     id: "hanok-courtyard",
@@ -126,7 +128,7 @@ export const SEOUL_PHOTOS: LedgerPhoto[] = [
     id: "yeonnam-street",
     area: "홍대·연남",
     alt: { ko: "작은 가게가 늘어선 연남동 골목", en: "A Yeonnam-dong lane of small shops and cafés" },
-    slot: null,
+    slot: "samples.s2",
   },
   // 이태원·한남
   {
