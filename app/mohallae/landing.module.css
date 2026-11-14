@@ -79,7 +79,7 @@
 @media (min-width: 1001px) { .brandMark { height: 27.3px; } }
 /* 로고 + 오른쪽 문구 '모할래? · what shall we do?' (써니 2026-11-14 꼬리말에서 옮김).
    메뉴 칸까지 한 줄에 들어가는 PC 에서만 보인다. 좁은 화면에서는 꼬리말(.footTag)에 남는다 */
-.brandRow { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brandRow { display: flex; align-items: baseline; gap: 14px; min-width: 0; } /* baseline: 문구의 글자 바닥을 로고 글자 바닥(SVG 아래 끝)에 맞춘다 (써니 2026-11-14) */
 .brandTag { display: none; font-size: 13.5px; font-weight: 500; color: var(--ink-3); white-space: nowrap; letter-spacing: -0.01em; }
 @media (min-width: 1001px) {
   .brandTag { display: inline; }

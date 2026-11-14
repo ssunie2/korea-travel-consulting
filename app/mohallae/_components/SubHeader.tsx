@@ -22,7 +22,7 @@ export default function SubHeader({ lang, path }: { lang: Lang; path: string }) 
         className={`${styles.wrap} flex items-center justify-between gap-4 py-4 md:py-5`}
       >
         {/* 로고는 <a> — 첫 화면을 새로 불러와 모션이 처음부터 돈다 (써니 2026-11-14, Hero.tsx 와 같음) */}
-        <div className="flex items-center gap-[14px]">
+        <div className="flex items-baseline gap-[14px]">
           <a
             href={withLang("/mohallae", lang)}
             className={`${link} md:ml-[10px]`}
