@@ -27,8 +27,11 @@ export const metadata = {
  * 랜딩 한가운데에 여덟 개를 늘어놓으면 사려는 사람의 발을 붙든다.
  * 개인정보 처리방침과 같은 자리(꼬리말)에 링크로 둔다.
  *
- * 답을 지어내지 않는다. 환불·수정 요청처럼 **아직 정해지지 않은 것은 아예 넣지 않았다** —
+ * 답을 지어내지 않는다. **아직 정해지지 않은 것은 아예 넣지 않는다** —
  * 반쯤 아는 것을 적어 두면 그게 약속이 된다.
+ *
+ * 환불은 2026-09-19 에 정해져서 넣었다. 자세한 것은 `/refund` 에 있고,
+ * 여기 답과 그 페이지가 어긋나면 안 된다 — 고칠 때 둘을 같이 본다.
  */
 const FAQ = t({
   ko: [
@@ -45,6 +48,8 @@ const FAQ = t({
     ["여러 도시를 도는 여행도 되나요?",
      "됩니다. 열다섯 곳 중에서 여러 곳을 고르실 수 있고, 목록에 없는 곳은 직접 적으시면 됩니다."],
     ["몇 명까지 되나요?", "한 명부터 스무 명까지 됩니다."],
+    ["마음에 안 들면 환불되나요?",
+     "전체 일정을 아직 열어보지 않으셨다면 7일 안에 전액 돌려드립니다. 여신 뒤라도 저희가 틀렸다면 — 요청하지 않은 도시가 들어갔거나, 날짜가 다르거나, 못 드시는 음식을 추천했다면 — 다시 만들어 드리거나 전액 돌려드립니다. 자세한 것은 취소·환불 규정에 적어뒀습니다."],
     ["비자가 필요한가요?",
      "국적마다 달라서 저희가 답할 수 없습니다. 반드시 대한민국 대사관이나 하이코리아(hikorea.go.kr)에서 확인해 주세요."],
   ] as [string, string][],
@@ -62,6 +67,8 @@ const FAQ = t({
     ["Can I visit several cities?",
      "Yes. Pick as many as you like from fifteen, and type in anywhere that is not on the list."],
     ["How many people?", "One to twenty."],
+    ["What if I don\u2019t like it?",
+     "If you have not opened the full plan yet, you get all of it back within 7 days. If you have opened it and we got it wrong \u2014 a city you did not ask for, the wrong dates, food you told us you cannot eat \u2014 we write it again or refund you in full. The refund page has the detail."],
     ["Do I need a visa?",
      "That depends on your passport, so we cannot answer it for you. Please check with a Korean embassy or hikorea.go.kr."],
   ] as [string, string][],
