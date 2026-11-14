@@ -393,7 +393,7 @@ export const plans = {
 
 export const ask = {
   question: { ko: "먼저 물어보고 싶으신가요?", en: "Rather just ask a question first?" },
-  faq: { ko: "자주 묻는 것 보기", en: "Read the FAQ" },
+  faq: { ko: "자주 묻는 것", en: "FAQ" },
   contact: { ko: "무엇이든 물어보세요", en: "Ask us anything" },
   cta: { ko: "무료 초안부터 받아보기", en: "Start with the free draft" },
 };
