@@ -179,7 +179,9 @@ THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
 
 ${BOUNDARY}
 
-Write everything in ${languageName(input.language)}.
+Write everything in ${languageName(input.language)} — including "travel" and "totalEstimate".
+The English examples in this prompt only show the shape. Never copy their English words.${input.language === 'ko' ? `
+  (Korean: "지하철로 약 25분", "도보 10분", ${input.budgetCurrency === 'KRW' ? '"1인 450,000원 · 2명 900,000원"' : `"1인 320 ${input.budgetCurrency} · 2명 640 ${input.budgetCurrency}"`})` : ''}
 Tone: warm, specific, confident. Never salesy.
 
 Field notes:
