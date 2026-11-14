@@ -15,6 +15,7 @@ import LocalTip from "./_components/LocalTip";
 import ClosingBand from "./_components/ClosingBand";
 import TipReveal from "./_components/TipReveal";
 import Facts from "./_components/Facts";
+import { fixSlips } from "@/lib/slips";
 
 /**
  * 새 결과 화면 — 무료 초안 (이슈 #86, 승인 시안 result-comp-3 "날짜별 기둥").
@@ -47,7 +48,9 @@ const getDraft = cache(async (id: string) => {
     .eq("id", id)
     .maybeSingle();
   if (error || !data) return null;
-  return data as DraftRow;
+  const row = data as DraftRow;
+  // 이미 저장된 초안에 남은 실수(한복 ↔ 한옥)도 화면에서는 바로잡아 보인다 — lib/slips.ts
+  return row.itinerary ? { ...row, itinerary: fixSlips(row.itinerary) } : row;
 });
 
 export async function generateMetadata({ params }: PageProps<"/mohallae/plan/[id]">): Promise<Metadata> {

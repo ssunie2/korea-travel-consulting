@@ -8,6 +8,7 @@ import { placeLabel } from "@/lib/places";
 import { dayLabel, dateRange } from "@/lib/date";
 import { PAID_ORDERS_OPEN } from "@/lib/orders";
 import CopyLinkButton from "@/components/CopyLinkButton";
+import { fixSlips } from "@/lib/slips";
 
 // 표제용 서체. 랜딩(app/page.tsx)과 같은 방식으로 이 화면에서만 불러온다.
 const display = Instrument_Serif({
@@ -67,7 +68,8 @@ export default async function PlanPage({ params }: { params: Promise<{ id: strin
   if (error || !data) notFound();
 
   const plan = data as Plan;
-  const trip = plan.itinerary;
+  // 이미 저장된 초안에 남은 실수(한복 ↔ 한옥)도 화면에서는 바로잡아 보인다 — lib/slips.ts
+  const trip = plan.itinerary ? fixSlips(plan.itinerary) : plan.itinerary;
 
   // AI 생성이 실패한 채 저장된 경우. 빈 화면 대신 다시 해볼 길을 준다.
   if (!trip) {

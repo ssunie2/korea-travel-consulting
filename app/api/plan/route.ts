@@ -1,5 +1,6 @@
 import { supabaseServer } from '@/lib/supabase-server'
 import { validatePlanInput } from '@/lib/validate'
+import { fixSlips } from '@/lib/slips'
 import { generateJson } from '@/lib/ai'
 import { buildFreeDraftPrompt, freeItinerarySchema } from '@/lib/prompt'
 import type { FreeItinerary } from '@/lib/types'
@@ -50,6 +51,8 @@ export async function POST(req: Request) {
       fallbackModel: 'gemini-3.5-flash-lite',
       primaryShare: 0.8,
     })
+    // AI 가 자꾸 틀리는 말(한복 ↔ 한옥)을 저장 전에 바로잡는다 — lib/slips.ts
+    itinerary = fixSlips(itinerary)
   } catch (e) {
     console.error('itinerary generation failed:', e)
     return Response.json({ error: 'Could not create your plan right now. Please try again.' }, { status: 502 })
