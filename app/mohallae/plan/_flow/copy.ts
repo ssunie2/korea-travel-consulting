@@ -47,7 +47,7 @@ export const flowCopy = {
   plus: tx("한 명 늘리기", "One more"),
   currency: tx("비용을 볼 통화", "Show costs in"),
   language: tx("초안을 받을 언어", "Language of your draft"),
-  reviewNote: tx("가입도 카드도 필요 없어요. 보통 15초쯤 걸려요.", "No account, no card. Usually about 15 seconds."),
+  reviewNote: tx("가입도 카드도 필요 없어요. 보통 30초 안팎 걸려요.", "No account, no card. Usually around 30 seconds."),
 
   postcardPause: tx("엽서 사진 멈추기", "Pause the photos"),
 
@@ -83,8 +83,8 @@ export const flowCopy = {
   // 기다림 — 초안을 쓰는 동안 랜딩의 고쳐 쓰기 장면을 보여 준다
   waiting: {
     title: tx("초안을 쓰고 있어요", "Writing your draft"),
-    body: tx("보통 15초쯤 걸려요. 그동안 현지인이 고쳐 쓴 계획을 구경해 보세요.", "Usually about 15 seconds. Meanwhile, a few plans a local would rewrite:"),
-    slow: tx("여행이 길면 1분 가까이 걸리기도 해요. 조금만 더 기다려 주세요.", "Longer trips can take up to a minute. Hang on a little longer."),
+    body: tx("보통 30초 안팎 걸려요. 그동안 현지인이 고쳐 쓴 계획을 구경해 보세요.", "Usually around 30 seconds. Meanwhile, a few plans a local would rewrite:"),
+    slow: tx("여행이 길면 1~2분 걸리기도 해요. 조금만 더 기다려 주세요.", "Longer trips can take a minute or two. Hang on a little longer."),
   },
   errors: {
     400: tx("적어 주신 값 중에 이상한 게 있어요. 날짜와 인원을 확인해 주세요.", "Something doesn't look right. Please check the dates and the number of people."),

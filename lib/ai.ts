@@ -32,10 +32,12 @@ export type GenerateOptions = {
    */
   thinking?: 'low' | 'medium' | 'high'
   /**
-   * 첫 모델이 붐비거나(429·503) 시간 안에 못 끝내면 넘어갈 가벼운 모델.
-   * 주면: 첫 모델에 남은 시간의 60% 만 주고, 나머지 시간에 이 모델로 한 번 더 쓴다.
+   * 첫 모델이 붐비거나(429·503) 오류가 나거나 시간 안에 못 끝내면 넘어갈 가벼운 모델.
+   * 주면: 첫 모델에 남은 시간의 primaryShare 만 주고, 나머지 시간에 이 모델로 한 번 더 쓴다.
    */
   fallbackModel?: string
+  /** 가벼운 모델이 있을 때 첫 모델에 주는 시간 비율 (기본 0.6) */
+  primaryShare?: number
 }
 
 const LEVEL = { low: ThinkingLevel.LOW, medium: ThinkingLevel.MEDIUM, high: ThinkingLevel.HIGH }
@@ -51,7 +53,7 @@ export async function generateJson<T>(prompt: string, schema: object, opts: Gene
     const model = plan[i]
     const left = deadline - Date.now()
     if (left < 3000) break // 3초도 안 남았으면 시작해 봐야 못 끝낸다
-    const timeout = Number.isFinite(left) ? (opts.fallbackModel && i === 0 ? Math.round(left * 0.6) : left) : undefined
+    const timeout = Number.isFinite(left) ? (opts.fallbackModel && i === 0 ? Math.round(left * (opts.primaryShare ?? 0.6)) : left) : undefined
     const thinking = opts.thinking && i === 0 && model.startsWith('gemini-3') ? { thinkingLevel: LEVEL[opts.thinking] } : undefined
     const started = Date.now()
     try {

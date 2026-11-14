@@ -5,7 +5,7 @@ import { buildFreeDraftPrompt, freeItinerarySchema } from '@/lib/prompt'
 import type { FreeItinerary } from '@/lib/types'
 
 // AI 생성에 실측 12.7초가 걸린다(gemini-3.5-flash 시절). 기본 상한에 걸려 잘리면 손님은 원인 모를 실패를 본다.
-export const maxDuration = 60
+export const maxDuration = 120
 
 // ponytail: 요금 폭탄 방어용 최소 장치. 서버 한 대 안에서만 세므로 서버가 여러 대로 늘면 그만큼 헐거워진다.
 // 제대로 하려면 DB나 별도 저장소로 옮긴다 (이슈 C3)
@@ -41,11 +41,14 @@ export async function POST(req: Request) {
 
   let itinerary: FreeItinerary
   try {
-    // 52초 안에 끝낸다 (상한 60초 - 저장할 시간). 생각은 낮게, 늦거나 붐비면 가벼운 모델로 한 번 더 (2026-11-14 504 대응)
+    // 품질 우선 (써니 2026-11-14): 상한 120초, 그중 112초를 AI 에 쓴다(나머지는 저장할 시간).
+    // 좋은 모델에 약 90초를 다 주고, 가벼운 모델은 좋은 모델이 오류·붐빔으로 실패하거나 90초를 넘겼을 때만 쓴다.
+    // (처음엔 52초 예산에 31초만 줬더니 절반쯤이 가벼운 모델로 넘어가 품질이 들쭉날쭉했다)
     itinerary = await generateJson<FreeItinerary>(buildFreeDraftPrompt(input), freeItinerarySchema, {
-      budgetMs: 52_000,
+      budgetMs: 112_000,
       thinking: 'low',
       fallbackModel: 'gemini-3.5-flash-lite',
+      primaryShare: 0.8,
     })
   } catch (e) {
     console.error('itinerary generation failed:', e)

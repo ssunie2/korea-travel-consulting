@@ -123,7 +123,8 @@ const MESSAGES: Record<number, string> = {
   502: t({ ko: "지금 초안을 못 쓰고 있습니다. 다시 시도해 주세요.", en: "Our writer is having a moment. Please try again." }),
 };
 const FALLBACK = t({ ko: "초안을 만들지 못했습니다. 다시 시도해 주세요.", en: "We couldn't create your draft. Please try again." });
-const TIMEOUT_MS = 60_000;
+// 서버(app/api/plan)가 120초까지 일하므로 화면은 그보다 넉넉히 기다린다 (2026-11-14)
+const TIMEOUT_MS = 135_000;
 
 export default function PlanForm() {
   const router = useRouter();

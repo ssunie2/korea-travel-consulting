@@ -98,11 +98,11 @@ export default function PlanFlow({ initialLang }: { initialLang: Lang }) {
     setSending(true);
     setFailure(null);
     // 시간 제한이 없으면 서버가 답을 안 줄 때 영원히 기다린다.
-    // 서버(app/api/plan)는 60초까지 일한다. 화면도 60초에 포기하면, 서버가 59초에 다 써서 저장까지 했는데
+    // 서버(app/api/plan)는 120초까지 일한다. 화면도 120초에 포기하면, 서버가 119초에 다 써서 저장까지 했는데
     // 서버가 깨어나는 시간·오가는 시간 때문에 화면이 먼저 포기할 수 있다 (손님은 실패를 보고, 초안은 저장돼 있다).
     // 그래서 화면은 서버보다 넉넉히 기다린다. 서버가 시간을 넘기면 Vercel 이 504 를 먼저 돌려준다.
     const abort = new AbortController();
-    const timer = setTimeout(() => abort.abort(), 75_000);
+    const timer = setTimeout(() => abort.abort(), 135_000);
     try {
       const res = await fetch("/api/plan", {
         method: "POST",
@@ -537,10 +537,10 @@ function dayLabel(key: string, lang: Lang) {
 /* ── 기다림 ──────────────────────────────────────────────────────── */
 
 function Waiting({ lang }: { lang: Lang }) {
-  // 20초가 넘으면 "보통 15초" 가 거짓말이 된다 — 긴 여행은 더 걸린다고 바꿔 말한다
+  // 40초가 넘으면 "보통 30초 안팎" 이 거짓말이 된다 — 긴 여행은 더 걸린다고 바꿔 말한다
   const [slow, setSlow] = useState(false);
   useEffect(() => {
-    const id = setTimeout(() => setSlow(true), 20_000);
+    const id = setTimeout(() => setSlow(true), 40_000);
     return () => clearTimeout(id);
   }, []);
   return (
