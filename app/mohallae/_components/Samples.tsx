@@ -3,8 +3,11 @@ import Link from "next/link";
 import styles from "../landing.module.css";
 import { dayOne, nav, planHref, samples, tipLabel, type Lang } from "../content";
 import { photo } from "../photos";
+import SamplesMotion from "./SamplesMotion";
 
 const CARD_CLASS = [styles.s1, styles.s2, styles.s3, styles.s4];
+// 스크롤할 때 사진이 액자 안에서 흐르는 빠르기 — 카드마다 달라 서로 다른 거리에 떠 있는 것처럼 보인다 (SamplesMotion)
+const CARD_DEPTH = [1, 0.55, 1.45, 0.8];
 const CARD_SIZES = [
   "(min-width: 1001px) 640px, 100vw",
   "(min-width: 1001px) 320px, (min-width: 641px) 33vw, 100vw",
@@ -26,7 +29,7 @@ export default function Samples({ lang }: { lang: Lang }) {
           {samples.heading[lang]}
         </h2>
       </div>
-      <div className={styles.grid}>
+      <div className={styles.grid} data-motion-grid>
         {samples.items.map((s, i) => {
           const card = photo(s.photo, lang);
           return (
@@ -34,6 +37,7 @@ export default function Samples({ lang }: { lang: Lang }) {
             key={s.id}
             href={`/mohallae/plan/${s.id}${lang === "en" ? "?lang=en" : ""}`}
             className={`${styles.t} ${styles.sample} ${CARD_CLASS[i]}`}
+            data-depth={CARD_DEPTH[i]}
           >
             <Image
               src={card.src}
@@ -69,6 +73,7 @@ export default function Samples({ lang }: { lang: Lang }) {
 
         <DayExample lang={lang} />
       </div>
+      <SamplesMotion />
     </section>
   );
 }
@@ -107,23 +112,27 @@ function DayExample({ lang }: { lang: Lang }) {
   const locked = dayOne.variants.filter((v) => !v.open);
   return (
     <figure className={`${styles.t} ${styles.tApp}`}>
-      <figcaption className={styles.appHead}>
+      <figcaption className={styles.appHead} data-w="text">
         <span>
           <span className={styles.chip}>{dayOne.sample[lang]}</span>
           <b>{dayOne.count[lang]}</b>
         </span>
       </figcaption>
 
-      <div className={styles.ov}>
+      <div className={styles.ov} data-w="ov">
+        {/* 테두리가 그려지는 모션용 선 — 모션이 꺼져 있으면 보이지 않고, 테두리는 box-shadow 가 그린다 */}
+        <svg className={styles.ovLine} aria-hidden="true">
+          <rect x="0.75" y="0.75" rx="19.25" pathLength={100} strokeDasharray="100 100" />
+        </svg>
         <div className={styles.ovH}>
-          <span className={styles.chip}>{open.tier[lang]}</span>
-          <span className={styles.won2}>{open.cost[lang]}</span>
+          <span className={styles.chip} data-w="text">{open.tier[lang]}</span>
+          <span className={styles.won2} data-w="text">{open.cost[lang]}</span>
           <span className={`${styles.chip} ${styles.chipAcc}`}>{dayOne.opened[lang]}</span>
         </div>
-        <p className={styles.ovt}>{open.title[lang]}</p>
+        <p className={styles.ovt} data-w="text">{open.title[lang]}</p>
         <ol className={styles.rows}>
           {dayOne.stops.map((stop) => (
-            <li key={stop.time} className={styles.row}>
+            <li key={stop.time} className={styles.row} data-w="row">
               {stop.icon === "photo" ? (
                 <span className={styles.thumb}>
                   <Thumb slot={open.photo} lang={lang} size="52px" />
@@ -136,7 +145,12 @@ function DayExample({ lang }: { lang: Lang }) {
               <div>
                 <span className={styles.tm}>{stop.time}</span>
                 <p className={styles.pl}>{stop.place[lang]}</p>
-                {stop.plan && <s>{stop.plan[lang]}</s>}
+                {/* 안쪽 span: 모션이 켜지면 빨간 줄을 이 span 의 배경으로 그어 나간다 */}
+                {stop.plan && (
+                  <s>
+                    <span>{stop.plan[lang]}</span>
+                  </s>
+                )}
                 <div className={styles.tip}>
                   <header>
                     <span>{tipLabel[lang]}</span>
@@ -151,7 +165,7 @@ function DayExample({ lang }: { lang: Lang }) {
 
       <ul className={styles.lks}>
         {locked.map((v) => (
-          <li key={v.title.ko} className={styles.lk}>
+          <li key={v.title.ko} className={styles.lk} data-w="lk">
             <span className={styles.thumb}>
               <Thumb slot={v.photo} lang={lang} size="44px" />
             </span>

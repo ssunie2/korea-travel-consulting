@@ -468,7 +468,9 @@
 .appHead .chip { margin-right: 8px; vertical-align: 3px; }
 .appHead b { font-size: 20px; font-weight: 800; letter-spacing: -0.035em; }
 .appHead .cnt { font-size: 13.5px; font-weight: 650; color: var(--ink-3); }
-.ov { margin-top: 14px; padding: 14px 16px 6px; border-radius: 20px; box-shadow: inset 0 0 0 1.5px var(--ink); }
+.ov { position: relative; margin-top: 14px; padding: 14px 16px 6px; border-radius: 20px; box-shadow: inset 0 0 0 1.5px var(--ink); }
+.ovLine { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; opacity: 0; }
+.ovLine rect { fill: none; stroke: var(--ink); stroke-width: 1.5; }
 .ovH { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .won2 { font-size: 14px; font-weight: 700; }
 .ovH .chipAcc { margin-left: auto; }
@@ -515,6 +517,40 @@
 .sk i:nth-of-type(1) { flex: 1.7; }
 .sk i:nth-of-type(2) { flex: 1; }
 .w3 { font-size: 13px; font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ── 샘플 구역 스크롤 모션 (써니 2026-11-14) ────────────────
+   SamplesMotion.tsx 가 구역에 .mvOn 을 붙이고 칸마다 값을 넣는다. .mvOn 이 없으면(스크립트 전 · 동작 줄이기) 모두 그대로.
+   --e 들어온 정도(0 → 1, 화면 가운데에서는 1) · --d 들어온 쪽(1 아래, -1 위) · --o 불투명도
+   --c 카드 가운데가 화면 가운데에서 떨어진 정도(-1 위 ~ 1 아래) · --depth 카드마다 다른 깊이
+   움직임은 translate · scale 속성으로 준다 — 마우스를 올렸을 때 쓰는 transform 과 겹쳐도 서로 지우지 않는다 */
+
+/* 사진 카드 — 사진 속 깊이 */
+.mvOn .sample {
+  opacity: var(--o, 1);
+  translate: 0 calc((1 - var(--e, 1)) * 28px * var(--d, 1) + var(--c, 0) * 18px * (var(--depth, 1) - 1));
+}
+.mvOn .sample img { scale: 1.3; translate: 0 calc(var(--c, 0) * -9% * var(--depth, 1)); }
+.mvOn .sampleTag { translate: 0 calc(var(--c, 0) * 12px * var(--depth, 1)); }
+.mvOn .s1 { scale: calc(1 + var(--c, 0) * var(--c, 0) * 0.03); }
+
+/* 1일차 예시 칸 — 초안이 써지듯 */
+.mvOn [data-w="text"] { opacity: var(--o, 1); translate: 0 calc((1 - var(--e, 1)) * 10px * var(--d, 1)); }
+.mvOn .ov { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ink) calc(var(--box, 1) * 100%), transparent); }
+.mvOn .ovLine { opacity: calc(1 - var(--box, 1)); }
+.mvOn .ovLine rect { stroke-dashoffset: calc(100 - var(--draw, 1) * 100); }
+.mvOn .ovH .chipAcc { scale: var(--pop, 1); opacity: min(1, calc(var(--pop, 1) * 2)); }
+.mvOn .row .tm { display: inline-block; }
+.mvOn .row .tm, .mvOn .row .pl { opacity: var(--o, 1); translate: calc((1 - var(--e, 1)) * 14px) 0; }
+.mvOn .row .ic, .mvOn .row .thumb { opacity: var(--o, 1); scale: calc(0.7 + 0.3 * var(--e, 1)); }
+.mvOn .row s { text-decoration-color: transparent; }
+.mvOn .row s span {
+  background: linear-gradient(var(--acc), var(--acc)) 0 58% / calc(var(--strike, 1) * 100%) 2px no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.mvOn .row .tip { transform-origin: 14px 0; opacity: var(--tipE, 1); scale: calc(0.86 + 0.14 * var(--tipE, 1)); }
+.mvOn .lk { opacity: var(--o, 1); translate: calc((1 - var(--e, 1)) * 36px) 0; }
+.mvOn .lk .sk i { transform-origin: left center; scale: var(--e, 1) 1; }
 
 /* ── 가격 ───────────────────────────────────────────── */
 .tPlan { grid-column: span 6; display: flex; flex-direction: column; padding: 34px 36px 36px; overflow: clip; } /* clip: 위와 같은 이유 */
