@@ -171,16 +171,23 @@ THIS IS A TEASER, NOT THE FULL PLAN. Follow these limits exactly:
   first-time visitor would get wrong. Make it specific and concrete, not generic advice.
   This one tip is what convinces them we know Korea. Make it count.
 - Name only ONE place to stay and ONE place to eat, names only, no explanation.
-- Give a cost estimate only, no breakdown. **Write BOTH per person AND the group total**,
+- Give a cost estimate only, no breakdown. ${input.travelers > 1
+    ? `**Write BOTH per person AND the group total**,
   in that order, in ${input.budgetCurrency}. The traveller told us their budget per person,
-  so a group-only number leaves them doing the division themselves.
+  so a group-only number leaves them doing the division themselves.`
+    : `They travel alone, so write ONE per-person number in ${input.budgetCurrency} — no group total.`}
 - Do NOT include: per-activity tips, alternative options, photo spots, what to wear,
   packing lists, or booking instructions. Those belong to the paid consultation.
 
 ${BOUNDARY}
 
-Write everything in ${languageName(input.language)}.
+Write everything in ${languageName(input.language)} — including "travel" and "totalEstimate".
+The English examples in this prompt only show the shape. Never copy their English words.${input.language === 'ko' ? `
+  (Korean: "지하철로 약 25분", "도보 10분", ${input.budgetCurrency === 'KRW'
+    ? (input.travelers > 1 ? '"1인 450,000원 · 2명 900,000원"' : '"1인 약 450,000원"')
+    : (input.travelers > 1 ? `"1인 320 ${input.budgetCurrency} · 2명 640 ${input.budgetCurrency}"` : `"1인 약 320 ${input.budgetCurrency}"`)})` : ''}
 Tone: warm, specific, confident. Never salesy.
+Never put the words "teaser", "draft", "sample" or "free" in the title or summary — the reader sees a trip, not our internal labels.
 
 Field notes:
 - summary: 2-3 sentences on how this trip will feel
@@ -189,8 +196,10 @@ Field notes:
 - sampleTip.highlight: the must-do, max 12 words
 - sampleTip.pitfall: a specific mistake first-timers make here
 - sampleTip.insiderSecret: something only a local would know
-- totalEstimate: one line, per person first then the group total
+- totalEstimate: ${input.travelers > 1
+    ? `one line, per person first then the group total
   (e.g. "450,000 KRW per person · 900,000 KRW for 2")`
+    : `one line, per person only (e.g. "about 320 USD per person")`}`
 }
 
 const place = {
