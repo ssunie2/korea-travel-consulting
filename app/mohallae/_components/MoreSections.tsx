@@ -197,8 +197,9 @@ export function LandingFooter({ lang }: { lang: Lang }) {
   return (
     <footer className={`${styles.wrap} ${styles.foot}`}>
       <p>
-        <Wordmark className={styles.footMark} />
-        <span>{footer.tagline}</span>
+        {/* 로고 크기는 머리줄 로고와 같다 (써니 2026-11-14) */}
+        <Wordmark className={styles.brandMark} />
+        <span className={styles.footTag}>{footer.tagline}</span>
       </p>
       <nav aria-label={lang === "ko" ? "꼬리말" : "Footer"}>
         <span>{footer.place[lang]}</span>
@@ -215,8 +216,9 @@ export function Footer({ lang }: { lang: Lang }) {
     <footer className="border-t border-[var(--m-line)]">
       <div className={`${base.wrap} flex flex-col gap-3 py-8 text-[13.5px] text-[var(--m-ink-3)] sm:flex-row sm:items-center sm:justify-between`}>
         <p className="flex items-baseline gap-3">
-          <Wordmark className="h-[17px] self-center" />
-          <span>{footer.tagline}</span>
+          {/* 로고 크기는 위 막대(SubHeader) 로고와 같다. 문구는 PC 에서는 위 막대 로고 옆에 있다 (써니 2026-11-14) */}
+          <Wordmark className="h-[24px] self-center md:h-[30px]" />
+          <span className="min-[1001px]:hidden">{footer.tagline}</span>
         </p>
         <p className="flex items-center gap-5">
           <span>{footer.place[lang]}</span>

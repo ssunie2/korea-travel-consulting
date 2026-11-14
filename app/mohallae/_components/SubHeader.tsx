@@ -1,6 +1,6 @@
 import Link from "next/link";
 import styles from "../mohallae.module.css";
-import { nav, planHref, withLang, type Lang } from "../content";
+import { footer, nav, planHref, withLang, type Lang } from "../content";
 import { LangSwitch } from "./Hero";
 import Wordmark from "./Wordmark";
 
@@ -22,12 +22,16 @@ export default function SubHeader({ lang, path }: { lang: Lang; path: string }) 
         className={`${styles.wrap} flex items-center justify-between gap-4 py-4 md:py-5`}
       >
         {/* 로고는 <a> — 첫 화면을 새로 불러와 모션이 처음부터 돈다 (써니 2026-11-14, Hero.tsx 와 같음) */}
-        <a
-          href={withLang("/mohallae", lang)}
-          className={`${link} md:ml-[10px]`}
-        >
-          <Wordmark className="h-[24px] md:h-[30px]" />
-        </a>
+        <div className="flex items-center gap-[14px]">
+          <a
+            href={withLang("/mohallae", lang)}
+            className={`${link} md:ml-[10px]`}
+          >
+            <Wordmark className="h-[24px] md:h-[30px]" />
+          </a>
+          {/* 로고 오른쪽 문구 — 랜딩 머리줄과 같게 PC 에서만 (써니 2026-11-14) */}
+          <span className="hidden text-[13.5px] font-medium text-[var(--m-ink-3)] min-[1001px]:inline">{footer.tagline}</span>
+        </div>
 
         <div className="flex items-center text-[13.5px] font-medium">
           <Link href={withLang("/mohallae", lang) + "#how"} className={`${link} hidden md:inline`}>

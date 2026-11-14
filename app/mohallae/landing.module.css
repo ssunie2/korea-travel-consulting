@@ -77,6 +77,14 @@
 .brandMark { height: 21px; }
 /* PC(1001px 이상)에서는 130% — 오른쪽 메뉴 칸과 무게를 맞춤 (써니 2026-11-13). 메뉴 칸보다 낮아서 머리줄 높이는 그대로 */
 @media (min-width: 1001px) { .brandMark { height: 27.3px; } }
+/* 로고 + 오른쪽 문구 '모할래? · what shall we do?' (써니 2026-11-14 꼬리말에서 옮김).
+   메뉴 칸까지 한 줄에 들어가는 PC 에서만 보인다. 좁은 화면에서는 꼬리말(.footTag)에 남는다 */
+.brandRow { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brandTag { display: none; font-size: 13.5px; font-weight: 500; color: var(--ink-3); white-space: nowrap; letter-spacing: -0.01em; }
+@media (min-width: 1001px) {
+  .brandTag { display: inline; }
+  .footTag { display: none; }
+}
 .links {
   display: flex;
   align-items: center;
@@ -646,7 +654,6 @@
 .foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 34px 0 46px; font-size: 13.5px; color: var(--ink-3); }
 .foot p { margin: 0; display: flex; align-items: center; gap: 10px; }
 .foot p b { color: var(--ink); font-size: 17px; letter-spacing: -0.03em; }
-.footMark { height: 16px; }
 .foot nav { display: flex; flex-wrap: wrap; gap: 20px; }
 
 /* ── 좁은 화면 ─────────────────────────────────────── */

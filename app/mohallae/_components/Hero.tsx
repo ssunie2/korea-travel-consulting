@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import base from "../mohallae.module.css";
 import styles from "../landing.module.css";
-import { commonPlan, dayOne, dayPrice, hero, nav, planHref, tipLabel, withLang, type Lang } from "../content";
+import { commonPlan, dayOne, dayPrice, footer, hero, nav, planHref, tipLabel, withLang, type Lang } from "../content";
 import { photo } from "../photos";
 import Wordmark from "./Wordmark";
 
@@ -21,9 +21,14 @@ export default function Hero({ lang }: { lang: Lang }) {
             o 에 다람쥐 귀 · 눈을 넣음 — 인트로 모션은 뺌 (써니 2026-11-13)
             로고는 <a> — 누르면 첫 화면을 새로 불러와서 맨 위부터, 잠금화면 모션도 처음부터 다시 돈다 (써니 2026-11-14).
             Link 로 두면 같은 화면이라 아무 일도 안 일어난다 */}
-        <a href={withLang("/mohallae", lang)} className={styles.brand}>
-          <Wordmark className={styles.brandMark} />
-        </a>
+        {/* 로고 오른쪽 문구 — 꼬리말에서 옮김 (써니 2026-11-14). 한 줄에 다 들어가는 PC 에서만 보이고,
+            좁은 화면에서는 꼬리말에 그대로 남는다 */}
+        <div className={styles.brandRow}>
+          <a href={withLang("/mohallae", lang)} className={styles.brand}>
+            <Wordmark className={styles.brandMark} />
+          </a>
+          <span className={styles.brandTag}>{footer.tagline}</span>
+        </div>
         <div className={styles.links}>
           <a href="#how">{nav.how[lang]}</a>
           <a href="#samples">{nav.samples[lang]}</a>
