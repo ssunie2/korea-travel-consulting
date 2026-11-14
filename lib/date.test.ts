@@ -1,7 +1,7 @@
 // 실행: npm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { dayLabel, dateRange } from './date.ts'
+import { dayLabel, dateRange, todayKey } from './date.ts'
 import { LANG } from './copy.ts'
 
 /**
@@ -64,5 +64,21 @@ test('시간대가 달라도 날짜가 안 밀린다', () => {
     process.env.TZ = tz
     assert.equal(dayLabel('2026-10-04', 1), 한국어 ? '10월 4일 (일)' : 'Oct 4, Sun', `${tz} 에서 밀림`)
   }
+  process.env.TZ = 원래
+})
+
+/**
+ * 위 함수들과 반대다. 여행 날짜는 시간대가 달라도 안 밀려야 하지만,
+ * **오늘은 시간대를 따라가야** 한다 (이슈 #83).
+ */
+test('오늘은 손님이 보는 달력을 따라간다 (세계표준시가 아니라)', () => {
+  const 원래 = process.env.TZ
+  // 같은 순간이지만 나라마다 날짜가 다르다.
+  // 세계표준시 9월 20일 16:57 = 서울 9월 21일 새벽 1시 57분 = 뉴욕 9월 20일 낮 12시 57분
+  const 그때 = new Date('2026-09-20T16:57:00Z')
+  process.env.TZ = 'Asia/Seoul'
+  assert.equal(todayKey(그때), '2026-09-21', '서울 손님에게는 21일이다')
+  process.env.TZ = 'America/New_York'
+  assert.equal(todayKey(그때), '2026-09-20', '뉴욕 손님에게는 아직 20일이다')
   process.env.TZ = 원래
 })
