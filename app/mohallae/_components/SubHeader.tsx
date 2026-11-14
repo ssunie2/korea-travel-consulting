@@ -30,7 +30,7 @@ export default function SubHeader({ lang, path }: { lang: Lang; path: string }) 
             <Wordmark className="h-[24px] md:h-[30px]" />
           </a>
           {/* 로고 오른쪽 문구 — 랜딩 머리줄과 같게 PC 에서만 (써니 2026-11-14) */}
-          <span className="hidden text-[13.5px] font-medium text-[var(--m-ink-3)] min-[1001px]:inline">{footer.tagline}</span>
+          <span className="hidden -translate-y-px text-[13.5px] font-medium text-[var(--m-ink-3)] min-[1001px]:inline-block">{footer.tagline}</span>
         </div>
 
         <div className="flex items-center text-[13.5px] font-medium">
