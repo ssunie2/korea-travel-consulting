@@ -162,7 +162,7 @@ export function HowItWorks({ lang }: { lang: Lang }) {
               <span className={styles.icon} aria-hidden="true">
                 {i + 1}
               </span>
-              <span>MOHALLAE</span>
+              {/* 숫자 옆 'MOHALLAE' 는 뺐다 (써니 2026-11-15) — 숫자 왼쪽, 짧은 꼬리표 오른쪽만 남긴다 */}
               <span>{s.tag[lang]}</span>
             </header>
             <h3>{s.title[lang]}</h3>
