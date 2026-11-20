@@ -46,13 +46,18 @@ export default async function RefundPage({ searchParams }: PageProps<"/mohallae/
         {CONTACT_EMAIL}
       </a>
     ),
-    // 한 줄에 하나씩 (써니 2026-11-20 "점 기준으로 밑줄로 내려줘")
-    "{가격}": plans.days.ladder[lang].map((line, i) => (
-      <Fragment key={i}>
-        {i > 0 && <br />}
-        {line}
-      </Fragment>
-    )),
+    // 한 줄에 하나씩 (써니 2026-11-20 "점 기준으로 밑줄로 내려줘").
+    // 첫 줄은 값($…) 바로 앞에 priceNote 를 넣는다: '첫 번째 날 $25' → '첫 번째 날(하루 값) $25'
+    "{가격}": plans.days.ladder[lang].map((line, i) => {
+      const at = line.indexOf(" $");
+      const text = i === 0 && t.priceNote && at > 0 ? `${line.slice(0, at)}${t.priceNote}${line.slice(at)}` : line;
+      return (
+        <Fragment key={i}>
+          {i > 0 && <br />}
+          {text}
+        </Fragment>
+      );
+    }),
   };
   const say = (s: string) => <Inline text={s} fill={fill} />;
 

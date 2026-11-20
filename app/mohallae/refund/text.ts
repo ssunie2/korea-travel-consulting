@@ -15,6 +15,8 @@ export type RefundText = {
   description: string;
   /** 제목 아래 한 줄 요약 */
   intro: string;
+  /** {가격} 첫 줄의 '첫 번째 날' 바로 뒤에 붙는 말 — 예: (하루 값) → '첫 번째 날(하루 값) $25'. 없으면 안 붙는다 */
+  priceNote?: string;
   /** id 는 주소 # 자리 이름이라 한국어 · 영어가 같아야 한다 */
   sections: { id: string; title: string; body: Block[] }[];
 };
