@@ -205,6 +205,7 @@ export function LandingFooter({ lang }: { lang: Lang }) {
         <span>{footer.place[lang]}</span>
         <Link href={withLang("/mohallae/faq", lang)}>{footer.faq[lang]}</Link>
         <Link href={withLang("/mohallae/privacy", lang)}>{footer.privacy[lang]}</Link>
+        <Link href={withLang("/mohallae/refund", lang)}>{footer.refund[lang]}</Link>
       </nav>
     </footer>
   );
@@ -220,13 +221,17 @@ export function Footer({ lang }: { lang: Lang }) {
           <Wordmark className="h-[24px] self-center md:h-[30px]" />
           <span className="min-[1001px]:hidden">{footer.tagline}</span>
         </p>
-        <p className="flex items-center gap-5">
+        {/* 네 칸이라 좁은 폰에서는 다음 줄로 넘어가게 둔다 */}
+        <p className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <span>{footer.place[lang]}</span>
           <Link href={withLang("/mohallae/faq", lang)} className={base.textLink}>
             {footer.faq[lang]}
           </Link>
           <Link href={withLang("/mohallae/privacy", lang)} className={base.textLink}>
             {footer.privacy[lang]}
+          </Link>
+          <Link href={withLang("/mohallae/refund", lang)} className={base.textLink}>
+            {footer.refund[lang]}
           </Link>
         </p>
       </div>

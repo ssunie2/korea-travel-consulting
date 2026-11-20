@@ -397,4 +397,12 @@ export const footer = {
   place: { ko: "대한민국 서울", en: "Seoul, Korea" },
   faq: { ko: "자주 묻는 것", en: "Questions" },
   privacy: { ko: "개인정보 처리방침", en: "Privacy" },
+  refund: { ko: "취소·환불", en: "Refunds" },
 };
+
+/**
+ * 손님이 메일을 보낼 주소 — 개인정보 처리방침 · 취소·환불 규정이 같이 쓴다.
+ * TODO(출시 전): 새 도메인 메일로 바꾼다 (써니 2026-11-20 "새 도메인 메일로"). 지금은 가짜 주소라 메일이 도착하지 않는다.
+ * **이 값이 가짜인 동안은 환불 화면을 실제 사이트에 올리지 않는다** — 환불 요청이 아무 데도 안 간다.
+ */
+export const CONTACT_EMAIL = "hello@example.com";

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import styles from "../mohallae.module.css";
-import { langFrom, type Lang, type Pair } from "../content";
+import { CONTACT_EMAIL, langFrom, type Lang, type Pair } from "../content";
 import SubHeader from "../_components/SubHeader";
 import { Footer } from "../_components/MoreSections";
 
@@ -16,8 +16,8 @@ import { Footer } from "../_components/MoreSections";
  */
 
 // TODO(출시 전): 사업자등록이 끝나면 상호·대표자·사업자등록번호·주소를 채운다.
-// TODO(출시 전): CONTACT 를 실제 이메일로 바꾼다. 지금은 placeholder라 문의가 도착하지 않는다.
-const CONTACT = "hello@example.com";
+// 메일 주소는 content.ts 의 CONTACT_EMAIL 한 곳에서 바꾼다 (취소·환불 규정과 같이 쓴다)
+const CONTACT = CONTACT_EMAIL;
 const UPDATED = "12 August 2026";
 
 const TITLE: Pair<string> = { ko: "개인정보 처리방침", en: "Privacy Policy" };
