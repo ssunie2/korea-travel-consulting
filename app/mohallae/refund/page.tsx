@@ -123,6 +123,8 @@ function BlockView({ block, say }: { block: Block; say: (s: string) => ReactNode
 
 /**
  * 글을 그린다. \n 은 줄 바꿈, **굵게** 는 굵은 글씨, {메일} · {가격} 은 fill 에 있는 것으로 바꾼다.
+ * '.' 으로 끝난 문장 뒤는 저절로 줄을 바꾼다 (써니 2026-11-20 ". 으로 끝나는 문장도 내려줘") —
+ * 마침표 뒤에 띄어쓰기가 있을 때만이라 $2.5 같은 숫자는 그대로다. 굵은 글씨가 마침표로 끝나도(…다.**) 같다.
  * 짝이 안 맞는 ** 나 모르는 {…} 는 글자 그대로 둔다 — 고치다 실수해도 화면이 깨지지 않게.
  */
 function Inline({ text, fill }: { text: string; fill: Record<string, ReactNode> }) {
@@ -140,7 +142,7 @@ function Inline({ text, fill }: { text: string; fill: Record<string, ReactNode> 
     );
   return (
     <>
-      {text.split("\n").map((s, i) => (
+      {text.replace(/\.(\*\*)? +(?=\S)/g, ".$1\n").split("\n").map((s, i) => (
         <Fragment key={i}>
           {i > 0 && <br />}
           {line(s)}
