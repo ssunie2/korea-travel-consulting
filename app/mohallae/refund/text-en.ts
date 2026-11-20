@@ -5,7 +5,7 @@ import type { RefundText } from "./text";
  * 한국어 글과 절(section)의 순서 · id 를 똑같이 맞춰 주세요.
  *
  *   "글" → 문단 · ["글", "글"] → 점 목록 · { note: "글" } → 회색 상자
- *   **굵게** · {메일} → 연락 메일 · {가격} → 하루 값
+ *   **굵게** · \n → 줄 바꿈 · {메일} → 연락 메일 · {가격} → 하루 값(한 줄에 하나씩)
  */
 const en: RefundText = {
   updated: "20 November 2026",
@@ -20,7 +20,7 @@ const en: RefundText = {
       title: "1. What you're buying",
       body: [
         "A travel information document our program writes from your answers. Nothing ships to you — you open it at a link. Each day has several plans, and you open only the days you choose.",
-        "**Price per day: {가격}**",
+        "**Price per day**\n**{가격}**",
         [
           "As soon as your payment goes through, the days you chose open.",
           "Before you pay, you can see one Day 1 plan in full, free — so you know what you are getting first.",
@@ -33,8 +33,8 @@ const en: RefundText = {
       title: "2. When you get all of it back",
       body: [
         [
-          "**Your payment went through but your days did not open** — if the document never got made, or will not open, you get all of it back.",
-          "**You were charged twice for the same order** — we refund the extra charge in full.",
+          "**Your payment went through but your days did not open**\nIf the document never got made, or will not open, you get all of it back.",
+          "**You were charged twice for the same order**\nWe refund the extra charge in full.",
         ],
       ],
     },

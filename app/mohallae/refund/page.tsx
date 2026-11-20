@@ -46,7 +46,13 @@ export default async function RefundPage({ searchParams }: PageProps<"/mohallae/
         {CONTACT_EMAIL}
       </a>
     ),
-    "{가격}": plans.days.ladder[lang].join(" · "),
+    // 한 줄에 하나씩 (써니 2026-11-20 "점 기준으로 밑줄로 내려줘")
+    "{가격}": plans.days.ladder[lang].map((line, i) => (
+      <Fragment key={i}>
+        {i > 0 && <br />}
+        {line}
+      </Fragment>
+    )),
   };
   const say = (s: string) => <Inline text={s} fill={fill} />;
 
@@ -111,23 +117,30 @@ function BlockView({ block, say }: { block: Block; say: (s: string) => ReactNode
 }
 
 /**
- * 글 한 줄을 그린다. **굵게** 는 굵은 글씨로, {메일} · {가격} 은 fill 에 있는 것으로 바꾼다.
+ * 글을 그린다. \n 은 줄 바꿈, **굵게** 는 굵은 글씨, {메일} · {가격} 은 fill 에 있는 것으로 바꾼다.
  * 짝이 안 맞는 ** 나 모르는 {…} 는 글자 그대로 둔다 — 고치다 실수해도 화면이 깨지지 않게.
  */
 function Inline({ text, fill }: { text: string; fill: Record<string, ReactNode> }) {
   const withFill = (s: string) =>
     s.split(/(\{[^{}]+\})/).map((part, i) => <Fragment key={i}>{part in fill ? fill[part] : part}</Fragment>);
+  const line = (s: string) =>
+    s.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
+      part.startsWith("**") && part.endsWith("**") && part.length > 4 ? (
+        <strong key={i} className="font-semibold text-[var(--m-ink)]">
+          {withFill(part.slice(2, -2))}
+        </strong>
+      ) : (
+        <Fragment key={i}>{withFill(part)}</Fragment>
+      ),
+    );
   return (
     <>
-      {text.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
-        part.startsWith("**") && part.endsWith("**") && part.length > 4 ? (
-          <strong key={i} className="font-semibold text-[var(--m-ink)]">
-            {withFill(part.slice(2, -2))}
-          </strong>
-        ) : (
-          <Fragment key={i}>{withFill(part)}</Fragment>
-        ),
-      )}
+      {text.split("\n").map((s, i) => (
+        <Fragment key={i}>
+          {i > 0 && <br />}
+          {line(s)}
+        </Fragment>
+      ))}
     </>
   );
 }
